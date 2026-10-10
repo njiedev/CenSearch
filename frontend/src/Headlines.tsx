@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 
 // Real headlines about covert filming, shown as clippings over the photo grid.
+// Not mounted for now; add <Headlines /> after <PhotoGrid /> in App to bring
+// it back.
 // Kickers and bylines are only what the source screenshots showed.
 type Article = {
   style: 'cbs' | 'business' | 'feature'
