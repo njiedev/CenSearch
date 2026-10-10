@@ -181,11 +181,30 @@ body {
   margin: 0;
   font-family: Futura, 'Futura PT', 'Futura Std', Jost, 'Century Gothic', 'Trebuchet MS', sans-serif;
   font-weight: 700;
-  font-size: clamp(2.5rem, 14vw, 16rem);
+  font-size: clamp(2.5rem, 12.5vw, 15rem);
   line-height: 1;
   letter-spacing: 0.02em;
   white-space: nowrap;
   text-shadow: 0 0 80px rgb(0 0 0 / 0.9);
+}
+
+.logo-eye {
+  height: 0.72em;
+  width: 1.2em;
+  margin: 0 0.03em;
+  overflow: visible;
+  filter: drop-shadow(0 0 40px rgb(0 0 0 / 0.9));
+}
+
+.logo-eye path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 13;
+  stroke-linejoin: round;
+}
+
+.logo-eye circle {
+  fill: currentColor;
 }
 
 
@@ -294,7 +313,7 @@ body {
   outline-offset: 2px;
 }
 
-@media (max-width: 839px) {
+@media (max-width: 1023px) {
   .nav-links,
   .nav-talk {
     display: none;
@@ -332,14 +351,9 @@ body {
   aspect-ratio: 16 / 9;
   padding: calc(var(--vf-inset) + 24px);
   overflow: hidden;
-  background:
-    /* faint light streaks bleeding in from the edges */
-    linear-gradient(to right, rgb(124 58 237 / 0.18), transparent 22%, transparent 78%, rgb(124 58 237 / 0.12)),
-    #050208;
-  border: 1px solid #1e1530;
-  box-shadow:
-    inset 0 0 80px rgb(124 58 237 / 0.18),
-    0 24px 80px rgb(0 0 0 / 0.7);
+  background: #050505;
+  border: 1px solid #1c1c1f;
+  box-shadow: 0 24px 80px rgb(0 0 0 / 0.7);
   color: var(--vf-line);
   font-family: var(--mono);
 }
@@ -388,8 +402,9 @@ body {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  font: clamp(14px, 1.6vw, 20px) / 1 var(--pixel);
+  font: clamp(13px, 1.4vw, 18px) / 1.2 var(--pixel);
   letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .vf-rec {
@@ -399,7 +414,14 @@ body {
   color: #fff;
 }
 
+@media (min-width: 1024px) {
+  .vf-rec {
+    white-space: nowrap;
+  }
+}
+
 .vf-rec-dot {
+  flex-shrink: 0;
   width: 0.9em;
   height: 0.9em;
   border-radius: 50%;
@@ -436,10 +458,22 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
-.vf-copy {
-  align-self: center;
-  max-width: 48ch;
+.vf-main {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 32px;
   padding: 24px 0;
+}
+
+.vf-copy {
+  max-width: 48ch;
+}
+
+.vf-eye {
+  width: clamp(120px, 20vw, 240px);
+  height: auto;
+  margin-right: clamp(0px, 4vw, 48px);
 }
 
 .vf-heading {
@@ -483,6 +517,27 @@ body {
   .viewfinder {
     aspect-ratio: auto;
     min-height: 70svh;
+  }
+
+  /* The long REC label takes the first row; the clock drops below it. */
+  .vf-top {
+    grid-template-columns: 1fr auto;
+    row-gap: 12px;
+  }
+
+  .vf-top time {
+    grid-row: 2;
+    justify-self: start;
+  }
+
+  .vf-main {
+    grid-template-columns: 1fr;
+  }
+
+  .vf-eye {
+    grid-row: 1;
+    justify-self: center;
+    margin: 0;
   }
 }
 

@@ -46,8 +46,10 @@ contact.
   locally.
 - **Details:**
   - The nav logo is a purple snake eye whose pupil follows your cursor.
+  - The wordmark draws the A in CENSEARCH as an eye.
   - "About" is a camera viewfinder over a blurred feed, with corner
-    brackets, a blinking REC light, a live clock and a running timecode.
+    brackets, a blinking "Recording without your permission" light, a live
+    clock, a running timecode, and a large snake eye that tracks the cursor.
   - Its copy types itself out in a monospace font.
 - **Restraint:** motion is ambient and sparse. It should make the site feel
   alive without getting in the way of the task.

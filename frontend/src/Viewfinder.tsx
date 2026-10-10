@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import SnakeEye from './SnakeEye'
 
 const HEADING = 'About Us'
 const BODY = "We search the web for your face and send deletion requests wherever they're needed."
@@ -118,24 +119,27 @@ export default function Viewfinder() {
       <div className="vf-hud vf-top" aria-hidden="true">
         <span className="vf-rec">
           <span className="vf-rec-dot" />
-          REC
+          Recording without your permission
         </span>
         <Clock />
         <Battery />
       </div>
 
-      <div className="vf-copy">
-        {/* Screen readers get the full text; the typed copy is visual only. */}
-        <h2 className="visually-hidden">{HEADING}</h2>
-        <p className="visually-hidden">{BODY}</p>
-        <p className="vf-heading" aria-hidden="true">
-          {typed.heading}
-          {typed.onHeading && caret}
-        </p>
-        <p className="vf-body" aria-hidden="true">
-          {typed.body}
-          {!typed.onHeading && caret}
-        </p>
+      <div className="vf-main">
+        <div className="vf-copy">
+          {/* Screen readers get the full text; the typed copy is visual only. */}
+          <h2 className="visually-hidden">{HEADING}</h2>
+          <p className="visually-hidden">{BODY}</p>
+          <p className="vf-heading" aria-hidden="true">
+            {typed.heading}
+            {typed.onHeading && caret}
+          </p>
+          <p className="vf-body" aria-hidden="true">
+            {typed.body}
+            {!typed.onHeading && caret}
+          </p>
+        </div>
+        <SnakeEye className="vf-eye" track />
       </div>
 
       <div className="vf-hud vf-bottom" aria-hidden="true">
