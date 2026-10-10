@@ -1,38 +1,85 @@
 import { useId, useState } from 'react'
 
-// The eye's top edge is the upper lid: a curve from corner to corner whose
-// control point sets how open it is. The bottom edge never moves.
-const OPEN = 30 // half open: a flat lid over the top of the pupil
-const SHUT = 86 // same as the bottom curve, so the eye becomes one line
+// The eye outline never changes. Inside it, the upper lid is a curve from
+// corner to corner; its control point sets how open the eye is. The pupil is
+// clipped to the area below the lid.
+const OUTLINE = 'M9 36 Q60 -14 111 36 Q60 86 9 36 Z'
 
-function eye(lid: number) {
+const WIDE = -14 // lid tucked into the top of the outline
+const OPEN = 4
+const HALF = 30
+const SQUINT = 50
+const SHUT = 86 // lid lies on the bottom curve
+
+function lidLine(lid: number) {
+  return `M9 36 Q60 ${lid} 111 36`
+}
+
+function visible(lid: number) {
   return `M9 36 Q60 ${lid} 111 36 Q60 86 9 36 Z`
 }
 
-// A slow close and reopen, then a quick blink later on. 8s per loop.
-const FRAMES = [OPEN, OPEN, SHUT, SHUT, OPEN, OPEN, SHUT, OPEN, OPEN]
-const TIMES = [0, 0.38, 0.46, 0.5, 0.58, 0.84, 0.87, 0.9, 1]
-const VALUES = FRAMES.map(eye).join(';')
-const KEY_TIMES = TIMES.join(';')
-const SPLINES = Array(FRAMES.length - 1).fill('0.42 0 0.58 1').join(';')
+// Lid and pupil loop at different lengths, so together they rarely repeat.
+const LID_SECONDS = 13
+const LID: [number, number][] = [
+  [0, HALF],
+  [0.15, HALF],
+  [0.21, OPEN],
+  [0.38, OPEN],
+  [0.44, HALF],
+  [0.54, HALF],
+  [0.57, SHUT],
+  [0.6, HALF],
+  [0.68, SQUINT],
+  [0.8, SQUINT],
+  [0.84, WIDE],
+  [0.88, WIDE],
+  [0.93, HALF],
+  [1, HALF],
+]
 
-function Lid() {
+const PUPIL_SECONDS = 11
+const CENTER = 60
+const PUPIL: [number, number][] = [
+  [0, CENTER],
+  [0.2, CENTER],
+  [0.24, 44], // look left
+  [0.4, 44],
+  [0.44, CENTER],
+  [0.6, CENTER],
+  [0.64, 76], // look right
+  [0.8, 76],
+  [0.84, CENTER],
+  [1, CENTER],
+]
+
+function Animate({
+  attribute,
+  seconds,
+  frames,
+  format,
+}: {
+  attribute: string
+  seconds: number
+  frames: [number, number][]
+  format: (value: number) => string
+}) {
   return (
     <animate
-      attributeName="d"
-      dur="8s"
+      attributeName={attribute}
+      dur={`${seconds}s`}
       repeatCount="indefinite"
       calcMode="spline"
-      values={VALUES}
-      keyTimes={KEY_TIMES}
-      keySplines={SPLINES}
+      keyTimes={frames.map(([time]) => time).join(';')}
+      values={frames.map(([, value]) => format(value)).join(';')}
+      keySplines={Array(frames.length - 1).fill('0.42 0 0.58 1').join(';')}
     />
   )
 }
 
-// The wordmark: CENSEARCH with the A drawn as a half-open eye whose lid
-// closes and reopens. Futura Bold comes from the system (it ships with
-// macOS); see the fallback stack in index.css.
+// The wordmark: CENSEARCH with the A drawn as an eye that opens by different
+// amounts, blinks, and glances left and right. Futura Bold comes from the
+// system (it ships with macOS); see the fallback stack in index.css.
 export default function Logo() {
   const clipId = `${useId()}-eye`
   const [still] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
@@ -42,12 +89,17 @@ export default function Logo() {
       <span aria-hidden="true">CENSE</span>
       <svg className="logo-eye" viewBox="0 0 120 72" aria-hidden="true">
         <clipPath id={clipId}>
-          <path d={eye(OPEN)}>{!still && <Lid />}</path>
+          <path d={visible(HALF)}>
+            {!still && <Animate attribute="d" seconds={LID_SECONDS} frames={LID} format={visible} />}
+          </path>
         </clipPath>
-        <circle className="logo-pupil" cx="60" cy="40" r="12" clipPath={`url(#${clipId})`} />
-        <path className="logo-outline" d={eye(OPEN)}>
-          {!still && <Lid />}
+        <circle className="logo-pupil" cx={CENTER} cy="40" r="12" clipPath={`url(#${clipId})`}>
+          {!still && <Animate attribute="cx" seconds={PUPIL_SECONDS} frames={PUPIL} format={String} />}
+        </circle>
+        <path className="logo-lid" d={lidLine(HALF)}>
+          {!still && <Animate attribute="d" seconds={LID_SECONDS} frames={LID} format={lidLine} />}
         </path>
+        <path className="logo-outline" d={OUTLINE} />
       </svg>
       <span aria-hidden="true">RCH</span>
     </h1>

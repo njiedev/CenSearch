@@ -196,11 +196,20 @@ body {
   filter: drop-shadow(0 0 40px rgb(0 0 0 / 0.9));
 }
 
-.logo-outline {
+.logo-outline,
+.logo-lid {
   fill: none;
   stroke: currentColor;
-  stroke-width: 13;
   stroke-linejoin: round;
+}
+
+.logo-outline {
+  stroke-width: 13;
+}
+
+.logo-lid {
+  stroke-width: 9;
+  stroke-linecap: round;
 }
 
 .logo-pupil {

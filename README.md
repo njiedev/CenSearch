@@ -47,8 +47,8 @@ contact.
 - **Details:**
   - The nav logo is a pixel-art purple snake eye. Its slit pupil follows your
     cursor in whole art-pixel steps.
-  - The wordmark draws the A in CENSEARCH as a half-open eye whose lid
-    slowly closes and reopens.
+  - The wordmark draws the A in CENSEARCH as an eye with an eyelid. It
+    opens by different amounts, blinks, and glances left and right.
   - "About" is a camera viewfinder drawn straight over the blurred feed, with corner
     brackets, a blinking "Recording without your permission" light, a live
     clock, a running timecode, and a large snake eye that tracks the cursor.
