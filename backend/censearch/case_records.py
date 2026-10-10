@@ -71,3 +71,28 @@ class Delivery(Base):
     sent_at: Mapped[str]
     deadline: Mapped[str]
     processed: Mapped[bool] = mapped_column(default=False)
+
+
+class Batch(Base):
+    __tablename__ = "batches"
+    id: Mapped[str] = mapped_column(primary_key=True)
+    accepted_by: Mapped[str]
+    accepted_at: Mapped[str]
+    accepted_warning: Mapped[bool]
+    warning: Mapped[str]
+    contact: Mapped[dict] = mapped_column(JSON)
+    status: Mapped[str] = mapped_column(default="queued")
+    finished_at: Mapped[str | None]
+
+
+class BatchItem(Base):
+    __tablename__ = "batch_items"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    batch_id: Mapped[str] = mapped_column(ForeignKey("batches.id", ondelete="CASCADE"))
+    case_id: Mapped[int] = mapped_column(ForeignKey("cases.id", ondelete="CASCADE"))
+    status: Mapped[str] = mapped_column(default="queued")
+    reason: Mapped[str] = mapped_column(default="Waiting for review")
+    decision: Mapped[dict] = mapped_column(JSON, default=dict)
+    recipient: Mapped[dict] = mapped_column(JSON, default=dict)
+    notice_id: Mapped[int | None] = mapped_column(ForeignKey("notices.id", ondelete="SET NULL"))
+    delivery_id: Mapped[int | None] = mapped_column(ForeignKey("deliveries.id", ondelete="SET NULL"))

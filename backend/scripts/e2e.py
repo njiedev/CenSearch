@@ -101,7 +101,8 @@ def browser_flow(base, person, output):
             errors = []
             page.on("pageerror", lambda error: errors.append(str(error)))
             page.goto(base, wait_until="networkidle")
-            expect(page.get_by_text("Face models: loaded", exact=False)).to_be_visible()
+            expect(page.get_by_test_id("health-summary")).to_contain_text("Face models: loaded")
+            page.get_by_role("button", name="Enrol", exact=True).click()
             page.get_by_label("Name", exact=True).fill("Browser fixture")
             page.get_by_label("Consent statement").fill(
                 "Local fixture for browser acceptance; no real consent claim"

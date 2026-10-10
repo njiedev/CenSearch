@@ -185,7 +185,7 @@ class Workflow:
             self.event(session, case_id, "recipients_researched", **result)
         return result
 
-    async def approve_draft(self, case_id, request):
+    async def approve_draft(self, case_id, request, authorization=None):
         with self.store.session.begin() as session:
             case, state = self.context(session, case_id)
             if request.revision != state.revision or not state.decision:
@@ -203,7 +203,11 @@ class Workflow:
                     at=self.now(),
                 )
             )
-            self.event(session, case_id, "draft_preparation_approved", **request.model_dump())
+            self.event(
+                session, case_id,
+                "batch_preparation_authorized" if authorization else "draft_preparation_approved",
+                **request.model_dump(), authorization=authorization,
+            )
         return self.view(case_id)
 
     async def draft(self, case_id, request):
@@ -289,7 +293,7 @@ class Workflow:
             )
             return record(notice)
 
-    async def approve_notice(self, case_id, request):
+    async def approve_notice(self, case_id, request, authorization=None):
         with self.store.session.begin() as session:
             _, state = self.context(session, case_id)
             notice = session.get(Notice, request.notice_id)
@@ -311,7 +315,8 @@ class Workflow:
             self.event(
                 session,
                 case_id,
-                "exact_notice_approved",
+                "batch_notice_authorized" if authorization else "exact_notice_approved",
+                authorization=authorization,
                 notice_id=notice.id,
                 sha256=notice.sha256,
                 approved_by=request.approved_by,

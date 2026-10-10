@@ -105,6 +105,8 @@ class CaseResponse(BaseModel):
     deliveries: list[dict[str, Any]]
     verification_checks: list[dict[str, Any]]
     matched_image_url: str
+    possible_action: dict[str, Any]
+    batch_outcome: dict[str, Any] | None
 
 
 class ProbeResponse(BaseModel):

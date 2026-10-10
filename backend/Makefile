@@ -2,7 +2,7 @@ PHOTOS ?= /Users/mnjie/Desktop/projects/hackathon testing bs/likeness-guard/seed
 API_PORT ?= 8490
 BASE_PORT ?= 9111
 
-.PHONY: setup test api mock seed demo e2e e2e-round2 ui
+.PHONY: setup test api mock seed demo e2e e2e-round2 e2e-round3 ui
 
 setup:
 	uv sync --frozen
@@ -33,3 +33,6 @@ ui:
 
 e2e-round2:
 	uv run python scripts/e2e_round2.py --photos "$(PHOTOS)" --api-port $(API_PORT) --base-port $(BASE_PORT) --browser
+
+e2e-round3:
+	uv run python scripts/e2e_round3.py --photos "$(PHOTOS)" --api-port $(API_PORT) --base-port $(BASE_PORT) --browser

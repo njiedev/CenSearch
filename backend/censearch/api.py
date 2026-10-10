@@ -14,6 +14,7 @@ from PIL import Image
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select, text
 from censearch.agent.probe import Probe
+from censearch.batches import Batches, case_summary
 from censearch.config import ROOT, Settings
 from censearch.copy_detect import VERSION
 from censearch.crawl import Crawler, validate_url
@@ -68,6 +69,8 @@ def create_app(settings=None):
         app.state.evidence = EvidenceStore(settings)
         app.state.probe = Probe(settings)
         app.state.workflow = Workflow(store, settings, app.state.evidence)
+        app.state.batches = Batches(app.state.workflow)
+        app.state.batches.recover()
         # Interrupted jobs cannot keep claiming to run after a process restart.
         with store.session.begin() as session:
             for run in session.scalars(select(CrawlRun).where(CrawlRun.status.in_(("queued", "running")))):
@@ -171,7 +174,7 @@ def create_app(settings=None):
             row = session.get(Case, case_id)
             if row is None:
                 raise HTTPException(404, "Case not found")
-            return record(row) | {"matched_image_url": f"/api/cases/{case_id}/image"}
+            return case_summary(session, row)
 
     @app.get("/api/health", response_model=HealthResponse)
     def health():
@@ -344,7 +347,7 @@ def create_app(settings=None):
             statement = statement.join(Scan).where(Scan.run_id == run_id)
         with app.state.store.session() as session:
             return [
-                record(row) | {"matched_image_url": f"/api/cases/{row.id}/image"}
+                case_summary(session, row)
                 for row in session.scalars(statement.order_by(Case.id))
             ]
 

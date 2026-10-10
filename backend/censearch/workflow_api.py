@@ -1,5 +1,6 @@
 """Typed workflow request contracts; all mutating operations serialize with scheduler ticks."""
 
+import asyncio
 from typing import Literal
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
@@ -65,6 +66,13 @@ class AdvanceRequest(Strict):
     seconds: int = Field(gt=0, le=31536000)
 
 
+class BatchRequest(Strict):
+    case_ids: list[int] = Field(min_length=1)
+    contact: Contact
+    accepted_by: str = Field(min_length=1, max_length=300, pattern=r".*\S.*")
+    accepted_warning: bool = False
+
+
 def install(app):
     router = APIRouter(prefix="/api")
 
@@ -82,6 +90,43 @@ def install(app):
                 raise HTTPException(422, str(error)) from error
             finally:
                 app.state.busy = False
+
+    @router.get("/batches/warning")
+    async def batch_warning() -> dict:
+        from censearch.batches import WARNING
+        return {"warning": WARNING}
+
+    @router.post("/batches", status_code=202)
+    async def create_batch(request: BatchRequest) -> dict:
+        if app.state.busy:
+            raise HTTPException(409, "Another operation is in progress")
+        async with app.state.workflow.lock:
+            try:
+                result = app.state.batches.create(request)
+            except LookupError as error:
+                raise HTTPException(404, str(error)) from error
+            except ValueError as error:
+                raise HTTPException(422, str(error)) from error
+            app.state.busy = True
+
+            async def worker():
+                try:
+                    async with app.state.workflow.lock:
+                        await app.state.batches.run(result["id"])
+                finally:
+                    app.state.busy = False
+
+            task = asyncio.create_task(worker())
+            app.state.tasks.add(task)
+            task.add_done_callback(app.state.tasks.discard)
+            return result
+
+    @router.get("/batches/{batch_id}")
+    async def get_batch(batch_id: str) -> dict:
+        try:
+            return app.state.batches.view(batch_id)
+        except LookupError as error:
+            raise HTTPException(404, str(error)) from error
 
     @router.get("/cases/{case_id}/workflow")
     async def view(case_id: int) -> dict:

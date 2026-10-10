@@ -175,6 +175,9 @@ class Handler(SimpleHTTPRequestHandler):
             "page_url": page_url,
             "image_url": image_url,
             "received_at": time.time(),
+            "received_recipient": (self.headers.get("X-Mock-Recipient") if path == "/mail-inbox"
+                                   else f"http://127.0.0.1:{self.server.server_port}{path}"),
+            "received_channel": "smtp" if path == "/mail-inbox" else "http_form",
         }
         site = self.server.site
         status = 200

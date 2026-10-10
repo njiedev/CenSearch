@@ -4,6 +4,7 @@ from pathlib import Path
 import uuid
 import cv2
 from sqlalchemy import select
+from censearch.case_records import Batch, BatchItem
 from censearch.db import Person, Reference, Original, record
 from censearch.face import active_references
 from censearch.imaging import decode
@@ -145,6 +146,9 @@ class Enrollment:
             # Remove files before reporting DB deletion; remote failures remain visible.
             self.evidence.delete_person(person_id)
             session.delete(person)
+            session.flush()
+            for batch in session.scalars(select(Batch).where(~Batch.id.in_(select(BatchItem.batch_id)))):
+                session.delete(batch)
         with self.store.engine.connect() as connection:
             connection.exec_driver_sql("VACUUM")
         return {"deleted": person_id}

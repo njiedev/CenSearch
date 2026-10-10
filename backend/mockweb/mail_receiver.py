@@ -52,7 +52,8 @@ class Handler(socketserver.StreamRequestHandler):
                     request = Request(
                         self.server.routes[recipient],
                         part.get_payload(decode=True),
-                        headers={"Content-Type": "application/json", "X-Mock-Mail": self.server.token},
+                        headers={"Content-Type": "application/json", "X-Mock-Mail": self.server.token,
+                                 "X-Mock-Recipient": recipient},
                     )
                     with urlopen(request, timeout=5) as response:
                         result = response.read().decode()

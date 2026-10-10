@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea'
 import './index.css'
 import { Workflow } from './Workflow'
 import { Readable } from './Readable'
+import { Matches } from './Matches'
 
 type Json = Record<string, any>
 
@@ -29,7 +30,7 @@ function App() {
   const [result, setResult] = useState<Json | null>(null)
   const [error, setError] = useState<unknown>(null)
   const [working, setWorking] = useState(false)
-  const [tab, setTab] = useState('enrol')
+  const [tab, setTab] = useState('matches')
   const [seeds, setSeeds] = useState('')
   const [rendered, setRendered] = useState(true)
   const [camera, setCamera] = useState(false)
@@ -123,18 +124,19 @@ function App() {
 
   const disabled = working || Boolean(health?.busy)
   return <main className="mx-auto max-w-6xl space-y-4 p-4 text-sm">
-    <h1 className="text-2xl font-medium">Likeness Guard console</h1>
+    <h1 className="text-2xl font-medium">Likeness Guard</h1>
     <Card><CardHeader><CardTitle className="text-lg">Status</CardTitle></CardHeader><CardContent className="space-y-2">
       {!health ? <p>Loading status...</p> : <>
-        <p>Database: {health.database.status} · Face models: {health.face_models.loaded ? 'loaded' : 'unavailable'} · Model: {health.model.configured ? 'configured' : 'not configured'} · Storage: {health.object_storage.mode} · Busy: {String(health.busy)}</p>
+        <p data-testid="health-summary">Database: {health.database.status} · Face models: {health.face_models.loaded ? 'loaded' : 'unavailable'} · Model: {health.model.configured ? 'configured' : 'not configured'} · Storage: {health.object_storage.mode} · Busy: {String(health.busy)}</p>
         <details><summary>Full health record</summary><Readable value={health} /></details>
       </>}
     </CardContent></Card>
     <nav aria-label="Console screens" className="flex flex-wrap gap-2">
-      {['enrol', 'find', 'case', 'decide', 'send', 'verify', 'agent'].map(name => <Button key={name} variant={tab === name ? 'default' : 'outline'} onClick={() => setTab(name)}>{name === 'enrol' ? 'Enrol' : name === 'find' ? 'Find' : name === 'case' ? 'Case' : name === 'agent' ? 'Agent probe' : name[0].toUpperCase() + name.slice(1)}</Button>)}
+      {['matches', 'enrol', 'find', 'case', 'decide', 'send', 'verify', 'agent'].map(name => <Button key={name} variant={tab === name ? 'default' : 'outline'} onClick={() => setTab(name)}>{name === 'enrol' ? 'Enrol' : name === 'find' ? 'Find' : name === 'case' ? 'Case' : name === 'agent' ? 'Agent probe' : name[0].toUpperCase() + name.slice(1)}</Button>)}
     </nav>
     {error !== null && <div role="alert" className="rounded border p-3"><p>Request failed</p><Readable value={error} /></div>}
     {working && <p role="status">Working...</p>}
+    {tab === 'matches' && <Matches cases={cases} people={people} busy={Boolean(health?.busy)} refresh={refresh} />}
     {tab === 'enrol' && <>
       <Card><CardHeader><CardTitle>Enrol a person</CardTitle></CardHeader><CardContent>
         <form onSubmit={enrol} className="space-y-4">
