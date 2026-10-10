@@ -42,11 +42,13 @@ contact.
   - The landing page is a dimmed, grayscale wall of faces.
   - Cells occasionally light up as a match or a flag, or dissolve into dust.
 - **Palette:** black, white, and one purple accent.
-- **Type:** Geist Pixel Square (SIL Open Font License), bundled locally.
+- **Type:** Geist Pixel Square and Geist Mono (SIL Open Font License), bundled
+  locally.
 - **Details:**
   - The nav logo is a purple snake eye whose pupil follows your cursor.
-  - "How it works" is a 1-bit CRT monitor that rises over a blurred feed.
-  - Its desktop icons are hand-drawn 16×16 pixel art.
+  - "About" is a camera viewfinder over a blurred feed, with corner
+    brackets, a blinking REC light, a live clock and a running timecode.
+  - Its copy types itself out in a monospace font.
 - **Restraint:** motion is ambient and sparse. It should make the site feel
   alive without getting in the way of the task.
 - **Built for usability:** the rules come from Ant Design, Material 3, and IBM

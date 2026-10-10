@@ -1,9 +1,9 @@
 import SnakeEye from './SnakeEye'
 
-// Only "How it works" has a section so far; the rest are placeholders.
+// Only "About" has a section so far; the rest are placeholders.
 const LINKS = [
   { label: 'Product', href: '#' },
-  { label: 'How it works', href: '#how-it-works' },
+  { label: 'About', href: '#about' },
   { label: 'Agent', href: '#' },
   { label: 'Privacy', href: '#' },
   { label: 'Docs', href: '#' },
@@ -26,7 +26,7 @@ export default function NavBar() {
         <a className="nav-link nav-talk" href="#">
           Talk to the team
         </a>
-        <a className="nav-cta" href="#how-it-works">
+        <a className="nav-cta" href="#about">
           Get started
         </a>
       </div>

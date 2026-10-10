@@ -1,7 +1,7 @@
 import Logo from './Logo'
-import Monitor from './Monitor'
 import NavBar from './NavBar'
 import PhotoGrid from './PhotoGrid'
+import Viewfinder from './Viewfinder'
 
 export default function App() {
   return (
@@ -13,13 +13,8 @@ export default function App() {
           <Logo />
           <p className="scroll-hint">Scroll</p>
         </section>
-        <section className="desk" id="how-it-works" aria-labelledby="desk-title">
-          <h2 className="desk-title" id="desk-title">
-            The agent does the legwork.
-            <br />
-            You sign off.
-          </h2>
-          <Monitor />
+        <section className="desk" id="about">
+          <Viewfinder />
         </section>
       </main>
     </>

@@ -6,7 +6,14 @@
   --accent-light: #c4b5fd;
   --accent-dark: #4c1d95;
   --pixel: 'Geist Pixel', ui-monospace, monospace;
+  --mono: 'Geist Mono', ui-monospace, monospace;
   color-scheme: dark;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('./fonts/GeistMono-Regular.woff2') format('woff2');
+  font-display: swap;
 }
 
 @font-face {
@@ -299,137 +306,192 @@ body {
   }
 }
 
-/* ---- How it works: the monitor ---- */
+/* ---- About: the camera viewfinder ---- */
 
 .desk {
   position: relative;
   display: grid;
-  align-content: start;
+  align-content: center;
   justify-items: center;
-  gap: 48px;
   min-height: 100svh;
-  padding: 160px 16px 120px;
-  background: rgb(0 0 0 / 0.45);
+  padding: 120px 16px;
+  background: rgb(0 0 0 / 0.55);
   -webkit-backdrop-filter: blur(14px);
   backdrop-filter: blur(14px);
   /* Soft top edge so the blur fades in instead of starting on a hard line. */
   mask-image: linear-gradient(to bottom, transparent, #000 160px);
 }
 
-.desk-title {
-  margin: 0;
-  font: clamp(2rem, 5.5vw, 4.5rem) / 1.05 var(--pixel);
-  text-align: center;
-  color: #d4d4d8;
-  text-shadow: 0 0 40px rgb(0 0 0 / 0.8);
-}
-
-.monitor {
-  width: min(1120px, 100%);
-  padding: clamp(12px, 2.5vw, 32px);
-  border: 4px solid #e4e4e7;
-  border-radius: 12px;
-  /* 2×2 checker dither, like a 1-bit bezel. */
-  background: repeating-conic-gradient(#3f3f46 0 25%, #09090b 0 50%) 0 0 / 4px 4px;
-  box-shadow:
-    inset 0 0 0 2px #09090b,
-    0 24px 80px rgb(0 0 0 / 0.7);
-}
-
-.monitor-bezel {
-  padding: clamp(16px, 3vw, 40px);
-  border-radius: 8px;
-  background: #050505;
-  box-shadow: inset 0 0 0 1px #27272a;
-}
-
-.screen {
+.viewfinder {
+  --vf-line: var(--accent-light);
+  --vf-inset: clamp(16px, 3vw, 32px);
   position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  width: min(1120px, 100%);
+  aspect-ratio: 16 / 9;
+  padding: calc(var(--vf-inset) + 24px);
   overflow: hidden;
-  border-radius: 20px / 16px;
-  background: radial-gradient(ellipse at 50% 25%, #f5f5f2 0%, #d6d6d1 65%, #b4b4ae 100%);
-  color: #09090b;
-  font: 16px/1.2 var(--pixel);
-  box-shadow: inset 0 0 48px rgb(0 0 0 / 0.35);
+  background:
+    /* faint light streaks bleeding in from the edges */
+    linear-gradient(to right, rgb(124 58 237 / 0.18), transparent 22%, transparent 78%, rgb(124 58 237 / 0.12)),
+    #050208;
+  border: 1px solid #1e1530;
+  box-shadow:
+    inset 0 0 80px rgb(124 58 237 / 0.18),
+    0 24px 80px rgb(0 0 0 / 0.7);
+  color: var(--vf-line);
+  font-family: var(--mono);
 }
 
-/* CRT scanlines. */
-.screen::after {
+/* Scanlines. */
+.viewfinder::after {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: repeating-linear-gradient(to bottom, rgb(0 0 0 / 0.06) 0 1px, transparent 1px 3px);
+  background: repeating-linear-gradient(to bottom, rgb(196 181 253 / 0.04) 0 1px, transparent 1px 3px);
 }
 
-.menubar {
+.vf-corner {
+  position: absolute;
+  width: clamp(32px, 8%, 96px);
+  aspect-ratio: 1;
+  border: 0 solid var(--vf-line);
+}
+
+.vf-tl {
+  top: var(--vf-inset);
+  left: var(--vf-inset);
+  border-width: 3px 0 0 3px;
+}
+
+.vf-tr {
+  top: var(--vf-inset);
+  right: var(--vf-inset);
+  border-width: 3px 3px 0 0;
+}
+
+.vf-bl {
+  bottom: var(--vf-inset);
+  left: var(--vf-inset);
+  border-width: 0 0 3px 3px;
+}
+
+.vf-br {
+  right: var(--vf-inset);
+  bottom: var(--vf-inset);
+  border-width: 0 3px 3px 0;
+}
+
+.vf-hud {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  font: clamp(14px, 1.6vw, 20px) / 1 var(--pixel);
+  letter-spacing: 0.08em;
+}
+
+.vf-rec {
   display: flex;
   align-items: center;
-  gap: 24px;
-  padding: 12px 24px;
-  background: #f4f4f1;
-  border-bottom: 1px solid #a1a1aa;
-}
-
-.menubar-eye {
-  width: 24px;
-  height: 24px;
-}
-
-.menubar-clock {
-  margin-left: auto;
-}
-
-.desktop {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 48px 16px;
-  margin: 0;
-  padding: 48px 24px 64px;
-  list-style: none;
-}
-
-.desktop-app {
-  display: grid;
-  justify-items: center;
   gap: 8px;
-  text-align: center;
+  color: #fff;
 }
 
-.desktop-icon {
-  width: 64px;
-  height: 64px;
-  shape-rendering: crispEdges;
+.vf-rec-dot {
+  width: 0.9em;
+  height: 0.9em;
+  border-radius: 50%;
+  background: #a855f7;
+  box-shadow: 0 0 12px #a855f7;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .vf-rec-dot {
+    animation: blink 1s steps(1) infinite;
+  }
+}
+
+.vf-battery {
+  justify-self: end;
+  width: 2.4em;
+  fill: none;
+  stroke: var(--vf-line);
+  stroke-width: 2;
+}
+
+.vf-battery-tip,
+.vf-battery-cell {
+  fill: var(--vf-line);
+  stroke: none;
+}
+
+.vf-bottom {
+  justify-items: end;
+}
+
+.vf-bottom span {
+  grid-column: 3;
+  font-variant-numeric: tabular-nums;
+}
+
+.vf-copy {
+  align-self: center;
+  max-width: 48ch;
+  padding: 24px 0;
+}
+
+.vf-heading {
+  margin: 0 0 16px;
+  min-height: 1.2em;
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  line-height: 1.2;
+  color: #fff;
+}
+
+.vf-body {
+  margin: 0;
+  min-height: 3em;
+  font-size: clamp(1rem, 1.8vw, 1.375rem);
+  line-height: 1.5;
+  color: #e4e4e7;
+}
+
+.vf-caret {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.1em;
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  background: var(--accent-light);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .vf-caret {
+    animation: blink 1s steps(1) infinite;
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
 }
 
 @media (max-width: 599px) {
-  .menubar span:not(.menubar-clock) {
-    display: none;
-  }
-
-  .desktop {
-    grid-template-columns: repeat(2, 1fr);
+  .viewfinder {
+    aspect-ratio: auto;
+    min-height: 70svh;
   }
 }
 
-/* Monitor rises in as it scrolls into view, where supported. */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .monitor {
-      animation: rise linear both;
-      animation-timeline: view();
-      animation-range: entry 0% entry 70%;
-    }
-  }
-}
-
-@keyframes rise {
-  from {
-    opacity: 0;
-    transform: translateY(64px) scale(0.97);
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
