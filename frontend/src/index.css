@@ -1,0 +1,167 @@
+:root {
+  --match: #2dff7a;
+  --flag: #ff2d46;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #000;
+  color: #fff;
+}
+
+/* ---- Photo grid backdrop ---- */
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--columns), 1fr);
+}
+
+.cell {
+  position: relative;
+  aspect-ratio: 1;
+  background: #000;
+}
+
+.cell img {
+  position: absolute;
+  inset: 1px;
+  width: calc(100% - 2px);
+  height: calc(100% - 2px);
+  object-fit: cover;
+  filter: grayscale(1) brightness(var(--dim));
+  transition:
+    opacity 400ms ease,
+    filter 300ms ease;
+  user-select: none;
+}
+
+.cell.empty img {
+  opacity: 0;
+}
+
+/* Hide or reset instantly, without the fade. */
+.cell.snap img {
+  transition: none;
+}
+
+.cell.hit {
+  z-index: 1;
+}
+
+.cell.hit img {
+  filter: grayscale(1) brightness(1);
+}
+
+.cell.hit::after {
+  content: '';
+  position: absolute;
+  inset: 1px;
+  border: 2px solid var(--tone);
+  background: color-mix(in srgb, var(--tone) 22%, transparent);
+  box-shadow:
+    0 0 28px color-mix(in srgb, var(--tone) 70%, transparent),
+    inset 0 0 24px color-mix(in srgb, var(--tone) 40%, transparent);
+  animation: hit 1500ms ease-in-out both;
+}
+
+.cell.match {
+  --tone: var(--match);
+}
+
+.cell.flag {
+  --tone: var(--flag);
+}
+
+.cell.out {
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+
+@keyframes hit {
+  0% {
+    opacity: 0;
+    transform: scale(1.12);
+  }
+  14% {
+    opacity: 1;
+    transform: none;
+  }
+  34% {
+    opacity: 0.4;
+  }
+  54%,
+  100% {
+    opacity: 1;
+  }
+}
+
+.dust,
+.vignette {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.vignette {
+  background: radial-gradient(ellipse at center, rgb(0 0 0 / 0.55) 0%, rgb(0 0 0 / 0.15) 55%, rgb(0 0 0 / 0.5) 100%);
+}
+
+/* ---- Logo ---- */
+
+.stage {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.logo {
+  margin: 0;
+  font-family: Futura, 'Futura PT', 'Futura Std', Jost, 'Century Gothic', 'Trebuchet MS', sans-serif;
+  font-weight: 700;
+  font-size: clamp(3.5rem, 18vw, 20rem);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  text-shadow: 0 0 80px rgb(0 0 0 / 0.9);
+}
+
+.logo-eye {
+  height: 0.72em;
+  width: 1.2em;
+  margin: 0 0.03em;
+  overflow: visible;
+  filter: drop-shadow(0 0 40px rgb(0 0 0 / 0.9));
+}
+
+.logo-eye path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 13;
+  stroke-linejoin: round;
+}
+
+.logo-eye circle {
+  fill: currentColor;
+}
