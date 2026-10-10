@@ -194,6 +194,31 @@ body {
   margin: 0 0.03em;
   overflow: visible;
   filter: drop-shadow(0 0 40px rgb(0 0 0 / 0.9));
+  transform-origin: center;
+}
+
+/* A quick blink every few seconds, with a double blink now and then. */
+@media (prefers-reduced-motion: no-preference) {
+  .logo-eye {
+    animation: blink-eye 7s ease-in-out infinite;
+  }
+}
+
+@keyframes blink-eye {
+  0%,
+  44%,
+  48%,
+  88%,
+  91%,
+  94%,
+  100% {
+    transform: none;
+  }
+  46%,
+  89.5%,
+  92.5% {
+    transform: scaleY(0.08);
+  }
 }
 
 .logo-eye path {
