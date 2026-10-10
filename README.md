@@ -45,14 +45,16 @@ contact.
 - **Type:** Geist Pixel Square and Geist Mono (SIL Open Font License), bundled
   locally.
 - **Details:**
-  - The nav logo is a pixel-art purple snake eye. Its slit pupil follows your
-    cursor in whole art-pixel steps.
   - The wordmark draws the A in CENSEARCH as an eye with an eyelid. It
     opens by different amounts, blinks, and glances left and right.
   - "About" is a camera viewfinder drawn straight over the blurred feed, with corner
     brackets, a blinking "Recording without your permission" light, a live
-    clock, a running timecode, and a large snake eye that tracks the cursor.
+    clock, a running timecode, and a large pixel-art snake eye whose slit pupil follows the cursor in whole
+    art-pixel steps.
   - Its copy types itself out in a monospace font.
+  - "Sign up" enrols your face: name, face photos, optional owned originals,
+    and explicit consent and ownership statements. It posts to the real
+    backend enrolment endpoint and shows which photos were accepted.
 - **Restraint:** motion is ambient and sparse. It should make the site feel
   alive without getting in the way of the task.
 - **Built for usability:** the rules come from Ant Design, Material 3, and IBM
@@ -81,3 +83,7 @@ npm run dev     # http://localhost:5173
 npm run build   # type-check and build to frontend/dist
 npm run lint
 ```
+
+The dev server proxies `/api` to the backend on `http://127.0.0.1:8190`
+(`make api` in `backend/`). Without it, sign-up shows a "couldn't reach the
+server" message.

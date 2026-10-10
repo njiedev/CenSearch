@@ -217,73 +217,6 @@ body {
   fill: currentColor;
 }
 
-/* ---- Nav ---- */
-
-.nav {
-  position: fixed;
-  top: 16px;
-  left: 50%;
-  z-index: 10;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
-  align-items: center;
-  width: min(1440px, calc(100% - 32px));
-  height: 56px;
-  padding: 0 8px 0 8px;
-  transform: translateX(-50%);
-  background: #141118;
-  border: 1px solid #2c2535;
-  border-radius: 4px;
-  box-shadow:
-    0 0 0 1px #000,
-    0 8px 24px rgb(0 0 0 / 0.5);
-  font: 15px/1 var(--pixel);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.nav-links,
-.nav-actions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.nav-actions {
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.nav-link,
-.nav-home {
-  border-radius: 2px;
-  color: #f4f4f5;
-  text-decoration: none;
-}
-
-.nav-link {
-  padding: 12px;
-}
-
-.nav-link:hover {
-  background: rgb(255 255 255 / 0.08);
-}
-
-.nav-link:active {
-  background: rgb(255 255 255 / 0.12);
-}
-
-.nav-home {
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-}
-
-.nav-eye {
-  width: 40px;
-}
-
 /* ---- Pixel eye ---- */
 
 .pixel-eye {
@@ -308,51 +241,6 @@ body {
 
 .pixel-eye-clip img {
   transition: transform 90ms steps(2);
-}
-
-.nav-cta {
-  position: relative;
-  padding: 11px 16px;
-  background: var(--accent);
-  color: #fff;
-  text-decoration: none;
-  box-shadow:
-    inset -2px -2px 0 var(--accent-dark),
-    inset 2px 2px 0 rgb(255 255 255 / 0.25);
-}
-
-/* Pads the hit area to 48px without changing the look. */
-.nav-cta::before {
-  content: '';
-  position: absolute;
-  inset: -6px -2px;
-}
-
-.nav-cta:hover {
-  background: var(--accent-hover);
-}
-
-.nav-cta:active {
-  box-shadow:
-    inset 2px 2px 0 var(--accent-dark),
-    inset -2px -2px 0 rgb(255 255 255 / 0.25);
-}
-
-.nav a:focus-visible {
-  outline: 2px solid var(--accent-light);
-  outline-offset: 2px;
-}
-
-@media (max-width: 1023px) {
-  .nav-links,
-  .nav-talk {
-    display: none;
-  }
-
-  /* Keep the eye centred once the links are gone. */
-  .nav::before {
-    content: '';
-  }
 }
 
 /* ---- About: the camera viewfinder ---- */
@@ -566,6 +454,242 @@ body {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/* ---- Sign up ---- */
+
+/* Continues the blurred panel from the section above, without a fade. */
+.signup {
+  display: grid;
+  justify-items: center;
+  align-content: center;
+  min-height: 100svh;
+  padding: 96px 16px 120px;
+  background: rgb(0 0 0 / 0.55);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.su-panel {
+  display: grid;
+  gap: 24px;
+  width: min(640px, 100%);
+  padding: clamp(24px, 4vw, 40px);
+  border: 1px solid #2c2535;
+  background: rgb(10 8 14 / 0.85);
+  font: 16px/1.5 var(--mono);
+  color: #e4e4e7;
+}
+
+.su-panel p {
+  margin: 0;
+}
+
+.su-title {
+  margin: 0;
+  font: clamp(2rem, 4vw, 3rem) / 1.1 var(--pixel);
+  color: #fff;
+}
+
+.su-lede {
+  color: #d4d4d8;
+}
+
+.su-field {
+  display: grid;
+  gap: 8px;
+}
+
+.su-field > label:first-child:not(.su-check) {
+  font-family: var(--pixel);
+  font-size: 15px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-light);
+}
+
+.su-hint {
+  font-size: 14px;
+  color: #a1a1aa;
+}
+
+.su-field input[type='text'] {
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid #3f3f46;
+  border-radius: 0;
+  background: #050505;
+  color: #fff;
+  font: inherit;
+}
+
+.su-field input[type='text']:hover {
+  border-color: #71717a;
+}
+
+.su-field input:focus-visible,
+.su-drop:focus-within,
+.su-check input:focus-visible + span,
+.su-panel button:focus-visible {
+  outline: 2px solid var(--accent-light);
+  outline-offset: 2px;
+}
+
+.su-field input[aria-invalid='true'],
+.su-drop:has(input[aria-invalid='true']) {
+  border-color: #f87171;
+}
+
+/* The file input covers the whole drop area, so clicks and keyboard focus
+   both land on it. */
+.su-drop {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 88px;
+  padding: 16px;
+  border: 1px dashed #52525b;
+  background: #050505;
+  color: #d4d4d8;
+  text-align: center;
+  cursor: pointer;
+}
+
+.su-drop:hover {
+  border-color: var(--accent-light);
+  background: rgb(196 181 253 / 0.06);
+}
+
+.su-drop input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.su-previews {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.su-previews img {
+  display: block;
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border: 1px solid #3f3f46;
+}
+
+.su-check {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 4px 0;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.su-check input {
+  width: 20px;
+  height: 20px;
+  margin: 2px 0 0;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.su-error {
+  font-size: 14px;
+  color: #fca5a5;
+}
+
+.su-error::before {
+  content: '✕ ';
+}
+
+.su-privacy {
+  font-size: 14px;
+  color: #a1a1aa;
+}
+
+.su-failure {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #f87171;
+  background: rgb(248 113 113 / 0.08);
+  color: #fecaca;
+}
+
+.su-results {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: 14px;
+}
+
+.su-results li {
+  display: flex;
+  gap: 8px;
+}
+
+.su-results .ok .su-mark {
+  color: #4ade80;
+}
+
+.su-results .bad .su-mark {
+  color: #f87171;
+}
+
+.su-submit,
+.su-secondary {
+  justify-self: start;
+  min-height: 48px;
+  padding: 0 24px;
+  border: 0;
+  font: 15px/1 var(--pixel);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.su-submit {
+  background: var(--accent);
+  color: #fff;
+  box-shadow:
+    inset -2px -2px 0 var(--accent-dark),
+    inset 2px 2px 0 rgb(255 255 255 / 0.25);
+}
+
+.su-submit:hover {
+  background: var(--accent-hover);
+}
+
+.su-submit:active {
+  box-shadow:
+    inset 2px 2px 0 var(--accent-dark),
+    inset -2px -2px 0 rgb(255 255 255 / 0.25);
+}
+
+.su-submit:disabled {
+  opacity: 0.38;
+  cursor: progress;
+}
+
+.su-secondary {
+  border: 1px solid var(--accent-light);
+  background: transparent;
+  color: var(--accent-light);
+}
+
+.su-secondary:hover {
+  background: rgb(196 181 253 / 0.08);
 }
 
 /* ---- Headline clippings over the grid ---- */

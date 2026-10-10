@@ -1,13 +1,12 @@
 import Logo from './Logo'
-import NavBar from './NavBar'
 import PhotoGrid from './PhotoGrid'
+import SignUp from './SignUp'
 import Viewfinder from './Viewfinder'
 
 export default function App() {
   return (
     <>
       <PhotoGrid />
-      <NavBar />
       <main>
         <section className="hero" id="top">
           <Logo />
@@ -15,6 +14,9 @@ export default function App() {
         </section>
         <section className="desk" id="about">
           <Viewfinder />
+        </section>
+        <section className="signup" id="signup" aria-labelledby="signup-title">
+          <SignUp />
         </section>
       </main>
     </>
