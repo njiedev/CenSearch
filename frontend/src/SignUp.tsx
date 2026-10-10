@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 
-// Sign-up is enrolment: POST /api/people (see backend/handoff/openapi.json).
+// Sign-up is enrollment: POST /api/people (see backend/handoff/openapi.json).
 // The person attests to consent and ownership by ticking the exact statements
 // below; those statements are what the backend stores.
 const CONSENT =
@@ -160,7 +160,7 @@ export default function SignUp() {
         <p className="su-lede">Here's how your photos did. We'll search the web using the accepted ones.</p>
         <PhotoList photos={outcome.photos} />
         <button type="button" className="su-secondary" onClick={reset}>
-          Enrol someone else
+          Enroll someone else
         </button>
       </div>
     )
@@ -296,7 +296,7 @@ export default function SignUp() {
       )}
 
       <button type="submit" className="su-submit" disabled={sending} aria-busy={sending}>
-        {sending ? 'Enrolling…' : 'Enrol my face'}
+        {sending ? 'Enrolling…' : 'Enroll my face'}
       </button>
     </form>
   )

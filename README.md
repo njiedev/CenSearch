@@ -12,7 +12,7 @@ contact.
 
 ## How it works
 
-1. **Enrol:** add a few photos of your face and any original photos you own.
+1. **Enroll:** add a few photos of your face and any original photos you own.
 2. **Find:** search and crawl for pages showing your face or copies of your
    photos.
 3. **Decide:** answer a few questions per appearance. Fixed rules pick the
@@ -52,9 +52,9 @@ contact.
     clock, a running timecode, and a large pixel-art snake eye whose slit pupil follows the cursor in whole
     art-pixel steps.
   - Its copy types itself out in a monospace font.
-  - "Sign up" enrols your face: name, face photos, optional owned originals,
+  - "Sign up" enrolls your face: name, face photos, optional owned originals,
     and explicit consent and ownership statements. It posts to the real
-    backend enrolment endpoint and shows which photos were accepted.
+    backend enrollment endpoint and shows which photos were accepted.
 - **Restraint:** motion is ambient and sparse. It should make the site feel
   alive without getting in the way of the task.
 - **Built for usability:** the rules come from Ant Design, Material 3, and IBM

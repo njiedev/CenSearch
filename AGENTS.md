@@ -13,7 +13,7 @@ right recipient, and checks whether it worked.
 
 The loop, end to end:
 
-1. **Enrol** — the person adds a few photos of their face and any original
+1. **Enroll** — the person adds a few photos of their face and any original
    photos they own.
 2. **Find** — search and crawl for pages showing that face or copies of those
    photos.
@@ -137,7 +137,7 @@ model; it sees page text and URLs only.
 
 1. Deployed skeleton on Akamai: backend, one screen, model call through Strands
    working.
-2. Enrol from webcam or upload.
+2. Enroll from webcam or upload.
 3. Find and match against a small mock web (two or three sites).
 4. Question screen → route → drafted request.
 5. Strands recipient-lookup agent, shown working on a real domain (read-only)

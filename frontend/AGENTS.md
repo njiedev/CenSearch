@@ -1,7 +1,7 @@
 # AGENTS.md: CenSearch frontend
 
 Read the root `AGENTS.md` first. It explains what the product is, how the
-end-to-end loop works (enrol → find → decide → send → verify), and the full
+end-to-end loop works (enroll → find → decide → send → verify), and the full
 backend and frontend stack. This file covers the frontend only. Most of the
 work happens here, in `frontend/`, on the `frontend` branch.
 
@@ -44,7 +44,7 @@ work happens here, in `frontend/`, on the `frontend` branch.
 - **Branch:** work on `frontend`. Don't commit to `main`.
 - **Commit early and often, in the Stripe style.**
   - Messages are short, imperative, and sentence case, with no prefix or
-    trailing period. Examples: `Add enrol screen`, `Fix grid resize on mobile`.
+    trailing period. Examples: `Add enroll screen`, `Fix grid resize on mobile`.
   - One logical change per commit.
   - End commit messages with the attribution trailer.
 - **README:** keep the root `README.md` current with anything a hackathon
