@@ -272,12 +272,33 @@ body {
 }
 
 .nav-eye {
-  width: 36px;
-  height: 36px;
+  width: 40px;
 }
 
-.eye-pupil {
-  transition: transform 120ms ease-out;
+/* ---- Pixel eye ---- */
+
+.pixel-eye {
+  position: relative;
+  display: block;
+  aspect-ratio: 29 / 26;
+}
+
+.pixel-eye img,
+.pixel-eye-clip {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  image-rendering: pixelated;
+  user-select: none;
+}
+
+.pixel-eye-clip {
+  mask-size: 100% 100%;
+}
+
+.pixel-eye-clip img {
+  transition: transform 90ms steps(2);
 }
 
 .nav-cta {
@@ -350,21 +371,8 @@ body {
   width: min(1120px, 100%);
   aspect-ratio: 16 / 9;
   padding: calc(var(--vf-inset) + 24px);
-  overflow: hidden;
-  background: #050505;
-  border: 1px solid #1c1c1f;
-  box-shadow: 0 24px 80px rgb(0 0 0 / 0.7);
   color: var(--vf-line);
   font-family: var(--mono);
-}
-
-/* Scanlines. */
-.viewfinder::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-linear-gradient(to bottom, rgb(196 181 253 / 0.04) 0 1px, transparent 1px 3px);
 }
 
 .vf-corner {
@@ -472,7 +480,6 @@ body {
 
 .vf-eye {
   width: clamp(120px, 20vw, 240px);
-  height: auto;
   margin-right: clamp(0px, 4vw, 48px);
 }
 
@@ -549,4 +556,118 @@ body {
   overflow: hidden;
   clip-path: inset(50%);
   white-space: nowrap;
+}
+
+/* ---- Headline clippings over the grid ---- */
+
+.headlines {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: opacity 400ms ease;
+}
+
+.headlines.hidden {
+  opacity: 0;
+}
+
+.clipping {
+  position: absolute;
+  width: clamp(240px, 28vw, 420px);
+  padding: 16px 20px;
+  background: #fafafa;
+  color: #111;
+  box-shadow:
+    0 0 0 1px rgb(0 0 0 / 0.6),
+    0 16px 40px rgb(0 0 0 / 0.6);
+  animation: clip-in 400ms ease-out both;
+}
+
+.clipping.leaving {
+  animation: clip-out 500ms ease-in both;
+}
+
+.clipping p,
+.clipping h3 {
+  margin: 0;
+}
+
+.clipping-kicker {
+  margin-bottom: 8px !important;
+  font: 13px/1.2 'Helvetica Neue', Arial, sans-serif;
+  color: #555;
+}
+
+.clipping-headline {
+  font-size: clamp(16px, 1.5vw, 24px);
+  line-height: 1.2;
+}
+
+.clipping-meta {
+  margin-top: 8px !important;
+  font: 12px/1.4 'Helvetica Neue', Arial, sans-serif;
+  color: #666;
+}
+
+.clipping-cbs .clipping-kicker {
+  text-decoration: underline;
+}
+
+.clipping-cbs .clipping-headline {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 800;
+}
+
+.clipping-business .clipping-kicker {
+  font-weight: 700;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.clipping-business .clipping-headline {
+  font-family: 'Iowan Old Style', Garamond, 'Times New Roman', serif;
+  font-weight: 400;
+  font-size: clamp(18px, 1.7vw, 27px);
+}
+
+.clipping-feature .clipping-headline {
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  font-weight: 700;
+  color: #222;
+}
+
+@keyframes clip-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes clip-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .clipping {
+    animation-name: fade-in;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* One column on phones: clippings stay inside the screen. */
+@media (max-width: 599px) {
+  .clipping {
+    left: 16px !important;
+    right: 16px !important;
+    width: auto;
+  }
 }

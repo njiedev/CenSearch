@@ -45,9 +45,12 @@ contact.
 - **Type:** Geist Pixel Square and Geist Mono (SIL Open Font License), bundled
   locally.
 - **Details:**
-  - The nav logo is a purple snake eye whose pupil follows your cursor.
+  - The nav logo is a pixel-art purple snake eye. Its slit pupil follows your
+    cursor in whole art-pixel steps.
+  - Real headlines about people filmed without consent by smart glasses
+    appear as news clippings over the photo wall.
   - The wordmark draws the A in CENSEARCH as an eye.
-  - "About" is a camera viewfinder over a blurred feed, with corner
+  - "About" is a camera viewfinder drawn straight over the blurred feed, with corner
     brackets, a blinking "Recording without your permission" light, a live
     clock, a running timecode, and a large snake eye that tracks the cursor.
   - Its copy types itself out in a monospace font.
