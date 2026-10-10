@@ -4,7 +4,8 @@ import pupilUrl from './assets/eye/pupil.png'
 import rimUrl from './assets/eye/rim.png'
 
 // The pixel-art snake eye is 29×26 art pixels, split into three layers: the
-// iris, the slit pupil, and the outline with its glint. Only the pupil moves.
+// iris, the slit pupil with its highlights, and the outline with its glint.
+// Only the pupil moves.
 const ART_WIDTH = 29
 const ART_HEIGHT = 26
 const REACH_PX = 240 // cursor distance at which the pupil reaches its limit
