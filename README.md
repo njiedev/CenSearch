@@ -1,6 +1,6 @@
-# SendGuard
+# CenSearch
 
-SendGuard finds where your face and photos appear on the web, works out which
+CenSearch finds where your face and photos appear on the web, works out which
 removal process applies to each appearance, sends the request to the right
 recipient, and checks whether it worked.
 

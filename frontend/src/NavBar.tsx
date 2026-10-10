@@ -19,7 +19,7 @@ export default function NavBar() {
           </a>
         ))}
       </nav>
-      <a className="nav-home" href="#top" aria-label="SendGuard home">
+      <a className="nav-home" href="#top" aria-label="CenSearch home">
         <SnakeEye className="nav-eye" track />
       </a>
       <div className="nav-actions">

@@ -174,31 +174,13 @@ body {
   margin: 0;
   font-family: Futura, 'Futura PT', 'Futura Std', Jost, 'Century Gothic', 'Trebuchet MS', sans-serif;
   font-weight: 700;
-  font-size: clamp(3.5rem, 18vw, 20rem);
+  font-size: clamp(2.5rem, 14vw, 16rem);
   line-height: 1;
   letter-spacing: 0.02em;
   white-space: nowrap;
   text-shadow: 0 0 80px rgb(0 0 0 / 0.9);
 }
 
-.logo-eye {
-  height: 0.72em;
-  width: 1.2em;
-  margin: 0 0.03em;
-  overflow: visible;
-  filter: drop-shadow(0 0 40px rgb(0 0 0 / 0.9));
-}
-
-.logo-eye path {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 13;
-  stroke-linejoin: round;
-}
-
-.logo-eye circle {
-  fill: currentColor;
-}
 
 /* ---- Nav ---- */
 

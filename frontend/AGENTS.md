@@ -1,4 +1,4 @@
-# AGENTS.md: SendGuard frontend
+# AGENTS.md: CenSearch frontend
 
 Read the root `AGENTS.md` first. It explains what the product is, how the
 end-to-end loop works (enrol → find → decide → send → verify), and the full
@@ -8,9 +8,8 @@ work happens here, in `frontend/`, on the `frontend` branch.
 ## Who and what
 
 - The owner of this folder is the frontend developer on a hackathon team.
-- The project is **SendGuard**. The root brief still calls it "Likeness Guard"
-  and the current wordmark reads "CENSOR". Treat the name as unsettled and
-  don't hard-code it in many places.
+- The project is **CenSearch**. The root brief still calls it "Likeness Guard";
+  CenSearch wins for anything user-facing.
 - Our goal is to **win Best Design**, and the root brief's goals still apply:
   the sponsor tracks and a demo a judge can follow in under 3 minutes.
 - Use the product loop in the root `AGENTS.md` to plan the screens and the
