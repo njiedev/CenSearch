@@ -1,0 +1,20 @@
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@layer base {
+  :root {
+    --background: 0 0% 100%; --foreground: 0 0% 0%;
+    --card: 0 0% 100%; --card-foreground: 0 0% 0%;
+    --primary: 0 0% 0%; --primary-foreground: 0 0% 100%;
+    --secondary: 0 0% 100%; --secondary-foreground: 0 0% 0%;
+    --muted: 0 0% 100%; --muted-foreground: 0 0% 0%;
+    --accent: 0 0% 100%; --accent-foreground: 0 0% 0%;
+    --destructive: 0 0% 0%; --destructive-foreground: 0 0% 100%;
+    --border: 0 0% 0%; --input: 0 0% 0%; --ring: 0 0% 0%; --radius: 0.5rem;
+  }
+  * { @apply border-border; }
+  body { @apply bg-background text-foreground; }
+  pre { @apply whitespace-pre-wrap break-all text-xs; }
+}
+/* This inspection console intentionally has no motion. */
+* { animation: none !important; transition: none !important; }

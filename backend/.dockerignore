@@ -1,0 +1,14 @@
+.env
+.env.*
+.venv
+.git
+**/*.md
+data
+models
+seed
+**/node_modules
+**/dist
+**/__pycache__
+.pytest_cache
+.ruff_cache
+handoff

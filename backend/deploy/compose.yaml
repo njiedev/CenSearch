@@ -1,0 +1,38 @@
+services:
+  app:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    network_mode: host
+    env_file: ../.env
+    environment:
+      LIKENESS_DATA_DIR: /app/data
+      LIKENESS_MODELS_DIR: /app/models
+      LIKENESS_CALIBRATION_PATH: /app/reports/calibration.json
+      MOCK_BASE_PORT: '8811'
+    volumes:
+      - app_data:/app/data
+    restart: unless-stopped
+  mockweb:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    network_mode: host
+    command: [uv, run, --no-sync, python, -m, mockweb.run, --root, /mock-sites, --base-port, '8811']
+    volumes:
+      - mock_sites:/mock-sites
+    restart: unless-stopped
+  caddy:
+    image: caddy:2.10.2-alpine
+    network_mode: host
+    env_file: ../.env
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    restart: unless-stopped
+volumes:
+  app_data:
+  mock_sites:
+  caddy_data:
+  caddy_config:

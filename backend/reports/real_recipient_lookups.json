@@ -1,0 +1,3305 @@
+[
+  {
+    "source": "deterministic_baseline",
+    "status": "completed",
+    "model_status": "not_used",
+    "recipients": [
+      {
+        "rung": "site",
+        "channel": "manual_web",
+        "address": "https://support.github.com/contact/report-abuse",
+        "endpoint": "https://support.github.com/contact/report-abuse",
+        "evidence": {
+          "source": "platform-registry-2026-10-10",
+          "method": "platform_registry",
+          "domain": "github.com"
+        },
+        "id": "contact-2",
+        "rank": 1
+      },
+      {
+        "rung": "host",
+        "channel": "manual_email",
+        "address": "abuse@github.com",
+        "endpoint": "mailto:abuse@github.com",
+        "evidence": {
+          "source": "https://rdap.db.ripe.net/ip/185.199.108.154",
+          "method": "RDAP_abuse_vcard",
+          "network": "US-GITHUB-20170413",
+          "origin_unverified": true
+        },
+        "id": "contact-1",
+        "rank": 2
+      },
+      {
+        "rung": "search",
+        "channel": "manual_web",
+        "address": "https://support.google.com/legal/troubleshooter/1114905",
+        "endpoint": "https://support.google.com/legal/troubleshooter/1114905",
+        "evidence": {
+          "source": "platform-registry-2026-10-10",
+          "method": "search_registry",
+          "scope": "Delisting only; source remains"
+        },
+        "id": "contact-3",
+        "rank": 3
+      }
+    ],
+    "tool_calls": [
+      {
+        "tool": "fetch_page",
+        "input": {
+          "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy"
+        },
+        "result": {
+          "status": 200,
+          "final_url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+          "title": "DMCA Takedown Policy - GitHub Docs",
+          "text": "DMCA Takedown Policy - GitHub Docs Skip to main content Skip to content GitHub Docs Search or ask Copilot / Menu Home Site policy Content Removal Policies DMCA Takedown Policy Site policy GitHub Terms Acceptable Use Policies Privacy Policies Other Site Policies Content Removal Policies Submitting content removal requests DMCA Takedown Policy GitHub Private Information Removal Policy GitHub Trademark Policy Guide to Submitting a DMCA Counter Notice Guide to Submitting a DMCA Takedown Notice Security Policies GitHub Company Policies In this article DMCA Takedown Policy Copy markdown In this article What Is the DMCA? DMCA Notices In a Nutshell A. How Does This Actually Work? B. What About Forks? (or What's a Fork?) C. What about Circumvention Claims? D. What If I Inadvertently Missed the Window to Make Changes? E. Transparency F. Repeated Infringement G. Submitting Notices Learn More and Speak Up Welcome to GitHub's Guide to the Digital Millennium Copyright Act, commonly known as the \"DMCA.\" This page is not meant as a comprehensive primer to the statute. However, if you've received a DMCA takedown notice targeting content you've posted on GitHub or if you're a rights-holder looking to issue such a notice, this page will hopefully help to demystify the law a bit as well as our policies for complying with it. (If you just want to submit a notice, you can skip to G. Submitting Notices .) As with all legal matters, it is always best to consult with a professional about your specific questions or situation. We strongly encourage you to do so before taking any action that might impact your rights. This guide isn't legal advice and shouldn't be taken as such. What Is the DMCA? In order to understand the DMCA and some of the policy lines it draws, it's perhaps helpful to consider life before it was enacted. The DMCA provides a safe harbor for service providers that host user-generated content. Since even a single claim of copyright infringement can carry statutory damages of up to $150,000, the possibility of being held liable for user-generated content could be very harmful for service providers. With potential damages multiplied across millions of users, cloud-computing and user-generated content sites like YouTube, Facebook, or GitHub probably never would have existed without the DMCA (or at least not without passing some of that cost downstream to their users). The DMCA addresses this issue by creating a copyright liability safe harbor for internet service providers hosting allegedly infringing user-generated content. Essentially, so long as a service provider follows the DMCA's notice-and-takedown rules, it won't be liable for copyright infringement based on user-generated content. Because of this, it is important for GitHub to maintain its DMCA safe-harbor status. The DMCA also prohibits the circumvention of technical measures that effectively control access to works protected by copyright. DMCA Notices In a Nutshell The DMCA provides two simple, straightforward procedures that all GitHub users should know about: (i) a takedown-notice procedure for copyright holders to request that content be removed; and (ii) a counter-notice procedure for users to get content re-enabled when content is taken down by mistake or misidentification. DMCA takedown notices are used by copyright owners to ask GitHub to take down content they believe to be infringing. If you are a software designer or developer, you create copyrighted content every day. If someone else is using your copyrighted content in an unauthorized manner on GitHub, you can send us a DMCA takedown notice to request that the infringing content be changed or removed. On the other hand, counter notices can be used to correct mistakes. Maybe the person sending the takedown notice does not hold the copyright or did not realize that you have a license or made some other mistake in their takedown notice. Since GitHub usually cannot know if there has been a mistake, the DMCA counter notice allows you to let us know and ask that we put the content back up. The DMCA notice and takedown process should be used only for complaints about copyright infringement. Notices sent through our DMCA process must identify copyrighted work or works that are allegedly being infringed. The process cannot be used for other complaints, such as complaints about alleged trademark infringement or sensitive data ; we offer separate processes for those situations. A. How Does This Actually Work? The DMCA framework is a bit like passing notes in class. The copyright owner hands GitHub a complaint about a user. If it's written correctly, we pass the complaint along to the user. If the user disputes the complaint, they can pass a note back saying so. GitHub exercises little discretion in the process other than determining whether the notices meet the minimum requirements of the DMCA. It is up to the parties (and their lawyers) to evaluate the merit of their claims, bearing in mind that notices must be made under penalty of perjury. Here are the basic steps in the process. Copyright Owner Investigates. A copyright owner should always conduct an initial investigation to confirm both (a) that they own the copyright to an original work and (b) that the content on GitHub is unauthorized and infringing. This includes confirming that the use is not protected as fair use . A particular use may be fair if it only uses a small amount of copyrighted content, uses that content in a transformative way, uses it for educational purposes, or some combination of the above. Because code naturally lends itself to such uses, each use case is different and must be considered separately. Example: An employee of Acme Web Company finds some of the company's code in a GitHub repository. Acme Web Company licenses its source code out to several trusted partners. Before sending in a take-down notice, Acme should review those licenses and its agreements to confirm that the code on GitHub is not authorized under any of them. Copyright Owner Sends A Notice. After conducting an investigation, a copyright owner prepares and sends a takedown notice to GitHub. Assuming the takedown notice is sufficiently detailed according to the statutory requirements (as explained in the how-to guide ), we will post the notice to our public repository and pass the link along to the affected user. GitHub Asks User to Make Changes. If the notice alleges that the entire contents of a repository infringe, or a package infringes, we will skip to Step 6 and disable the entire repository or package expeditiously. Otherwise, because GitHub cannot disable access to specific files within a repository, we will contact the user who created the repository and give them approximately 1 business day to delete or modify the content specified in the notice. We'll notify the copyright owner if and when we give the user a chance to make changes. Because packages are immutable, if only part of a package is infringing, GitHub would need to disable the entire package, but we permit reinstatement once the infringing portion is removed. User Notifies GitHub of Changes. If the user chooses to make the specified changes, they must tell us so within the window of approximately 1 business day. If they don't, we will disable the repository (as described in Step 6). If the user notifies us that they made changes, we will verify that the changes have been made and then notify the copyright owner. Copyright Owner Revises or Retracts the Notice. If the user makes changes, the copyright owner must review them and renew or revise their takedown notice if the changes are insufficient. GitHub will not take any further action unless the copyright owner contacts us to either renew the original takedown notice or submit a revised one. If the copyright owner is satisfied with the changes, they may either submit a formal retraction or else do nothing. GitHub will interpret silence longer than two weeks as an implied retraction of the takedown notice. GitHub May Disable Access to the Content. GitHub will disable a user's content if: (i) the copyright owner has alleged copyright over the user's entire repository or package (as noted in Step 3); (ii) the user has not made any changes after being given an opportunity to do so (as noted in Step 4); or (iii) the copyright owner has renewed their takedown notice after the user had a chance to make changes. If the copyright owner chooses instead to revise the notice, we will go back to Step 2 and repeat the process as if the revised notice were a new notice. User May Send A Counter Notice. We encourage users who have had content disabled to consult with a lawyer about their options. If a user believes that their content was disabled as a result of a mistake or misidentification, they may send us a counter notice . As with the original notice, we will make sure that the counter notice is sufficiently detailed (as explained in the how-to guide ). If it is, we will post it to our public repository and pass the notice back to the copyright owner by sending them the link. Copyright Owner May File a Legal Action. If a copyright owner wishes to keep the content disabled after receiving a counter notice, they will need to initiate a legal action seeking a court order to restrain the user from engaging in infringing activity relating to the content on GitHub. In other words, you might get sued. If the copyright owner does not give GitHub notice within 10-14 days, by sending a copy of a valid legal complaint filed in a court of competent jurisdiction, GitHub will re-enable the disabled content. B. What About Forks? (or What's a Fork?) One of the best features of GitHub is the ability for users to \"fork\" one another's repositories. What does that mean? In essence, it means that users can make a copy of a project on GitHub into their own repositories. As the license or the law allows, users can then make changes to that fork to either push back to the main project or just keep as their own variation of a project. Each of these copies is a GitHub glossary of the original repository, which in turn may also be called the \"parent\" of the fork. GitHub will not automatically disable forks when disabling a parent repository. This is because forks belong to different users, may have been altered in significant ways, and may be licensed or used in a different way that is protected by the fair-use doctrine. GitHub does not conduct any independent investigation into forks. We expect copyright owners to conduct that investigation and, if they believe that the forks are also infringing, expressly include forks in their takedown notice. In rare cases, you may be alleging copyright infringement in a full repository that is actively being forked. If at the time that you submitted your notice, you identified all existing forks of that repository as allegedly infringing, we would process a valid claim against all forks in that network at the time we process the notice. We would do this given the likelihood that all newly created forks would contain the same content. In addition, if the reported network that contains the allegedly infringing content is larger than one hundred (100) repositories and thus would be difficult to review in its entirety, we may consider disabling the entire network if you state in your notice that, \"Based on the representative number of forks I have reviewed, I believe that all or most of the forks are infringing to the same extent as the parent repository.\" Your sworn statement would apply to this statement. C. What about Circumvention Claims? The DMCA prohibits the circumvention of technical measures that effectively control access to works protected by copyright. Given that these types of claims are often highly technical in nature, GitHub requires claimants to provide detailed information about these claims , and we undertake a more extensive review. A circumvention claim must include the following details ",
+          "links": [
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "Skip to main content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "Skip to content"
+            },
+            {
+              "url": "https://docs.github.com/en",
+              "text": ""
+            },
+            {
+              "url": "https://docs.github.com/en",
+              "text": "GitHub Docs"
+            },
+            {
+              "url": "https://docs.github.com/en",
+              "text": "Home"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy",
+              "text": "Site policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies",
+              "text": "Content Removal Policies"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy",
+              "text": "Site policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": ""
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+              "text": "GitHub Terms of Service"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-corporate-terms-of-service",
+              "text": "GitHub Corporate Terms of Service"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features",
+              "text": "GitHub Terms for Additional Products and Features"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-community-guidelines",
+              "text": "GitHub Community Guidelines"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-community-code-of-conduct",
+              "text": "GitHub Community Code of Conduct"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-pre-release-license-terms",
+              "text": "GitHub Pre-release License Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-dpa-previews",
+              "text": "GitHub DPA-Covered Previews"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-sponsors-additional-terms",
+              "text": "GitHub Sponsors Additional Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-registered-developer-agreement",
+              "text": "GitHub Registered Developer Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-marketplace-terms-of-service",
+              "text": "GitHub Marketplace Terms of Service"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-marketplace-developer-agreement",
+              "text": "GitHub Marketplace Developer Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-research-program-terms",
+              "text": "GitHub Research Program Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-open-source-applications-terms-and-conditions",
+              "text": "GitHub Open Source Applications Terms and Conditions"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-event-terms",
+              "text": "GitHub Event Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-event-code-of-conduct",
+              "text": "GitHub Event Code of Conduct"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-educational-use-agreement",
+              "text": "GitHub Educational Use Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-copilot-extension-developer-policy",
+              "text": "GitHub Copilot Extension Developer Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-secret-scanning-partner-program-agreement",
+              "text": "GitHub Secret Scanning Partner Program Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies",
+              "text": "GitHub Acceptable Use Policies"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-active-malware-or-exploits",
+              "text": "Active Malware or Exploits"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-bullying-and-harassment",
+              "text": "Bullying and Harassment"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-disrupting-the-experience-of-other-users",
+              "text": "Disrupting the Experience of Other Users"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-doxxing-and-invasion-of-privacy",
+              "text": "Doxxing and Invasion of Privacy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-hate-speech-and-discrimination",
+              "text": "Hate Speech and Discrimination"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-impersonation",
+              "text": "Impersonation"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-misinformation-and-disinformation",
+              "text": "Disinformation Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-sexually-obscene-content",
+              "text": "Sexually Obscene Content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-threats-of-violence-and-gratuitously-violent-content",
+              "text": "Threats of Violence and Gratuitously Violent Content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-terrorism-and-violent-extremism",
+              "text": "Terrorism and Violent Extremism Content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-child-sexual-exploitation-or-abuse",
+              "text": "CSAM Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-non-consensual-intimate-imagery",
+              "text": "NCII"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-synthetic-media-and-ai-tools",
+              "text": "Synthetic Media and AI Tools"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-appeal-and-reinstatement",
+              "text": "GitHub Appeal and Reinstatement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "GitHub General Privacy Statement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-subprocessors",
+              "text": "GitHub Subprocessors"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-cookies",
+              "text": "GitHub Cookies"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-candidate-privacy-policy",
+              "text": "GitHub Global Data Privacy Notice for Candidates"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-and-trade-controls",
+              "text": "GitHub and Trade Controls"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-deceased-user-policy",
+              "text": "GitHub Deceased User Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-logo-policy",
+              "text": "GitHub Logo Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-government-takedown-policy",
+              "text": "GitHub Government Takedown Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-username-policy",
+              "text": "GitHub Username Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/guidelines-for-legal-requests-of-user-data",
+              "text": "Guidelines for Legal Requests of User Data"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-account-recovery-policy",
+              "text": "GitHub Account Recovery Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/submitting-content-removal-requests",
+              "text": "Submitting content removal requests"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "DMCA Takedown Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/github-private-information-removal-policy",
+              "text": "GitHub Private Information Removal Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/github-trademark-policy",
+              "text": "GitHub Trademark Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "Guide to Submitting a DMCA Counter Notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "Guide to Submitting a DMCA Takedown Notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/security-policies/coordinated-disclosure-of-security-vulnerabilities",
+              "text": "Coordinated Disclosure of Security Vulnerabilities"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/security-policies/github-bug-bounty-program-legal-safe-harbor",
+              "text": "GitHub Bug Bounty Program Legal Safe Harbor"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/security-policies/github-sirt-description-rfc-2350",
+              "text": "GitHub SIRT description RFC 2350"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-statement-against-modern-slavery-and-child-labor",
+              "text": "GitHub Statement Against Modern Slavery and Child Labor"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-anti-bribery-statement",
+              "text": "GitHub Anti-Bribery Statement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-gpl-cooperation-commitment",
+              "text": "GitHub GPL Cooperation Commitment"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-gifts-and-entertainment-policy",
+              "text": "GitHub Gifts and Entertainment Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "What Is the DMCA?"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "DMCA Notices In a Nutshell"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "A. How Does This Actually Work?"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "B. What About Forks? (or What's a Fork?)"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "C. What about Circumvention Claims?"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "D. What If I Inadvertently Missed the Window to Make Changes?"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "E. Transparency"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "F. Repeated Infringement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "G. Submitting Notices"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "Learn More and Speak Up"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "G. Submitting Notices"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "What Is the DMCA?"
+            },
+            {
+              "url": "https://arstechnica.com/tech-policy/2015/04/how-the-dmca-made-youtube/",
+              "text": "never would have existed"
+            },
+            {
+              "url": "https://www.copyright.gov/title17/92chap5.html",
+              "text": "copyright liability safe harbor"
+            },
+            {
+              "url": "https://www.copyright.gov/title17/92chap12.html",
+              "text": "circumvention of technical measures"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "DMCA Notices In a Nutshell"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "takedown-notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "counter-notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "takedown notices"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "counter notices"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/github-trademark-policy",
+              "text": "trademark infringement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/github-private-information-removal-policy",
+              "text": "sensitive data"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "A. How Does This Actually Work?"
+            },
+            {
+              "url": "https://www.lumendatabase.org/topics/22",
+              "text": "fair use"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "takedown notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "how-to guide"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "post the notice"
+            },
+            {
+              "url": "https://github.com/github/dmca",
+              "text": "public repository"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "counter notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "how-to guide"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "post it"
+            },
+            {
+              "url": "https://github.com/github/dmca",
+              "text": "public repository"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "B. What About Forks? (or What's a Fork?)"
+            },
+            {
+              "url": "https://docs.github.com/en/get-started/learning-about-github/github-glossary",
+              "text": "GitHub glossary"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "C. What about Circumvention Claims?"
+            },
+            {
+              "url": "https://www.copyright.gov/title17/92chap12.html",
+              "text": "circumvention of technical measures"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "detailed information about these claims"
+            },
+            {
+              "url": "https://github.blog/2021-07-27-github-developer-rights-fellowship-stanford-law-school/",
+              "text": "GitHub\u2019s Developer Defense Fund"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "D. What If I Inadvertently Missed the Window to Make Changes?"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "Step A.4"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "E. Transparency"
+            },
+            {
+              "url": "https://github.com/github/dmca",
+              "text": "https://github.com/github/dmca"
+            },
+            {
+              "url": "https://github.com/github/dmca/blob/master/2014/2014-05-28-Delicious-Brains.md",
+              "text": "notice"
+            },
+            {
+              "url": "https://github.com/github/dmca/blob/master/2014/2014-05-01-Pushwoosh-SDK-counternotice.md",
+              "text": "counter notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "F. Repeated Infringement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "G. Submitting Notices"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "How to Submit a DMCA Notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "How to Submit a DMCA Counter Notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "Learn More and Speak Up"
+            },
+            {
+              "url": "https://www.eff.org/wp/unintended-consequences-under-dmca",
+              "text": "Unintended Consequences: Twelve Years Under the DMCA"
+            },
+            {
+              "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1375604",
+              "text": "Statutory Damages in Copyright Law: A Remedy in Need of Reform"
+            },
+            {
+              "url": "https://the1709blog.blogspot.com/2012/11/is-term-of-protection-of-copyright-too.html",
+              "text": "Is the Term of Protection of Copyright Too Long?"
+            },
+            {
+              "url": "https://www.techdirt.com/articles/20140314/11350426579/if-were-going-to-change-dmcas-notice-takedown-lets-focus-how-widely-its-abused.shtml",
+              "text": "If We're Going to Change DMCA's 'Notice & Takedown,' Let's Focus on How Widely It's Abused"
+            },
+            {
+              "url": "https://www.cato-unbound.org/issues/january-2013/opportunities-copyright-reform",
+              "text": "Opportunities for Copyright Reform"
+            },
+            {
+              "url": "https://digitalcommons.law.scu.edu/lawreview/vol42/iss1/6/",
+              "text": "Fair Use Doctrine and the Digital Millennium Copyright Act: Does Fair Use Exist on the Internet Under the DMCA?"
+            },
+            {
+              "url": "https://www.govtrack.us/congress/members",
+              "text": "U.S. Congress"
+            },
+            {
+              "url": "https://www.europarl.europa.eu/meps/en/home",
+              "text": "E.U. Parliament"
+            },
+            {
+              "url": "https://github.com",
+              "text": ""
+            },
+            {
+              "url": "https://github.com/github/docs/blob/main/content/site-policy/content-removal-policies/dmca-takedown-policy.md",
+              "text": "Make a contribution"
+            },
+            {
+              "url": "https://github.com/orgs/community/discussions",
+              "text": "Ask the GitHub community"
+            },
+            {
+              "url": "https://support.github.com",
+              "text": "Contact support"
+            },
+            {
+              "url": "https://services.github.com",
+              "text": "Expert services"
+            },
+            {
+              "url": "https://github.blog",
+              "text": "Blog"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+              "text": "Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement",
+              "text": "Privacy"
+            },
+            {
+              "url": "https://www.githubstatus.com/",
+              "text": "Status"
+            },
+            {
+              "url": "https://github.com/pricing",
+              "text": "Pricing"
+            }
+          ],
+          "forms": [],
+          "headers": {
+            "content-type": "text/html; charset=utf-8",
+            "via": "1.1 varnish, 1.1 varnish",
+            "x-served-by": "cache-iad-khef600053-IAD, cache-dfw-kdfw8210050-DFW"
+          },
+          "contacts": []
+        }
+      },
+      {
+        "tool": "fetch_page",
+        "input": {
+          "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy"
+        },
+        "result": {
+          "status": 200,
+          "final_url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+          "title": "DMCA Takedown Policy - GitHub Docs",
+          "text": "DMCA Takedown Policy - GitHub Docs Skip to main content Skip to content GitHub Docs Search or ask Copilot / Menu Home Site policy Content Removal Policies DMCA Takedown Policy Site policy GitHub Terms Acceptable Use Policies Privacy Policies Other Site Policies Content Removal Policies Submitting content removal requests DMCA Takedown Policy GitHub Private Information Removal Policy GitHub Trademark Policy Guide to Submitting a DMCA Counter Notice Guide to Submitting a DMCA Takedown Notice Security Policies GitHub Company Policies In this article DMCA Takedown Policy Copy markdown In this article What Is the DMCA? DMCA Notices In a Nutshell A. How Does This Actually Work? B. What About Forks? (or What's a Fork?) C. What about Circumvention Claims? D. What If I Inadvertently Missed the Window to Make Changes? E. Transparency F. Repeated Infringement G. Submitting Notices Learn More and Speak Up Welcome to GitHub's Guide to the Digital Millennium Copyright Act, commonly known as the \"DMCA.\" This page is not meant as a comprehensive primer to the statute. However, if you've received a DMCA takedown notice targeting content you've posted on GitHub or if you're a rights-holder looking to issue such a notice, this page will hopefully help to demystify the law a bit as well as our policies for complying with it. (If you just want to submit a notice, you can skip to G. Submitting Notices .) As with all legal matters, it is always best to consult with a professional about your specific questions or situation. We strongly encourage you to do so before taking any action that might impact your rights. This guide isn't legal advice and shouldn't be taken as such. What Is the DMCA? In order to understand the DMCA and some of the policy lines it draws, it's perhaps helpful to consider life before it was enacted. The DMCA provides a safe harbor for service providers that host user-generated content. Since even a single claim of copyright infringement can carry statutory damages of up to $150,000, the possibility of being held liable for user-generated content could be very harmful for service providers. With potential damages multiplied across millions of users, cloud-computing and user-generated content sites like YouTube, Facebook, or GitHub probably never would have existed without the DMCA (or at least not without passing some of that cost downstream to their users). The DMCA addresses this issue by creating a copyright liability safe harbor for internet service providers hosting allegedly infringing user-generated content. Essentially, so long as a service provider follows the DMCA's notice-and-takedown rules, it won't be liable for copyright infringement based on user-generated content. Because of this, it is important for GitHub to maintain its DMCA safe-harbor status. The DMCA also prohibits the circumvention of technical measures that effectively control access to works protected by copyright. DMCA Notices In a Nutshell The DMCA provides two simple, straightforward procedures that all GitHub users should know about: (i) a takedown-notice procedure for copyright holders to request that content be removed; and (ii) a counter-notice procedure for users to get content re-enabled when content is taken down by mistake or misidentification. DMCA takedown notices are used by copyright owners to ask GitHub to take down content they believe to be infringing. If you are a software designer or developer, you create copyrighted content every day. If someone else is using your copyrighted content in an unauthorized manner on GitHub, you can send us a DMCA takedown notice to request that the infringing content be changed or removed. On the other hand, counter notices can be used to correct mistakes. Maybe the person sending the takedown notice does not hold the copyright or did not realize that you have a license or made some other mistake in their takedown notice. Since GitHub usually cannot know if there has been a mistake, the DMCA counter notice allows you to let us know and ask that we put the content back up. The DMCA notice and takedown process should be used only for complaints about copyright infringement. Notices sent through our DMCA process must identify copyrighted work or works that are allegedly being infringed. The process cannot be used for other complaints, such as complaints about alleged trademark infringement or sensitive data ; we offer separate processes for those situations. A. How Does This Actually Work? The DMCA framework is a bit like passing notes in class. The copyright owner hands GitHub a complaint about a user. If it's written correctly, we pass the complaint along to the user. If the user disputes the complaint, they can pass a note back saying so. GitHub exercises little discretion in the process other than determining whether the notices meet the minimum requirements of the DMCA. It is up to the parties (and their lawyers) to evaluate the merit of their claims, bearing in mind that notices must be made under penalty of perjury. Here are the basic steps in the process. Copyright Owner Investigates. A copyright owner should always conduct an initial investigation to confirm both (a) that they own the copyright to an original work and (b) that the content on GitHub is unauthorized and infringing. This includes confirming that the use is not protected as fair use . A particular use may be fair if it only uses a small amount of copyrighted content, uses that content in a transformative way, uses it for educational purposes, or some combination of the above. Because code naturally lends itself to such uses, each use case is different and must be considered separately. Example: An employee of Acme Web Company finds some of the company's code in a GitHub repository. Acme Web Company licenses its source code out to several trusted partners. Before sending in a take-down notice, Acme should review those licenses and its agreements to confirm that the code on GitHub is not authorized under any of them. Copyright Owner Sends A Notice. After conducting an investigation, a copyright owner prepares and sends a takedown notice to GitHub. Assuming the takedown notice is sufficiently detailed according to the statutory requirements (as explained in the how-to guide ), we will post the notice to our public repository and pass the link along to the affected user. GitHub Asks User to Make Changes. If the notice alleges that the entire contents of a repository infringe, or a package infringes, we will skip to Step 6 and disable the entire repository or package expeditiously. Otherwise, because GitHub cannot disable access to specific files within a repository, we will contact the user who created the repository and give them approximately 1 business day to delete or modify the content specified in the notice. We'll notify the copyright owner if and when we give the user a chance to make changes. Because packages are immutable, if only part of a package is infringing, GitHub would need to disable the entire package, but we permit reinstatement once the infringing portion is removed. User Notifies GitHub of Changes. If the user chooses to make the specified changes, they must tell us so within the window of approximately 1 business day. If they don't, we will disable the repository (as described in Step 6). If the user notifies us that they made changes, we will verify that the changes have been made and then notify the copyright owner. Copyright Owner Revises or Retracts the Notice. If the user makes changes, the copyright owner must review them and renew or revise their takedown notice if the changes are insufficient. GitHub will not take any further action unless the copyright owner contacts us to either renew the original takedown notice or submit a revised one. If the copyright owner is satisfied with the changes, they may either submit a formal retraction or else do nothing. GitHub will interpret silence longer than two weeks as an implied retraction of the takedown notice. GitHub May Disable Access to the Content. GitHub will disable a user's content if: (i) the copyright owner has alleged copyright over the user's entire repository or package (as noted in Step 3); (ii) the user has not made any changes after being given an opportunity to do so (as noted in Step 4); or (iii) the copyright owner has renewed their takedown notice after the user had a chance to make changes. If the copyright owner chooses instead to revise the notice, we will go back to Step 2 and repeat the process as if the revised notice were a new notice. User May Send A Counter Notice. We encourage users who have had content disabled to consult with a lawyer about their options. If a user believes that their content was disabled as a result of a mistake or misidentification, they may send us a counter notice . As with the original notice, we will make sure that the counter notice is sufficiently detailed (as explained in the how-to guide ). If it is, we will post it to our public repository and pass the notice back to the copyright owner by sending them the link. Copyright Owner May File a Legal Action. If a copyright owner wishes to keep the content disabled after receiving a counter notice, they will need to initiate a legal action seeking a court order to restrain the user from engaging in infringing activity relating to the content on GitHub. In other words, you might get sued. If the copyright owner does not give GitHub notice within 10-14 days, by sending a copy of a valid legal complaint filed in a court of competent jurisdiction, GitHub will re-enable the disabled content. B. What About Forks? (or What's a Fork?) One of the best features of GitHub is the ability for users to \"fork\" one another's repositories. What does that mean? In essence, it means that users can make a copy of a project on GitHub into their own repositories. As the license or the law allows, users can then make changes to that fork to either push back to the main project or just keep as their own variation of a project. Each of these copies is a GitHub glossary of the original repository, which in turn may also be called the \"parent\" of the fork. GitHub will not automatically disable forks when disabling a parent repository. This is because forks belong to different users, may have been altered in significant ways, and may be licensed or used in a different way that is protected by the fair-use doctrine. GitHub does not conduct any independent investigation into forks. We expect copyright owners to conduct that investigation and, if they believe that the forks are also infringing, expressly include forks in their takedown notice. In rare cases, you may be alleging copyright infringement in a full repository that is actively being forked. If at the time that you submitted your notice, you identified all existing forks of that repository as allegedly infringing, we would process a valid claim against all forks in that network at the time we process the notice. We would do this given the likelihood that all newly created forks would contain the same content. In addition, if the reported network that contains the allegedly infringing content is larger than one hundred (100) repositories and thus would be difficult to review in its entirety, we may consider disabling the entire network if you state in your notice that, \"Based on the representative number of forks I have reviewed, I believe that all or most of the forks are infringing to the same extent as the parent repository.\" Your sworn statement would apply to this statement. C. What about Circumvention Claims? The DMCA prohibits the circumvention of technical measures that effectively control access to works protected by copyright. Given that these types of claims are often highly technical in nature, GitHub requires claimants to provide detailed information about these claims , and we undertake a more extensive review. A circumvention claim must include the following details ",
+          "links": [
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "Skip to main content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "Skip to content"
+            },
+            {
+              "url": "https://docs.github.com/en",
+              "text": ""
+            },
+            {
+              "url": "https://docs.github.com/en",
+              "text": "GitHub Docs"
+            },
+            {
+              "url": "https://docs.github.com/en",
+              "text": "Home"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy",
+              "text": "Site policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies",
+              "text": "Content Removal Policies"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy",
+              "text": "Site policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": ""
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+              "text": "GitHub Terms of Service"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-corporate-terms-of-service",
+              "text": "GitHub Corporate Terms of Service"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features",
+              "text": "GitHub Terms for Additional Products and Features"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-community-guidelines",
+              "text": "GitHub Community Guidelines"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-community-code-of-conduct",
+              "text": "GitHub Community Code of Conduct"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-pre-release-license-terms",
+              "text": "GitHub Pre-release License Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-dpa-previews",
+              "text": "GitHub DPA-Covered Previews"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-sponsors-additional-terms",
+              "text": "GitHub Sponsors Additional Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-registered-developer-agreement",
+              "text": "GitHub Registered Developer Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-marketplace-terms-of-service",
+              "text": "GitHub Marketplace Terms of Service"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-marketplace-developer-agreement",
+              "text": "GitHub Marketplace Developer Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-research-program-terms",
+              "text": "GitHub Research Program Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-open-source-applications-terms-and-conditions",
+              "text": "GitHub Open Source Applications Terms and Conditions"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-event-terms",
+              "text": "GitHub Event Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-event-code-of-conduct",
+              "text": "GitHub Event Code of Conduct"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-educational-use-agreement",
+              "text": "GitHub Educational Use Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-copilot-extension-developer-policy",
+              "text": "GitHub Copilot Extension Developer Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-secret-scanning-partner-program-agreement",
+              "text": "GitHub Secret Scanning Partner Program Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies",
+              "text": "GitHub Acceptable Use Policies"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-active-malware-or-exploits",
+              "text": "Active Malware or Exploits"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-bullying-and-harassment",
+              "text": "Bullying and Harassment"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-disrupting-the-experience-of-other-users",
+              "text": "Disrupting the Experience of Other Users"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-doxxing-and-invasion-of-privacy",
+              "text": "Doxxing and Invasion of Privacy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-hate-speech-and-discrimination",
+              "text": "Hate Speech and Discrimination"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-impersonation",
+              "text": "Impersonation"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-misinformation-and-disinformation",
+              "text": "Disinformation Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-sexually-obscene-content",
+              "text": "Sexually Obscene Content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-threats-of-violence-and-gratuitously-violent-content",
+              "text": "Threats of Violence and Gratuitously Violent Content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-terrorism-and-violent-extremism",
+              "text": "Terrorism and Violent Extremism Content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-child-sexual-exploitation-or-abuse",
+              "text": "CSAM Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-non-consensual-intimate-imagery",
+              "text": "NCII"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-synthetic-media-and-ai-tools",
+              "text": "Synthetic Media and AI Tools"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-appeal-and-reinstatement",
+              "text": "GitHub Appeal and Reinstatement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "GitHub General Privacy Statement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-subprocessors",
+              "text": "GitHub Subprocessors"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-cookies",
+              "text": "GitHub Cookies"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-candidate-privacy-policy",
+              "text": "GitHub Global Data Privacy Notice for Candidates"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-and-trade-controls",
+              "text": "GitHub and Trade Controls"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-deceased-user-policy",
+              "text": "GitHub Deceased User Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-logo-policy",
+              "text": "GitHub Logo Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-government-takedown-policy",
+              "text": "GitHub Government Takedown Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-username-policy",
+              "text": "GitHub Username Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/guidelines-for-legal-requests-of-user-data",
+              "text": "Guidelines for Legal Requests of User Data"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-account-recovery-policy",
+              "text": "GitHub Account Recovery Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/submitting-content-removal-requests",
+              "text": "Submitting content removal requests"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "DMCA Takedown Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/github-private-information-removal-policy",
+              "text": "GitHub Private Information Removal Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/github-trademark-policy",
+              "text": "GitHub Trademark Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "Guide to Submitting a DMCA Counter Notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "Guide to Submitting a DMCA Takedown Notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/security-policies/coordinated-disclosure-of-security-vulnerabilities",
+              "text": "Coordinated Disclosure of Security Vulnerabilities"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/security-policies/github-bug-bounty-program-legal-safe-harbor",
+              "text": "GitHub Bug Bounty Program Legal Safe Harbor"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/security-policies/github-sirt-description-rfc-2350",
+              "text": "GitHub SIRT description RFC 2350"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-statement-against-modern-slavery-and-child-labor",
+              "text": "GitHub Statement Against Modern Slavery and Child Labor"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-anti-bribery-statement",
+              "text": "GitHub Anti-Bribery Statement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-gpl-cooperation-commitment",
+              "text": "GitHub GPL Cooperation Commitment"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-gifts-and-entertainment-policy",
+              "text": "GitHub Gifts and Entertainment Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "What Is the DMCA?"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "DMCA Notices In a Nutshell"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "A. How Does This Actually Work?"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "B. What About Forks? (or What's a Fork?)"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "C. What about Circumvention Claims?"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "D. What If I Inadvertently Missed the Window to Make Changes?"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "E. Transparency"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "F. Repeated Infringement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "G. Submitting Notices"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "Learn More and Speak Up"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "G. Submitting Notices"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "What Is the DMCA?"
+            },
+            {
+              "url": "https://arstechnica.com/tech-policy/2015/04/how-the-dmca-made-youtube/",
+              "text": "never would have existed"
+            },
+            {
+              "url": "https://www.copyright.gov/title17/92chap5.html",
+              "text": "copyright liability safe harbor"
+            },
+            {
+              "url": "https://www.copyright.gov/title17/92chap12.html",
+              "text": "circumvention of technical measures"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "DMCA Notices In a Nutshell"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "takedown-notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "counter-notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "takedown notices"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "counter notices"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/github-trademark-policy",
+              "text": "trademark infringement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/github-private-information-removal-policy",
+              "text": "sensitive data"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "A. How Does This Actually Work?"
+            },
+            {
+              "url": "https://www.lumendatabase.org/topics/22",
+              "text": "fair use"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "takedown notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "how-to guide"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "post the notice"
+            },
+            {
+              "url": "https://github.com/github/dmca",
+              "text": "public repository"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "counter notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "how-to guide"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "post it"
+            },
+            {
+              "url": "https://github.com/github/dmca",
+              "text": "public repository"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "B. What About Forks? (or What's a Fork?)"
+            },
+            {
+              "url": "https://docs.github.com/en/get-started/learning-about-github/github-glossary",
+              "text": "GitHub glossary"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "C. What about Circumvention Claims?"
+            },
+            {
+              "url": "https://www.copyright.gov/title17/92chap12.html",
+              "text": "circumvention of technical measures"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "detailed information about these claims"
+            },
+            {
+              "url": "https://github.blog/2021-07-27-github-developer-rights-fellowship-stanford-law-school/",
+              "text": "GitHub\u2019s Developer Defense Fund"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "D. What If I Inadvertently Missed the Window to Make Changes?"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "Step A.4"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "E. Transparency"
+            },
+            {
+              "url": "https://github.com/github/dmca",
+              "text": "https://github.com/github/dmca"
+            },
+            {
+              "url": "https://github.com/github/dmca/blob/master/2014/2014-05-28-Delicious-Brains.md",
+              "text": "notice"
+            },
+            {
+              "url": "https://github.com/github/dmca/blob/master/2014/2014-05-01-Pushwoosh-SDK-counternotice.md",
+              "text": "counter notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "F. Repeated Infringement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "G. Submitting Notices"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "How to Submit a DMCA Notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "How to Submit a DMCA Counter Notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "Learn More and Speak Up"
+            },
+            {
+              "url": "https://www.eff.org/wp/unintended-consequences-under-dmca",
+              "text": "Unintended Consequences: Twelve Years Under the DMCA"
+            },
+            {
+              "url": "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=1375604",
+              "text": "Statutory Damages in Copyright Law: A Remedy in Need of Reform"
+            },
+            {
+              "url": "https://the1709blog.blogspot.com/2012/11/is-term-of-protection-of-copyright-too.html",
+              "text": "Is the Term of Protection of Copyright Too Long?"
+            },
+            {
+              "url": "https://www.techdirt.com/articles/20140314/11350426579/if-were-going-to-change-dmcas-notice-takedown-lets-focus-how-widely-its-abused.shtml",
+              "text": "If We're Going to Change DMCA's 'Notice & Takedown,' Let's Focus on How Widely It's Abused"
+            },
+            {
+              "url": "https://www.cato-unbound.org/issues/january-2013/opportunities-copyright-reform",
+              "text": "Opportunities for Copyright Reform"
+            },
+            {
+              "url": "https://digitalcommons.law.scu.edu/lawreview/vol42/iss1/6/",
+              "text": "Fair Use Doctrine and the Digital Millennium Copyright Act: Does Fair Use Exist on the Internet Under the DMCA?"
+            },
+            {
+              "url": "https://www.govtrack.us/congress/members",
+              "text": "U.S. Congress"
+            },
+            {
+              "url": "https://www.europarl.europa.eu/meps/en/home",
+              "text": "E.U. Parliament"
+            },
+            {
+              "url": "https://github.com",
+              "text": ""
+            },
+            {
+              "url": "https://github.com/github/docs/blob/main/content/site-policy/content-removal-policies/dmca-takedown-policy.md",
+              "text": "Make a contribution"
+            },
+            {
+              "url": "https://github.com/orgs/community/discussions",
+              "text": "Ask the GitHub community"
+            },
+            {
+              "url": "https://support.github.com",
+              "text": "Contact support"
+            },
+            {
+              "url": "https://services.github.com",
+              "text": "Expert services"
+            },
+            {
+              "url": "https://github.blog",
+              "text": "Blog"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+              "text": "Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement",
+              "text": "Privacy"
+            },
+            {
+              "url": "https://www.githubstatus.com/",
+              "text": "Status"
+            },
+            {
+              "url": "https://github.com/pricing",
+              "text": "Pricing"
+            }
+          ],
+          "forms": [],
+          "headers": {
+            "content-type": "text/html; charset=utf-8",
+            "via": "1.1 varnish, 1.1 varnish",
+            "x-served-by": "cache-iad-khef600053-IAD, cache-dfw-kdfw8210050-DFW"
+          },
+          "contacts": []
+        }
+      },
+      {
+        "tool": "find_policy_pages",
+        "input": {
+          "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy"
+        },
+        "result": {
+          "status": 200,
+          "source": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+          "links": [
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-doxxing-and-invasion-of-privacy",
+              "text": "Doxxing and Invasion of Privacy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-child-sexual-exploitation-or-abuse",
+              "text": "CSAM Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "GitHub General Privacy Statement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-subprocessors",
+              "text": "GitHub Subprocessors"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-cookies",
+              "text": "GitHub Cookies"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-candidate-privacy-policy",
+              "text": "GitHub Global Data Privacy Notice for Candidates"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/guidelines-for-legal-requests-of-user-data",
+              "text": "Guidelines for Legal Requests of User Data"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "Guide to Submitting a DMCA Counter Notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "Guide to Submitting a DMCA Takedown Notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/security-policies/github-bug-bounty-program-legal-safe-harbor",
+              "text": "GitHub Bug Bounty Program Legal Safe Harbor"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "takedown-notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "counter-notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "takedown notices"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "counter notices"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "takedown notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "how-to guide"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "counter notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "how-to guide"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "detailed information about these claims"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "How to Submit a DMCA Notice"
+            }
+          ]
+        }
+      },
+      {
+        "tool": "fetch_page",
+        "input": {
+          "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-doxxing-and-invasion-of-privacy"
+        },
+        "result": {
+          "status": 200,
+          "final_url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-doxxing-and-invasion-of-privacy",
+          "title": "GitHub Doxxing and Invasion of Privacy - GitHub Docs",
+          "text": "GitHub Doxxing and Invasion of Privacy - GitHub Docs Skip to main content Skip to content GitHub Docs Search or ask Copilot / Menu Home Site policy Acceptable Use Policies Doxxing and Invasion of Privacy Site policy GitHub Terms Acceptable Use Policies GitHub Acceptable Use Policies Active Malware or Exploits Bullying and Harassment Disrupting the Experience of Other Users Doxxing and Invasion of Privacy Hate Speech and Discrimination Impersonation Disinformation Policy Sexually Obscene Content Threats of Violence and Gratuitously Violent Content Terrorism and Violent Extremism Content CSAM Policy NCII Synthetic Media and AI Tools GitHub Appeal and Reinstatement Privacy Policies Other Site Policies Content Removal Policies Security Policies GitHub Company Policies GitHub Doxxing and Invasion of Privacy Copy markdown Don't post other people's personal information. This includes: Personal, private email addresses Phone numbers Physical addresses or other private location information Bank account information or credit card numbers Social Security/National Identity numbers Passwords Voter information Medical information and personal biometric data Other private information that may pose a safety or security risk We may consider other information, such as photos or videos that were taken or distributed without the subject's consent, to be an invasion of privacy, especially when such material presents a safety risk to the subject, such as in the case of intimidation or harassment. GitHub will take context into account as well as whether the reported content is publicly available elsewhere. Please note, however, that while sharing publicly available content may not be a violation of this policy, if the information is shared with the intent to harass or incite other abusive behavior, it may violate our prohibition against bullying and harassment . For more information, or to learn how to report a violation, see our Private Information Removal Policy and our instructions for Reporting Abuse . Back to top Help and support Help us make GitHub Docs great! All Docs are open source. See something that's wrong or unclear? Submit a pull request. Make a contribution Still need help? Ask the GitHub community Contact support Expert services Blog GitHub Inc. \u00a9 2026 Terms Privacy Status Pricing",
+          "links": [
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-doxxing-and-invasion-of-privacy",
+              "text": "Skip to main content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-doxxing-and-invasion-of-privacy",
+              "text": "Skip to content"
+            },
+            {
+              "url": "https://docs.github.com/en",
+              "text": ""
+            },
+            {
+              "url": "https://docs.github.com/en",
+              "text": "GitHub Docs"
+            },
+            {
+              "url": "https://docs.github.com/en",
+              "text": "Home"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy",
+              "text": "Site policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies",
+              "text": "Acceptable Use Policies"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy",
+              "text": "Site policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-doxxing-and-invasion-of-privacy",
+              "text": ""
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+              "text": "GitHub Terms of Service"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-corporate-terms-of-service",
+              "text": "GitHub Corporate Terms of Service"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features",
+              "text": "GitHub Terms for Additional Products and Features"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-community-guidelines",
+              "text": "GitHub Community Guidelines"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-community-code-of-conduct",
+              "text": "GitHub Community Code of Conduct"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-pre-release-license-terms",
+              "text": "GitHub Pre-release License Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-dpa-previews",
+              "text": "GitHub DPA-Covered Previews"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-sponsors-additional-terms",
+              "text": "GitHub Sponsors Additional Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-registered-developer-agreement",
+              "text": "GitHub Registered Developer Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-marketplace-terms-of-service",
+              "text": "GitHub Marketplace Terms of Service"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-marketplace-developer-agreement",
+              "text": "GitHub Marketplace Developer Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-research-program-terms",
+              "text": "GitHub Research Program Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-open-source-applications-terms-and-conditions",
+              "text": "GitHub Open Source Applications Terms and Conditions"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-event-terms",
+              "text": "GitHub Event Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-event-code-of-conduct",
+              "text": "GitHub Event Code of Conduct"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-educational-use-agreement",
+              "text": "GitHub Educational Use Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-copilot-extension-developer-policy",
+              "text": "GitHub Copilot Extension Developer Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-secret-scanning-partner-program-agreement",
+              "text": "GitHub Secret Scanning Partner Program Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies",
+              "text": "GitHub Acceptable Use Policies"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-active-malware-or-exploits",
+              "text": "Active Malware or Exploits"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-bullying-and-harassment",
+              "text": "Bullying and Harassment"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-disrupting-the-experience-of-other-users",
+              "text": "Disrupting the Experience of Other Users"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-doxxing-and-invasion-of-privacy",
+              "text": "Doxxing and Invasion of Privacy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-hate-speech-and-discrimination",
+              "text": "Hate Speech and Discrimination"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-impersonation",
+              "text": "Impersonation"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-misinformation-and-disinformation",
+              "text": "Disinformation Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-sexually-obscene-content",
+              "text": "Sexually Obscene Content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-threats-of-violence-and-gratuitously-violent-content",
+              "text": "Threats of Violence and Gratuitously Violent Content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-terrorism-and-violent-extremism",
+              "text": "Terrorism and Violent Extremism Content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-child-sexual-exploitation-or-abuse",
+              "text": "CSAM Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-non-consensual-intimate-imagery",
+              "text": "NCII"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-synthetic-media-and-ai-tools",
+              "text": "Synthetic Media and AI Tools"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-appeal-and-reinstatement",
+              "text": "GitHub Appeal and Reinstatement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "GitHub General Privacy Statement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-subprocessors",
+              "text": "GitHub Subprocessors"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-cookies",
+              "text": "GitHub Cookies"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-candidate-privacy-policy",
+              "text": "GitHub Global Data Privacy Notice for Candidates"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-and-trade-controls",
+              "text": "GitHub and Trade Controls"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-deceased-user-policy",
+              "text": "GitHub Deceased User Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-logo-policy",
+              "text": "GitHub Logo Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-government-takedown-policy",
+              "text": "GitHub Government Takedown Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-username-policy",
+              "text": "GitHub Username Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/guidelines-for-legal-requests-of-user-data",
+              "text": "Guidelines for Legal Requests of User Data"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-account-recovery-policy",
+              "text": "GitHub Account Recovery Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/submitting-content-removal-requests",
+              "text": "Submitting content removal requests"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "DMCA Takedown Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/github-private-information-removal-policy",
+              "text": "GitHub Private Information Removal Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/github-trademark-policy",
+              "text": "GitHub Trademark Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "Guide to Submitting a DMCA Counter Notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "Guide to Submitting a DMCA Takedown Notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/security-policies/coordinated-disclosure-of-security-vulnerabilities",
+              "text": "Coordinated Disclosure of Security Vulnerabilities"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/security-policies/github-bug-bounty-program-legal-safe-harbor",
+              "text": "GitHub Bug Bounty Program Legal Safe Harbor"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/security-policies/github-sirt-description-rfc-2350",
+              "text": "GitHub SIRT description RFC 2350"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-statement-against-modern-slavery-and-child-labor",
+              "text": "GitHub Statement Against Modern Slavery and Child Labor"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-anti-bribery-statement",
+              "text": "GitHub Anti-Bribery Statement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-gpl-cooperation-commitment",
+              "text": "GitHub GPL Cooperation Commitment"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-gifts-and-entertainment-policy",
+              "text": "GitHub Gifts and Entertainment Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-bullying-and-harassment",
+              "text": "bullying and harassment"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/github-private-information-removal-policy",
+              "text": "Private Information Removal Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/communities/maintaining-your-safety-on-github/reporting-abuse-or-spam",
+              "text": "Reporting Abuse"
+            },
+            {
+              "url": "https://github.com",
+              "text": ""
+            },
+            {
+              "url": "https://github.com/github/docs/blob/main/content/site-policy/acceptable-use-policies/github-doxxing-and-invasion-of-privacy.md",
+              "text": "Make a contribution"
+            },
+            {
+              "url": "https://github.com/orgs/community/discussions",
+              "text": "Ask the GitHub community"
+            },
+            {
+              "url": "https://support.github.com",
+              "text": "Contact support"
+            },
+            {
+              "url": "https://services.github.com",
+              "text": "Expert services"
+            },
+            {
+              "url": "https://github.blog",
+              "text": "Blog"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+              "text": "Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement",
+              "text": "Privacy"
+            },
+            {
+              "url": "https://www.githubstatus.com/",
+              "text": "Status"
+            },
+            {
+              "url": "https://github.com/pricing",
+              "text": "Pricing"
+            }
+          ],
+          "forms": [],
+          "headers": {
+            "content-type": "text/html; charset=utf-8",
+            "via": "1.1 varnish, 1.1 varnish",
+            "x-served-by": "cache-iad-kcgs7200090-IAD, cache-dfw-kdfw8210050-DFW"
+          },
+          "contacts": []
+        }
+      },
+      {
+        "tool": "fetch_page",
+        "input": {
+          "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-child-sexual-exploitation-or-abuse"
+        },
+        "result": {
+          "status": 200,
+          "final_url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-child-sexual-exploitation-or-abuse",
+          "title": "GitHub Child Sexual Exploitation or Abuse - GitHub Docs",
+          "text": "GitHub Child Sexual Exploitation or Abuse - GitHub Docs Skip to main content Skip to content GitHub Docs Search or ask Copilot / Menu Home Site policy Acceptable Use Policies CSAM Policy Site policy GitHub Terms Acceptable Use Policies GitHub Acceptable Use Policies Active Malware or Exploits Bullying and Harassment Disrupting the Experience of Other Users Doxxing and Invasion of Privacy Hate Speech and Discrimination Impersonation Disinformation Policy Sexually Obscene Content Threats of Violence and Gratuitously Violent Content Terrorism and Violent Extremism Content CSAM Policy NCII Synthetic Media and AI Tools GitHub Appeal and Reinstatement Privacy Policies Other Site Policies Content Removal Policies Security Policies GitHub Company Policies GitHub Child Sexual Exploitation or Abuse Copy markdown GitHub does not allow any content or conduct on GitHub that exploits, harms, or endangers children, and we have a zero-tolerance policy for child sexual exploitation or abuse material (CSAM). This means you may not engage in activities including but not limited to: Uploading, linking to, or otherwise distributing or promoting CSAM Depicting sexualized minors in any form, including textual fantasies, cartoons or drawings, simulations, or AI-generated content Soliciting or advertising CSAM or services involving the exploitation of children Engaging in or facilitating child grooming, sextortion, or trafficking of minors Glorifying, praising, supporting, or instructing in the abuse of children GitHub may use automated tools, such as hash matching, as well as human review to detect and remove CSAM. GitHub will swiftly remove any such content once identified and may take additional action, including account suspension and reporting illegal activity to the National Center for Missing & Exploited Children or other law enforcement authorities. If you encounter any content that you believe violates this policy, please report it immediately using our Reporting Abuse instructions. Back to top Help and support Help us make GitHub Docs great! All Docs are open source. See something that's wrong or unclear? Submit a pull request. Make a contribution Still need help? Ask the GitHub community Contact support Expert services Blog GitHub Inc. \u00a9 2026 Terms Privacy Status Pricing",
+          "links": [
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-child-sexual-exploitation-or-abuse",
+              "text": "Skip to main content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-child-sexual-exploitation-or-abuse",
+              "text": "Skip to content"
+            },
+            {
+              "url": "https://docs.github.com/en",
+              "text": ""
+            },
+            {
+              "url": "https://docs.github.com/en",
+              "text": "GitHub Docs"
+            },
+            {
+              "url": "https://docs.github.com/en",
+              "text": "Home"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy",
+              "text": "Site policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies",
+              "text": "Acceptable Use Policies"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy",
+              "text": "Site policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-child-sexual-exploitation-or-abuse",
+              "text": ""
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+              "text": "GitHub Terms of Service"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-corporate-terms-of-service",
+              "text": "GitHub Corporate Terms of Service"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features",
+              "text": "GitHub Terms for Additional Products and Features"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-community-guidelines",
+              "text": "GitHub Community Guidelines"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-community-code-of-conduct",
+              "text": "GitHub Community Code of Conduct"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-pre-release-license-terms",
+              "text": "GitHub Pre-release License Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-dpa-previews",
+              "text": "GitHub DPA-Covered Previews"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-sponsors-additional-terms",
+              "text": "GitHub Sponsors Additional Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-registered-developer-agreement",
+              "text": "GitHub Registered Developer Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-marketplace-terms-of-service",
+              "text": "GitHub Marketplace Terms of Service"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-marketplace-developer-agreement",
+              "text": "GitHub Marketplace Developer Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-research-program-terms",
+              "text": "GitHub Research Program Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-open-source-applications-terms-and-conditions",
+              "text": "GitHub Open Source Applications Terms and Conditions"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-event-terms",
+              "text": "GitHub Event Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-event-code-of-conduct",
+              "text": "GitHub Event Code of Conduct"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-educational-use-agreement",
+              "text": "GitHub Educational Use Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-copilot-extension-developer-policy",
+              "text": "GitHub Copilot Extension Developer Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-secret-scanning-partner-program-agreement",
+              "text": "GitHub Secret Scanning Partner Program Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies",
+              "text": "GitHub Acceptable Use Policies"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-active-malware-or-exploits",
+              "text": "Active Malware or Exploits"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-bullying-and-harassment",
+              "text": "Bullying and Harassment"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-disrupting-the-experience-of-other-users",
+              "text": "Disrupting the Experience of Other Users"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-doxxing-and-invasion-of-privacy",
+              "text": "Doxxing and Invasion of Privacy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-hate-speech-and-discrimination",
+              "text": "Hate Speech and Discrimination"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-impersonation",
+              "text": "Impersonation"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-misinformation-and-disinformation",
+              "text": "Disinformation Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-sexually-obscene-content",
+              "text": "Sexually Obscene Content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-threats-of-violence-and-gratuitously-violent-content",
+              "text": "Threats of Violence and Gratuitously Violent Content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-terrorism-and-violent-extremism",
+              "text": "Terrorism and Violent Extremism Content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-child-sexual-exploitation-or-abuse",
+              "text": "CSAM Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-non-consensual-intimate-imagery",
+              "text": "NCII"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-synthetic-media-and-ai-tools",
+              "text": "Synthetic Media and AI Tools"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-appeal-and-reinstatement",
+              "text": "GitHub Appeal and Reinstatement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "GitHub General Privacy Statement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-subprocessors",
+              "text": "GitHub Subprocessors"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-cookies",
+              "text": "GitHub Cookies"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-candidate-privacy-policy",
+              "text": "GitHub Global Data Privacy Notice for Candidates"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-and-trade-controls",
+              "text": "GitHub and Trade Controls"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-deceased-user-policy",
+              "text": "GitHub Deceased User Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-logo-policy",
+              "text": "GitHub Logo Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-government-takedown-policy",
+              "text": "GitHub Government Takedown Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-username-policy",
+              "text": "GitHub Username Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/guidelines-for-legal-requests-of-user-data",
+              "text": "Guidelines for Legal Requests of User Data"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-account-recovery-policy",
+              "text": "GitHub Account Recovery Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/submitting-content-removal-requests",
+              "text": "Submitting content removal requests"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "DMCA Takedown Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/github-private-information-removal-policy",
+              "text": "GitHub Private Information Removal Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/github-trademark-policy",
+              "text": "GitHub Trademark Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "Guide to Submitting a DMCA Counter Notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "Guide to Submitting a DMCA Takedown Notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/security-policies/coordinated-disclosure-of-security-vulnerabilities",
+              "text": "Coordinated Disclosure of Security Vulnerabilities"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/security-policies/github-bug-bounty-program-legal-safe-harbor",
+              "text": "GitHub Bug Bounty Program Legal Safe Harbor"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/security-policies/github-sirt-description-rfc-2350",
+              "text": "GitHub SIRT description RFC 2350"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-statement-against-modern-slavery-and-child-labor",
+              "text": "GitHub Statement Against Modern Slavery and Child Labor"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-anti-bribery-statement",
+              "text": "GitHub Anti-Bribery Statement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-gpl-cooperation-commitment",
+              "text": "GitHub GPL Cooperation Commitment"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-gifts-and-entertainment-policy",
+              "text": "GitHub Gifts and Entertainment Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/communities/maintaining-your-safety-on-github/reporting-abuse-or-spam",
+              "text": "Reporting Abuse"
+            },
+            {
+              "url": "https://github.com",
+              "text": ""
+            },
+            {
+              "url": "https://github.com/github/docs/blob/main/content/site-policy/acceptable-use-policies/github-child-sexual-exploitation-or-abuse.md",
+              "text": "Make a contribution"
+            },
+            {
+              "url": "https://github.com/orgs/community/discussions",
+              "text": "Ask the GitHub community"
+            },
+            {
+              "url": "https://support.github.com",
+              "text": "Contact support"
+            },
+            {
+              "url": "https://services.github.com",
+              "text": "Expert services"
+            },
+            {
+              "url": "https://github.blog",
+              "text": "Blog"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+              "text": "Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement",
+              "text": "Privacy"
+            },
+            {
+              "url": "https://www.githubstatus.com/",
+              "text": "Status"
+            },
+            {
+              "url": "https://github.com/pricing",
+              "text": "Pricing"
+            }
+          ],
+          "forms": [],
+          "headers": {
+            "content-type": "text/html; charset=utf-8",
+            "via": "1.1 varnish, 1.1 varnish",
+            "x-served-by": "cache-iad-khef600024-IAD, cache-dfw-kdfw8210050-DFW"
+          },
+          "contacts": []
+        }
+      },
+      {
+        "tool": "fetch_page",
+        "input": {
+          "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement"
+        },
+        "result": {
+          "status": 200,
+          "final_url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+          "title": "GitHub General Privacy Statement - GitHub Docs",
+          "text": "GitHub General Privacy Statement - GitHub Docs Skip to main content Skip to content GitHub Docs Search or ask Copilot / Menu Home Site policy Privacy Policies GitHub General Privacy Statement Site policy GitHub Terms Acceptable Use Policies Privacy Policies GitHub General Privacy Statement GitHub Subprocessors GitHub Cookies GitHub Global Data Privacy Notice for Candidates Other Site Policies Content Removal Policies Security Policies GitHub Company Policies In this article GitHub General Privacy Statement Copy markdown In this article GitHub Privacy Statement Personal Data We Collect Processing Purposes: How We Use Your Personal Data Sharing of Personal Data Private repositories: GitHub Access Lawful Bases for Processing Personal Data (Applicable to EEA and UK End Users) Your Privacy Rights International data transfers Data Privacy Framework (DPF) Security and Retention Security Contact Us Information for Minors Changes to Our Privacy Statement Translations Our use of cookies and tracking technologies US State Specific Information GitHub Privacy Statement Effective date: April 27, 2026 Welcome to the GitHub Privacy Statement. This is where we describe how we handle your \u201cPersonal Data\u201d, which is information that is directly linked or can be linked to you. It applies to the Personal Data that GitHub, Inc. or GitHub B.V., processes as the \u201cData Controller\u201d when you interact with websites, applications, and services that display this Statement (collectively, \u201cServices\u201d). This Statement does not apply to services or products that do not display this Statement, such as Previews, where relevant. End User Notice: Organization-Provided GitHub Accounts When a school or employer supplies your GitHub account, they assume the role of Data Controller for most Personal Data used in our Services. This enables them to: Manage and administer your GitHub account, including adjusting privacy settings. Access and utilize your Personal Data, which includes details on how you use the Services, as well as your content and files. Should you access a GitHub Service through an account provided by an organization, such as your employer or school, the organization becomes the Data Controller, and this Privacy Statement's direct applicability to you changes. Even so, GitHub remains dedicated to preserving your privacy rights. In such circumstances, GitHub functions as a Data Processor, adhering to the Data Controller's instructions regarding your Personal Data's processing. A Data Protection Agreement governs the relationship between GitHub and the Data Controller. For further details regarding their privacy practices, please refer to the privacy statement of the organization providing your account. In cases where your organization grants access to GitHub products, GitHub acts as the Data Controller solely for specific processing activities. These activities are clearly defined in a contractual agreement with your organization, known as a Data Protection Agreement. You can review our standard Data Protection Agreement at GitHub Data Protection Agreement . For those limited purposes, this Statement governs the handling of your Personal Data. For all other aspects of GitHub product usage, your organization's policies apply. Third Party Access and Data Protection When you use third-party extensions, integrations, or follow references and links within our Services, the privacy policies of these third parties apply to any Personal Data you provide or consent to share with them. Their privacy statements will govern how this data is processed. Personal Data We Collect Personal Data is collected from you directly, automatically from your device, and also from third parties. The Personal Data GitHub processes when you use the Services depends on variables like how you interact with our Services (such as through web interfaces, desktop or mobile applications), the features you use (such as pull requests, Codespaces, or GitHub Copilot) and your method of accessing the Services (your preferred IDE). Below, we detail the information we collect through each of these channels: From You Account Data: We collect certain information when you open an account such as your GitHub handle, name, email address, password, payment information and transaction information. User Content and Files: When you use our Services, we collect Personal Data included as part of the information you provide such as code, inputs, AI outputs, text, documents, images, or feedback. Demographic information: In some cases, you provide us with ethnicity, gender, or similar demographic details. Feedback Data: This consists of information you submit through surveys, reviews, or interactive features. Payment Information: For paid subscriptions, we collect details like name, billing address, and payment specifics. Profile Information: We collect information to create a user profile, which may include a photo, additional email addresses, job title, or biography. Sales and Marketing Data: This includes information provided for promotional communications, such as name, email address, and company name. Support Data: When you seek customer support, we collect details like code, text, or multimedia files. Automatically Buttons, Tools, and Content from Other Companies: Our Services may contain links or buttons that lead to third-party services like Twitter or LinkedIn. Use of these features may result in data collection. Engaging with these buttons, tools, or content may automatically send certain browser information to these companies. Please review the privacy statements of these companies for more information. Essential Cookies and Similar Tracking Technologies: We use cookies and similar technologies to provide essential functionality like storing settings and recognizing you while using our Services. Non-essential Cookies: Depending on your jurisdiction, we may use online analytics products that use cookies to help us analyze how de-identified users use our Services and to enhance your experience when you use the Services. We may also employ third-party Cookies to gather data for interest-based advertising. In some jurisdictions, we only use non-essential cookies after obtaining your consent. See this section for more details and control options. Email Marketing Interactions: Our emails may have web beacons that offer information on your device type, email client, email reception, opens, and link clicks. Geolocation Information: Depending on the Service's functionality, we collect regional geolocation data. Service Usage Information: We collect data about your interactions with the Services, such as IP address, device information, session details, date and time of requests, device type and ID, operating system and application version, information related to your contributions to repositories, and performance of specific features or Services. Website Usage Data: We automatically log data about your Website interactions, including the referring site, date and time of visit, pages viewed, and links clicked. From Third Parties Information from Other Users of the Services: Other users may share information about you when they submit issues and comments. We may also receive information about you if you are identified as a representative or administrator on your company's account. Publicly Available Sources: We may acquire information about you from publicly available sources. Services you linked to your GitHub account: When you or your administrator integrate third-party apps or services with our Services, we receive information based on your settings with those services. This can include details like your name and email from services like Google for authentication. The information we receive depends on the third-party's settings and privacy policies. Always review these to understand what data is shared with our Services. Vendors, Partners, and Affiliates: We may receive information about you from third parties, like vendors, resellers, partners, or affiliates for the purposes outlined in this statement. Processing Purposes: How We Use Your Personal Data The Personal Data we process depends on your interaction and access methods with our Services, including the interfaces (web, desktop, mobile apps), features used (pull requests, Codespaces, GitHub Copilot), and your preferred access tools (like your IDE). This section details all the potential ways GitHub may process your Personal Data: Business Operations: We use Personal Data for activities like billing, accounting, and compensation. This includes creating aggregated statistical data for internal reporting, financial reporting, revenue planning, capacity planning, and forecast modeling (including product strategy). Communication: We use Personal Data to inform you about new Services, features, offers, promotions, and other pertinent information. This also includes sending confirmations, invoices, technical notices, updates, security alerts, and administrative messages. Inference: We generate new information from other data we collect to derive likely preferences or other characteristics. For instance, we infer your general geographic location based on your IP address. Personalization: We use Personal Data to customize the Service to your preferences, to evaluate the effectiveness of enterprise business ads and promotional communications, and to ensure a seamless and consistent user experience. Safety and Security: To promote safety, integrity, and security across our Services, we process Personal Data, using both automated and, at times, manual techniques for abuse detection, prevention, and violations of terms of service. Service Provision: We use Personal Data to deliver and update our Services as configured and used by You, and to make ongoing personalized experiences and recommendations. Troubleshooting: We use Personal Data to identify and resolve technical issues. Ongoing Service Performance: Personal Data helps us keep the Services up to date and performant, and meet user productivity, reliability, efficacy, quality, privacy, accessibility and security needs. Product Development and Improvement: We use Personal Data to develop and improve our products, services, and technologies, including artificial intelligence and machine learning technologies. This includes improving features, developing new offerings, enhancing safety and security capabilities, and training models. We apply appropriate technical safeguards, including aggregation and de-identification techniques where feasible, to protect your privacy while enabling these improvements. Complying with and resolving legal obligations: including responding to Data Subject Requests for Personal Data processed by GitHub as Controller (for example website data), tax requirements, agreements and disputes. Delivering Professional Services: We use Personal Data to deliver training, consulting or implementation (\u201cProfessional Services\u201d). This includes providing technical support, professional planning, advice, guidance, data migration, deployment, and solution/software development services. Improving Professional Services: Enhancing delivery, efficacy, quality, and security of Professional Services and the underlying product(s) based on issues identified while providing Professional Services, including fixing software defects, and otherwise keeping the Professional Services up to date and performant. When carrying out these activities, GitHub practices data minimization and uses the minimum amount of Personal Information required. Sharing of Personal Data We may share Personal Data with the following recipients: Abuse and Fraud Prevention Entities: We may disclose Personal Data based on a good faith belief it is needed to prevent fraud, abuse, or attacks on our Services, or to protect the safety of GitHub and our users. Affiliates: Personal Data may be shared with GitHub affiliates, including Microsoft, to facilitate customer service, marketing and ad",
+          "links": [
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Skip to main content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Skip to content"
+            },
+            {
+              "url": "https://docs.github.com/en",
+              "text": ""
+            },
+            {
+              "url": "https://docs.github.com/en",
+              "text": "GitHub Docs"
+            },
+            {
+              "url": "https://docs.github.com/en",
+              "text": "Home"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy",
+              "text": "Site policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies",
+              "text": "Privacy Policies"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy",
+              "text": "Site policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": ""
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+              "text": "GitHub Terms of Service"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-corporate-terms-of-service",
+              "text": "GitHub Corporate Terms of Service"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features",
+              "text": "GitHub Terms for Additional Products and Features"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-community-guidelines",
+              "text": "GitHub Community Guidelines"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-community-code-of-conduct",
+              "text": "GitHub Community Code of Conduct"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-pre-release-license-terms",
+              "text": "GitHub Pre-release License Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-dpa-previews",
+              "text": "GitHub DPA-Covered Previews"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-sponsors-additional-terms",
+              "text": "GitHub Sponsors Additional Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-registered-developer-agreement",
+              "text": "GitHub Registered Developer Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-marketplace-terms-of-service",
+              "text": "GitHub Marketplace Terms of Service"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-marketplace-developer-agreement",
+              "text": "GitHub Marketplace Developer Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-research-program-terms",
+              "text": "GitHub Research Program Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-open-source-applications-terms-and-conditions",
+              "text": "GitHub Open Source Applications Terms and Conditions"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-event-terms",
+              "text": "GitHub Event Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-event-code-of-conduct",
+              "text": "GitHub Event Code of Conduct"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-educational-use-agreement",
+              "text": "GitHub Educational Use Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-copilot-extension-developer-policy",
+              "text": "GitHub Copilot Extension Developer Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-secret-scanning-partner-program-agreement",
+              "text": "GitHub Secret Scanning Partner Program Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-acceptable-use-policies",
+              "text": "GitHub Acceptable Use Policies"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-active-malware-or-exploits",
+              "text": "Active Malware or Exploits"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-bullying-and-harassment",
+              "text": "Bullying and Harassment"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-disrupting-the-experience-of-other-users",
+              "text": "Disrupting the Experience of Other Users"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-doxxing-and-invasion-of-privacy",
+              "text": "Doxxing and Invasion of Privacy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-hate-speech-and-discrimination",
+              "text": "Hate Speech and Discrimination"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-impersonation",
+              "text": "Impersonation"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-misinformation-and-disinformation",
+              "text": "Disinformation Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-sexually-obscene-content",
+              "text": "Sexually Obscene Content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-threats-of-violence-and-gratuitously-violent-content",
+              "text": "Threats of Violence and Gratuitously Violent Content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-terrorism-and-violent-extremism",
+              "text": "Terrorism and Violent Extremism Content"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-child-sexual-exploitation-or-abuse",
+              "text": "CSAM Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-non-consensual-intimate-imagery",
+              "text": "NCII"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-synthetic-media-and-ai-tools",
+              "text": "Synthetic Media and AI Tools"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-appeal-and-reinstatement",
+              "text": "GitHub Appeal and Reinstatement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "GitHub General Privacy Statement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-subprocessors",
+              "text": "GitHub Subprocessors"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-cookies",
+              "text": "GitHub Cookies"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-candidate-privacy-policy",
+              "text": "GitHub Global Data Privacy Notice for Candidates"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-and-trade-controls",
+              "text": "GitHub and Trade Controls"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-deceased-user-policy",
+              "text": "GitHub Deceased User Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-logo-policy",
+              "text": "GitHub Logo Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-government-takedown-policy",
+              "text": "GitHub Government Takedown Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-username-policy",
+              "text": "GitHub Username Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/guidelines-for-legal-requests-of-user-data",
+              "text": "Guidelines for Legal Requests of User Data"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/github-account-recovery-policy",
+              "text": "GitHub Account Recovery Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/submitting-content-removal-requests",
+              "text": "Submitting content removal requests"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+              "text": "DMCA Takedown Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/github-private-information-removal-policy",
+              "text": "GitHub Private Information Removal Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/github-trademark-policy",
+              "text": "GitHub Trademark Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-counter-notice",
+              "text": "Guide to Submitting a DMCA Counter Notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/content-removal-policies/guide-to-submitting-a-dmca-takedown-notice",
+              "text": "Guide to Submitting a DMCA Takedown Notice"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/security-policies/coordinated-disclosure-of-security-vulnerabilities",
+              "text": "Coordinated Disclosure of Security Vulnerabilities"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/security-policies/github-bug-bounty-program-legal-safe-harbor",
+              "text": "GitHub Bug Bounty Program Legal Safe Harbor"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/security-policies/github-sirt-description-rfc-2350",
+              "text": "GitHub SIRT description RFC 2350"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-statement-against-modern-slavery-and-child-labor",
+              "text": "GitHub Statement Against Modern Slavery and Child Labor"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-anti-bribery-statement",
+              "text": "GitHub Anti-Bribery Statement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-gpl-cooperation-commitment",
+              "text": "GitHub GPL Cooperation Commitment"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-company-policies/github-gifts-and-entertainment-policy",
+              "text": "GitHub Gifts and Entertainment Policy"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "GitHub Privacy Statement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Personal Data We Collect"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Processing Purposes: How We Use Your Personal Data"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Sharing of Personal Data"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Private repositories: GitHub Access"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Lawful Bases for Processing Personal Data (Applicable to EEA and UK End Users)"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Your Privacy Rights"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "International data transfers"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Data Privacy Framework (DPF)"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Security and Retention"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Security"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Contact Us"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Information for Minors"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Changes to Our Privacy Statement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Translations"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Our use of cookies and tracking technologies"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "US State Specific Information"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "GitHub Privacy Statement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "End User Notice: Organization-Provided GitHub Accounts"
+            },
+            {
+              "url": "https://github.com/customer-terms/github-data-protection-agreement",
+              "text": "GitHub Data Protection Agreement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Third Party Access and Data Protection"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Personal Data We Collect"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "From You"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Automatically"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "this"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "From Third Parties"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Processing Purposes: How We Use Your Personal Data"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Sharing of Personal Data"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/other-site-policies/guidelines-for-legal-requests-of-user-data",
+              "text": "Guidelines for Legal Requests of User Data"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-subprocessors",
+              "text": "GitHub Subprocessors"
+            },
+            {
+              "url": "https://code.visualstudio.com/docs/configure/telemetry",
+              "text": "VS Code website"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Private repositories: GitHub Access"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Lawful Bases for Processing Personal Data (Applicable to EEA and UK End Users)"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Your Privacy Rights"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "International data transfers"
+            },
+            {
+              "url": "https://eur-lex.europa.eu/eli/dec_impl/2021/914/oj",
+              "text": "Commission Implementing Decision 2021/914"
+            },
+            {
+              "url": "https://commission.europa.eu/law/law-topic/data-protection/international-dimension-data-protection/adequacy-decisions_en",
+              "text": "European Commission website"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Data Privacy Framework (DPF)"
+            },
+            {
+              "url": "https://www.dataprivacyframework.gov/",
+              "text": "https://www.dataprivacyframework.gov/"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Dispute resolution process"
+            },
+            {
+              "url": "https://go.adr.org/dpf_irm.html",
+              "text": "https://go.adr.org/dpf_irm.html"
+            },
+            {
+              "url": "https://www.dataprivacyframework.gov/framework-article/ANNEX-I-introduction",
+              "text": "https://www.dataprivacyframework.gov/framework-article/ANNEX-I-introduction"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Government Enforcement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Security and Retention"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Security"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Contact Us"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Information for Minors"
+            },
+            {
+              "url": "https://support.github.com/contact/privacy",
+              "text": "notify us"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Changes to Our Privacy Statement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Translations"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "French"
+            },
+            {
+              "url": "https://docs.github.com/assets/images/help/site-policy/github-privacy-statement(07.22.20)(fr).pdf",
+              "text": "D\u00e9claration de confidentialit\u00e9 de GitHub (PDF)"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Other translations"
+            },
+            {
+              "url": "https://docs.github.com/",
+              "text": "https://docs.github.com/"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Our use of cookies and tracking technologies"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Cookies and tracking technologies"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-cookies",
+              "text": "cookies on GitHub"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "GitHub General Privacy Statement"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "What are cookies and similar technologies?"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "How do we and our partners use cookies and similar technologies?"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "What are your cookie choices and controls?"
+            },
+            {
+              "url": "https://en.wikipedia.org/wiki/Do_Not_Track",
+              "text": "Do Not Track"
+            },
+            {
+              "url": "https://en.wikipedia.org/wiki/Privacy_Badger",
+              "text": "Privacy Badger"
+            },
+            {
+              "url": "https://en.wikipedia.org/wiki/UBlock_Origin",
+              "text": "uBlock Origin"
+            },
+            {
+              "url": "https://globalprivacycontrol.org/",
+              "text": "Global Privacy Control \u2014 Take Control Of Your Privacy"
+            },
+            {
+              "url": "http://optout.networkadvertising.org",
+              "text": "NAI"
+            },
+            {
+              "url": "http://optout.aboutads.info/",
+              "text": "DAA"
+            },
+            {
+              "url": "https://youradchoices.ca/",
+              "text": "Digital Advertising Alliance of Canada"
+            },
+            {
+              "url": "http://www.youronlinechoices.com/",
+              "text": "European Digital Advertising Alliance"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "US State Specific Information"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Privacy Rights"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Notice of Collection of Personal Information"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Exercising your Privacy Rights"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "California"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Mandatory Disclosures"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Shine the Light Act"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Removal of Content"
+            },
+            {
+              "url": "https://support.github.com/contact/private-information",
+              "text": "Private Information Removal request"
+            },
+            {
+              "url": "https://support.github.com/request",
+              "text": "GitHub support"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Colorado/Connecticut/Virginia"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+              "text": "Nevada"
+            },
+            {
+              "url": "https://github.com",
+              "text": ""
+            },
+            {
+              "url": "https://github.com/github/docs/blob/main/content/site-policy/privacy-policies/github-general-privacy-statement.md",
+              "text": "Make a contribution"
+            },
+            {
+              "url": "https://github.com/orgs/community/discussions",
+              "text": "Ask the GitHub community"
+            },
+            {
+              "url": "https://support.github.com",
+              "text": "Contact support"
+            },
+            {
+              "url": "https://services.github.com",
+              "text": "Expert services"
+            },
+            {
+              "url": "https://github.blog",
+              "text": "Blog"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+              "text": "Terms"
+            },
+            {
+              "url": "https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement",
+              "text": "Privacy"
+            },
+            {
+              "url": "https://www.githubstatus.com/",
+              "text": "Status"
+            },
+            {
+              "url": "https://github.com/pricing",
+              "text": "Pricing"
+            }
+          ],
+          "forms": [],
+          "headers": {
+            "content-type": "text/html; charset=utf-8",
+            "via": "1.1 varnish, 1.1 varnish",
+            "x-served-by": "cache-iad-kcgs7200141-IAD, cache-dfw-kdfw8210050-DFW"
+          },
+          "contacts": []
+        }
+      },
+      {
+        "tool": "dns_lookup",
+        "input": {
+          "hostname": "docs.github.com"
+        },
+        "result": {
+          "hostname": "docs.github.com",
+          "status": "resolved",
+          "addresses": [
+            "185.199.108.154",
+            "185.199.109.154",
+            "185.199.110.154",
+            "185.199.111.154"
+          ],
+          "cnames": [],
+          "caution": "DNS/CDN addresses do not prove the origin hosting provider."
+        }
+      },
+      {
+        "tool": "rdap_lookup",
+        "input": {
+          "ip_or_domain": "185.199.108.154"
+        },
+        "result": {
+          "status": "completed",
+          "bootstrap": "https://data.iana.org/rdap/ipv4.json",
+          "registry_url": "https://rdap.db.ripe.net/ip/185.199.108.154",
+          "name": "US-GITHUB-20170413",
+          "contacts": [
+            {
+              "rung": "host",
+              "channel": "manual_email",
+              "address": "abuse@github.com",
+              "endpoint": "mailto:abuse@github.com",
+              "evidence": {
+                "source": "https://rdap.db.ripe.net/ip/185.199.108.154",
+                "method": "RDAP_abuse_vcard",
+                "network": "US-GITHUB-20170413",
+                "origin_unverified": true
+              },
+              "id": "contact-1"
+            }
+          ]
+        }
+      },
+      {
+        "tool": "platform_registry",
+        "input": {
+          "hostname": "docs.github.com"
+        },
+        "result": {
+          "version": "2026-10-10",
+          "contacts": [
+            {
+              "rung": "site",
+              "channel": "manual_web",
+              "address": "https://support.github.com/contact/report-abuse",
+              "endpoint": "https://support.github.com/contact/report-abuse",
+              "evidence": {
+                "source": "platform-registry-2026-10-10",
+                "method": "platform_registry",
+                "domain": "github.com"
+              },
+              "id": "contact-2"
+            },
+            {
+              "rung": "search",
+              "channel": "manual_web",
+              "address": "https://support.google.com/legal/troubleshooter/1114905",
+              "endpoint": "https://support.google.com/legal/troubleshooter/1114905",
+              "evidence": {
+                "source": "platform-registry-2026-10-10",
+                "method": "search_registry",
+                "scope": "Delisting only; source remains"
+              },
+              "id": "contact-3"
+            }
+          ]
+        }
+      }
+    ],
+    "requests": [
+      {
+        "url": "https://docs.github.com/robots.txt",
+        "method": "GET",
+        "status": 200,
+        "headers": {
+          "content-type": "text/plain; charset=utf-8",
+          "via": "1.1 varnish, 1.1 varnish",
+          "x-served-by": "cache-iad-khef600081-IAD, cache-dfw-kdfw8210050-DFW"
+        }
+      },
+      {
+        "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+        "robots_allowed": true
+      },
+      {
+        "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+        "method": "GET",
+        "status": 200,
+        "headers": {
+          "content-type": "text/html; charset=utf-8",
+          "via": "1.1 varnish, 1.1 varnish",
+          "x-served-by": "cache-iad-khef600053-IAD, cache-dfw-kdfw8210050-DFW"
+        }
+      },
+      {
+        "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-doxxing-and-invasion-of-privacy",
+        "robots_allowed": true
+      },
+      {
+        "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-doxxing-and-invasion-of-privacy",
+        "method": "GET",
+        "status": 200,
+        "headers": {
+          "content-type": "text/html; charset=utf-8",
+          "via": "1.1 varnish, 1.1 varnish",
+          "x-served-by": "cache-iad-kcgs7200090-IAD, cache-dfw-kdfw8210050-DFW"
+        }
+      },
+      {
+        "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-child-sexual-exploitation-or-abuse",
+        "robots_allowed": true
+      },
+      {
+        "url": "https://docs.github.com/en/site-policy/acceptable-use-policies/github-child-sexual-exploitation-or-abuse",
+        "method": "GET",
+        "status": 200,
+        "headers": {
+          "content-type": "text/html; charset=utf-8",
+          "via": "1.1 varnish, 1.1 varnish",
+          "x-served-by": "cache-iad-khef600024-IAD, cache-dfw-kdfw8210050-DFW"
+        }
+      },
+      {
+        "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+        "robots_allowed": true
+      },
+      {
+        "url": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+        "method": "GET",
+        "status": 200,
+        "headers": {
+          "content-type": "text/html; charset=utf-8",
+          "via": "1.1 varnish, 1.1 varnish",
+          "x-served-by": "cache-iad-kcgs7200141-IAD, cache-dfw-kdfw8210050-DFW"
+        }
+      },
+      {
+        "url": "https://data.iana.org/robots.txt",
+        "method": "GET",
+        "status": 200,
+        "headers": {
+          "content-type": "text/plain; charset=UTF-8",
+          "etag": "W/\"40-63f30497a5d00-br\"",
+          "last-modified": "Sat, 20 Sep 2025 00:01:24 GMT",
+          "server": "cloudflare",
+          "cf-ray": "a487ceaace384de7-MCI"
+        }
+      },
+      {
+        "url": "https://data.iana.org/rdap/ipv4.json",
+        "robots_allowed": true
+      },
+      {
+        "url": "https://data.iana.org/rdap/ipv4.json",
+        "method": "GET",
+        "status": 200,
+        "headers": {
+          "content-type": "application/json",
+          "etag": "W/\"15fd-58ac070130427-br\"",
+          "last-modified": "Fri, 07 Jun 2019 19:00:02 GMT",
+          "server": "cloudflare",
+          "cf-ray": "a487ceab0e5c4de7-MCI"
+        }
+      },
+      {
+        "url": "https://rdap.db.ripe.net/robots.txt",
+        "method": "GET",
+        "status": 404,
+        "headers": {
+          "content-type": "application/rdap+json"
+        }
+      },
+      {
+        "url": "https://rdap.db.ripe.net/ip/185.199.108.154",
+        "robots_allowed": true
+      },
+      {
+        "url": "https://rdap.db.ripe.net/ip/185.199.108.154",
+        "method": "GET",
+        "status": 200,
+        "headers": {
+          "content-type": "application/rdap+json"
+        }
+      }
+    ],
+    "page_status": 200,
+    "limitations": [
+      "Published contacts require human review.",
+      "CDN/RDAP contacts may identify a serving network rather than the origin."
+    ],
+    "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+    "wall_seconds": 1.475
+  },
+  {
+    "source": "deterministic_baseline",
+    "status": "completed",
+    "model_status": "not_used",
+    "recipients": [
+      {
+        "rung": "host",
+        "channel": "manual_email",
+        "address": "abuse@wikimedia.org",
+        "endpoint": "mailto:abuse@wikimedia.org",
+        "evidence": {
+          "source": "https://rdap.arin.net/registry/ip/208.80.154.224",
+          "method": "RDAP_abuse_vcard",
+          "network": "WIKIMEDIA",
+          "origin_unverified": true
+        },
+        "id": "contact-1",
+        "rank": 1
+      },
+      {
+        "rung": "search",
+        "channel": "manual_web",
+        "address": "https://support.google.com/legal/troubleshooter/1114905",
+        "endpoint": "https://support.google.com/legal/troubleshooter/1114905",
+        "evidence": {
+          "source": "platform-registry-2026-10-10",
+          "method": "search_registry",
+          "scope": "Delisting only; source remains"
+        },
+        "id": "contact-2",
+        "rank": 2
+      }
+    ],
+    "tool_calls": [
+      {
+        "tool": "fetch_page",
+        "input": {
+          "url": "https://www.wikimedia.org/"
+        },
+        "result": {
+          "status": 200,
+          "final_url": "https://www.wikimedia.org/",
+          "title": "Wikimedia",
+          "text": "Wikimedia Welcome! The Wikimedia movement is a global community of people, projects, and activities working together to create and share knowledge freely. Join us in making all knowledge available to everyone, everywhere. Our Projects Our projects are the core of the Wikimedia movement . All major projects are operated by the Wikimedia Foundation , and the content is collaboratively developed by over 260,000 users worldwide using the MediaWiki software. Reference Wikipedia The Free Encyclopedia Wiktionary Free dictionary Wikiquote Free quote compendium Wikibooks Free textbooks Collections Commons Free media collection Wikisource Free content library Wikiversity Free learning resources Wikispecies Free species directory Technology Wikidata Free knowledge base Wikifunctions Free function library MediaWiki Free & open wiki software Guides Wikivoyage Free travel guide Collaboration Meta-Wiki Community coordination & documentation The Wikimedia Foundation is the non-profit organization that hosts all Wikimedia projects and supports communities all over the world who create and curate freely accessible content. Your donation protects the human right to free and open knowledge for everyone. Donate now Contact Questions about the Wikimedia Foundation or Wikimedia projects? Get in touch. Contact This page is available under the Creative Commons Attribution-ShareAlike License Terms of Use Privacy Policy",
+          "links": [
+            {
+              "url": "https://meta.wikimedia.org/wiki/Special:MyLanguage/Wikimedia_movement",
+              "text": "Wikimedia movement"
+            },
+            {
+              "url": "https://wikimediafoundation.org/",
+              "text": "Wikimedia Foundation"
+            },
+            {
+              "url": "https://www.mediawiki.org/",
+              "text": "MediaWiki"
+            },
+            {
+              "url": "https://www.wikipedia.org",
+              "text": "Wikipedia The Free Encyclopedia"
+            },
+            {
+              "url": "https://www.wiktionary.org",
+              "text": "Wiktionary Free dictionary"
+            },
+            {
+              "url": "https://www.wikiquote.org",
+              "text": "Wikiquote Free quote compendium"
+            },
+            {
+              "url": "https://www.wikibooks.org",
+              "text": "Wikibooks Free textbooks"
+            },
+            {
+              "url": "https://commons.wikimedia.org",
+              "text": "Commons Free media collection"
+            },
+            {
+              "url": "https://www.wikisource.org",
+              "text": "Wikisource Free content library"
+            },
+            {
+              "url": "https://www.wikiversity.org",
+              "text": "Wikiversity Free learning resources"
+            },
+            {
+              "url": "https://www.wikispecies.org",
+              "text": "Wikispecies Free species directory"
+            },
+            {
+              "url": "https://www.wikidata.org",
+              "text": "Wikidata Free knowledge base"
+            },
+            {
+              "url": "https://www.wikifunctions.org",
+              "text": "Wikifunctions Free function library"
+            },
+            {
+              "url": "https://www.mediawiki.org",
+              "text": "MediaWiki Free & open wiki software"
+            },
+            {
+              "url": "https://www.wikivoyage.org",
+              "text": "Wikivoyage Free travel guide"
+            },
+            {
+              "url": "https://meta.wikimedia.org",
+              "text": "Meta-Wiki Community coordination & documentation"
+            },
+            {
+              "url": "https://wikimediafoundation.org/",
+              "text": "Wikimedia Foundation"
+            },
+            {
+              "url": "https://donate.wikimedia.org/?wmf_medium=wikimediaPortal&wmf_campaign=wikimediaPortalBtn&wmf_source=wikimediaPortalBtn",
+              "text": "Donate now"
+            },
+            {
+              "url": "https://wikimediafoundation.org/about/contact/",
+              "text": "Contact"
+            },
+            {
+              "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "text": "Creative Commons Attribution-ShareAlike License"
+            },
+            {
+              "url": "https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Terms_of_Use",
+              "text": "Terms of Use"
+            },
+            {
+              "url": "https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Privacy_policy",
+              "text": "Privacy Policy"
+            }
+          ],
+          "forms": [],
+          "headers": {
+            "content-type": "text/html",
+            "etag": "W/\"c0d4-65d54a13c8d00\"",
+            "last-modified": "Thu, 08 Oct 2026 13:58:44 GMT",
+            "server": "ATS/9.2.15"
+          },
+          "contacts": []
+        }
+      },
+      {
+        "tool": "fetch_page",
+        "input": {
+          "url": "https://www.wikimedia.org/"
+        },
+        "result": {
+          "status": 200,
+          "final_url": "https://www.wikimedia.org/",
+          "title": "Wikimedia",
+          "text": "Wikimedia Welcome! The Wikimedia movement is a global community of people, projects, and activities working together to create and share knowledge freely. Join us in making all knowledge available to everyone, everywhere. Our Projects Our projects are the core of the Wikimedia movement . All major projects are operated by the Wikimedia Foundation , and the content is collaboratively developed by over 260,000 users worldwide using the MediaWiki software. Reference Wikipedia The Free Encyclopedia Wiktionary Free dictionary Wikiquote Free quote compendium Wikibooks Free textbooks Collections Commons Free media collection Wikisource Free content library Wikiversity Free learning resources Wikispecies Free species directory Technology Wikidata Free knowledge base Wikifunctions Free function library MediaWiki Free & open wiki software Guides Wikivoyage Free travel guide Collaboration Meta-Wiki Community coordination & documentation The Wikimedia Foundation is the non-profit organization that hosts all Wikimedia projects and supports communities all over the world who create and curate freely accessible content. Your donation protects the human right to free and open knowledge for everyone. Donate now Contact Questions about the Wikimedia Foundation or Wikimedia projects? Get in touch. Contact This page is available under the Creative Commons Attribution-ShareAlike License Terms of Use Privacy Policy",
+          "links": [
+            {
+              "url": "https://meta.wikimedia.org/wiki/Special:MyLanguage/Wikimedia_movement",
+              "text": "Wikimedia movement"
+            },
+            {
+              "url": "https://wikimediafoundation.org/",
+              "text": "Wikimedia Foundation"
+            },
+            {
+              "url": "https://www.mediawiki.org/",
+              "text": "MediaWiki"
+            },
+            {
+              "url": "https://www.wikipedia.org",
+              "text": "Wikipedia The Free Encyclopedia"
+            },
+            {
+              "url": "https://www.wiktionary.org",
+              "text": "Wiktionary Free dictionary"
+            },
+            {
+              "url": "https://www.wikiquote.org",
+              "text": "Wikiquote Free quote compendium"
+            },
+            {
+              "url": "https://www.wikibooks.org",
+              "text": "Wikibooks Free textbooks"
+            },
+            {
+              "url": "https://commons.wikimedia.org",
+              "text": "Commons Free media collection"
+            },
+            {
+              "url": "https://www.wikisource.org",
+              "text": "Wikisource Free content library"
+            },
+            {
+              "url": "https://www.wikiversity.org",
+              "text": "Wikiversity Free learning resources"
+            },
+            {
+              "url": "https://www.wikispecies.org",
+              "text": "Wikispecies Free species directory"
+            },
+            {
+              "url": "https://www.wikidata.org",
+              "text": "Wikidata Free knowledge base"
+            },
+            {
+              "url": "https://www.wikifunctions.org",
+              "text": "Wikifunctions Free function library"
+            },
+            {
+              "url": "https://www.mediawiki.org",
+              "text": "MediaWiki Free & open wiki software"
+            },
+            {
+              "url": "https://www.wikivoyage.org",
+              "text": "Wikivoyage Free travel guide"
+            },
+            {
+              "url": "https://meta.wikimedia.org",
+              "text": "Meta-Wiki Community coordination & documentation"
+            },
+            {
+              "url": "https://wikimediafoundation.org/",
+              "text": "Wikimedia Foundation"
+            },
+            {
+              "url": "https://donate.wikimedia.org/?wmf_medium=wikimediaPortal&wmf_campaign=wikimediaPortalBtn&wmf_source=wikimediaPortalBtn",
+              "text": "Donate now"
+            },
+            {
+              "url": "https://wikimediafoundation.org/about/contact/",
+              "text": "Contact"
+            },
+            {
+              "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "text": "Creative Commons Attribution-ShareAlike License"
+            },
+            {
+              "url": "https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Terms_of_Use",
+              "text": "Terms of Use"
+            },
+            {
+              "url": "https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Privacy_policy",
+              "text": "Privacy Policy"
+            }
+          ],
+          "forms": [],
+          "headers": {
+            "content-type": "text/html",
+            "etag": "W/\"c0d4-65d54a13c8d00\"",
+            "last-modified": "Thu, 08 Oct 2026 13:58:44 GMT",
+            "server": "ATS/9.2.15"
+          },
+          "contacts": []
+        }
+      },
+      {
+        "tool": "find_policy_pages",
+        "input": {
+          "url": "https://www.wikimedia.org/"
+        },
+        "result": {
+          "status": 200,
+          "source": "https://www.wikimedia.org/",
+          "links": []
+        }
+      },
+      {
+        "tool": "fetch_page",
+        "input": {
+          "url": "https://www.wikimedia.org/"
+        },
+        "result": {
+          "status": 200,
+          "final_url": "https://www.wikimedia.org/",
+          "title": "Wikimedia",
+          "text": "Wikimedia Welcome! The Wikimedia movement is a global community of people, projects, and activities working together to create and share knowledge freely. Join us in making all knowledge available to everyone, everywhere. Our Projects Our projects are the core of the Wikimedia movement . All major projects are operated by the Wikimedia Foundation , and the content is collaboratively developed by over 260,000 users worldwide using the MediaWiki software. Reference Wikipedia The Free Encyclopedia Wiktionary Free dictionary Wikiquote Free quote compendium Wikibooks Free textbooks Collections Commons Free media collection Wikisource Free content library Wikiversity Free learning resources Wikispecies Free species directory Technology Wikidata Free knowledge base Wikifunctions Free function library MediaWiki Free & open wiki software Guides Wikivoyage Free travel guide Collaboration Meta-Wiki Community coordination & documentation The Wikimedia Foundation is the non-profit organization that hosts all Wikimedia projects and supports communities all over the world who create and curate freely accessible content. Your donation protects the human right to free and open knowledge for everyone. Donate now Contact Questions about the Wikimedia Foundation or Wikimedia projects? Get in touch. Contact This page is available under the Creative Commons Attribution-ShareAlike License Terms of Use Privacy Policy",
+          "links": [
+            {
+              "url": "https://meta.wikimedia.org/wiki/Special:MyLanguage/Wikimedia_movement",
+              "text": "Wikimedia movement"
+            },
+            {
+              "url": "https://wikimediafoundation.org/",
+              "text": "Wikimedia Foundation"
+            },
+            {
+              "url": "https://www.mediawiki.org/",
+              "text": "MediaWiki"
+            },
+            {
+              "url": "https://www.wikipedia.org",
+              "text": "Wikipedia The Free Encyclopedia"
+            },
+            {
+              "url": "https://www.wiktionary.org",
+              "text": "Wiktionary Free dictionary"
+            },
+            {
+              "url": "https://www.wikiquote.org",
+              "text": "Wikiquote Free quote compendium"
+            },
+            {
+              "url": "https://www.wikibooks.org",
+              "text": "Wikibooks Free textbooks"
+            },
+            {
+              "url": "https://commons.wikimedia.org",
+              "text": "Commons Free media collection"
+            },
+            {
+              "url": "https://www.wikisource.org",
+              "text": "Wikisource Free content library"
+            },
+            {
+              "url": "https://www.wikiversity.org",
+              "text": "Wikiversity Free learning resources"
+            },
+            {
+              "url": "https://www.wikispecies.org",
+              "text": "Wikispecies Free species directory"
+            },
+            {
+              "url": "https://www.wikidata.org",
+              "text": "Wikidata Free knowledge base"
+            },
+            {
+              "url": "https://www.wikifunctions.org",
+              "text": "Wikifunctions Free function library"
+            },
+            {
+              "url": "https://www.mediawiki.org",
+              "text": "MediaWiki Free & open wiki software"
+            },
+            {
+              "url": "https://www.wikivoyage.org",
+              "text": "Wikivoyage Free travel guide"
+            },
+            {
+              "url": "https://meta.wikimedia.org",
+              "text": "Meta-Wiki Community coordination & documentation"
+            },
+            {
+              "url": "https://wikimediafoundation.org/",
+              "text": "Wikimedia Foundation"
+            },
+            {
+              "url": "https://donate.wikimedia.org/?wmf_medium=wikimediaPortal&wmf_campaign=wikimediaPortalBtn&wmf_source=wikimediaPortalBtn",
+              "text": "Donate now"
+            },
+            {
+              "url": "https://wikimediafoundation.org/about/contact/",
+              "text": "Contact"
+            },
+            {
+              "url": "https://creativecommons.org/licenses/by-sa/4.0/",
+              "text": "Creative Commons Attribution-ShareAlike License"
+            },
+            {
+              "url": "https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Terms_of_Use",
+              "text": "Terms of Use"
+            },
+            {
+              "url": "https://foundation.wikimedia.org/wiki/Special:MyLanguage/Policy:Privacy_policy",
+              "text": "Privacy Policy"
+            }
+          ],
+          "forms": [],
+          "headers": {
+            "content-type": "text/html",
+            "etag": "W/\"c0d4-65d54a13c8d00\"",
+            "last-modified": "Thu, 08 Oct 2026 13:58:44 GMT",
+            "server": "ATS/9.2.15"
+          },
+          "contacts": []
+        }
+      },
+      {
+        "tool": "find_policy_pages",
+        "input": {
+          "url": "https://www.wikimedia.org/"
+        },
+        "result": {
+          "status": 200,
+          "source": "https://www.wikimedia.org/",
+          "links": []
+        }
+      },
+      {
+        "tool": "dns_lookup",
+        "input": {
+          "hostname": "www.wikimedia.org"
+        },
+        "result": {
+          "hostname": "www.wikimedia.org",
+          "status": "resolved",
+          "addresses": [
+            "208.80.154.224"
+          ],
+          "cnames": [
+            "dyna.wikimedia.org."
+          ],
+          "caution": "DNS/CDN addresses do not prove the origin hosting provider."
+        }
+      },
+      {
+        "tool": "rdap_lookup",
+        "input": {
+          "ip_or_domain": "208.80.154.224"
+        },
+        "result": {
+          "status": "completed",
+          "bootstrap": "https://data.iana.org/rdap/ipv4.json",
+          "registry_url": "https://rdap.arin.net/registry/ip/208.80.154.224",
+          "name": "WIKIMEDIA",
+          "contacts": [
+            {
+              "rung": "host",
+              "channel": "manual_email",
+              "address": "abuse@wikimedia.org",
+              "endpoint": "mailto:abuse@wikimedia.org",
+              "evidence": {
+                "source": "https://rdap.arin.net/registry/ip/208.80.154.224",
+                "method": "RDAP_abuse_vcard",
+                "network": "WIKIMEDIA",
+                "origin_unverified": true
+              },
+              "id": "contact-1"
+            }
+          ]
+        }
+      },
+      {
+        "tool": "platform_registry",
+        "input": {
+          "hostname": "www.wikimedia.org"
+        },
+        "result": {
+          "version": "2026-10-10",
+          "contacts": [
+            {
+              "rung": "search",
+              "channel": "manual_web",
+              "address": "https://support.google.com/legal/troubleshooter/1114905",
+              "endpoint": "https://support.google.com/legal/troubleshooter/1114905",
+              "evidence": {
+                "source": "platform-registry-2026-10-10",
+                "method": "search_registry",
+                "scope": "Delisting only; source remains"
+              },
+              "id": "contact-2"
+            }
+          ]
+        }
+      }
+    ],
+    "requests": [
+      {
+        "url": "https://www.wikimedia.org/robots.txt",
+        "method": "GET",
+        "status": 404,
+        "headers": {
+          "content-type": "text/html; charset=utf-8",
+          "server": "mw-web.eqiad.main-67c8cb7f6b-b4l62"
+        }
+      },
+      {
+        "url": "https://www.wikimedia.org/",
+        "robots_allowed": true
+      },
+      {
+        "url": "https://www.wikimedia.org/",
+        "method": "GET",
+        "status": 200,
+        "headers": {
+          "content-type": "text/html",
+          "etag": "W/\"c0d4-65d54a13c8d00\"",
+          "last-modified": "Thu, 08 Oct 2026 13:58:44 GMT",
+          "server": "ATS/9.2.15"
+        }
+      },
+      {
+        "url": "https://data.iana.org/robots.txt",
+        "method": "GET",
+        "status": 200,
+        "headers": {
+          "content-type": "text/plain; charset=UTF-8",
+          "etag": "W/\"40-63f30497a5d00-br\"",
+          "last-modified": "Sat, 20 Sep 2025 00:01:24 GMT",
+          "server": "cloudflare",
+          "cf-ray": "a487ceb2bbb5fb49-MCI"
+        }
+      },
+      {
+        "url": "https://data.iana.org/rdap/ipv4.json",
+        "robots_allowed": true
+      },
+      {
+        "url": "https://data.iana.org/rdap/ipv4.json",
+        "method": "GET",
+        "status": 200,
+        "headers": {
+          "content-type": "application/json",
+          "etag": "W/\"15fd-58ac070130427-br\"",
+          "last-modified": "Fri, 07 Jun 2019 19:00:02 GMT",
+          "server": "cloudflare",
+          "cf-ray": "a487ceb2dbe6fb49-MCI"
+        }
+      },
+      {
+        "url": "https://rdap.arin.net/robots.txt",
+        "method": "GET",
+        "status": 404,
+        "headers": {
+          "content-type": "text/html; charset=iso-8859-1",
+          "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips"
+        }
+      },
+      {
+        "url": "https://rdap.arin.net/registry/ip/208.80.154.224",
+        "robots_allowed": true
+      },
+      {
+        "url": "https://rdap.arin.net/registry/ip/208.80.154.224",
+        "method": "GET",
+        "status": 200,
+        "headers": {
+          "content-type": "application/rdap+json",
+          "server": "Apache/2.4.6 (CentOS) OpenSSL/1.0.2k-fips"
+        }
+      }
+    ],
+    "page_status": 200,
+    "limitations": [
+      "Published contacts require human review.",
+      "CDN/RDAP contacts may identify a serving network rather than the origin."
+    ],
+    "url": "https://www.wikimedia.org/",
+    "wall_seconds": 0.721
+  }
+]

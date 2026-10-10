@@ -1,0 +1,238 @@
+{
+  "arin_originas0_originautnums" : [ ],
+  "cidr0_cidrs" : [ {
+    "v4prefix" : "208.80.152.0",
+    "length" : 22
+  } ],
+  "endAddress" : "208.80.155.255",
+  "entities" : [ {
+    "entities" : [ {
+      "events" : [ {
+        "eventAction" : "last changed",
+        "eventDate" : "2026-04-09T06:53:49-04:00"
+      }, {
+        "eventAction" : "registration",
+        "eventDate" : "2014-01-29T11:04:27-05:00"
+      } ],
+      "handle" : "WIKIM-ARIN",
+      "links" : [ {
+        "href" : "https://rdap.arin.net/registry/entity/WIKIM-ARIN",
+        "rel" : "self",
+        "type" : "application/rdap+json",
+        "value" : "https://rdap.arin.net/registry/ip/208.80.154.224"
+      }, {
+        "href" : "https://whois.arin.net/rest/poc/WIKIM-ARIN",
+        "rel" : "alternate",
+        "type" : "application/xml",
+        "value" : "https://rdap.arin.net/registry/ip/208.80.154.224"
+      } ],
+      "objectClassName" : "entity",
+      "port43" : "whois.arin.net",
+      "roles" : [ "administrative", "noc" ],
+      "status" : [ "validated" ],
+      "vcardArray" : [ "vcard", [ [ "version", { }, "text", "4.0" ], [ "adr", {
+        "label" : "1 Sansome Street Suite 1895\nSan Francisco\nCA\n94104\nUnited States"
+      }, "text", [ "", "", "", "", "", "", "" ] ], [ "fn", { }, "text", "Wikimedia NOC" ], [ "org", { }, "text", "Wikimedia Foundation, Inc." ], [ "kind", { }, "text", "group" ], [ "email", { }, "text", "noc@wikimedia.org" ], [ "tel", {
+        "type" : [ "work", "voice" ]
+      }, "text", "+1-415-839-6885" ] ] ]
+    }, {
+      "events" : [ {
+        "eventAction" : "last changed",
+        "eventDate" : "2026-03-29T03:24:02-04:00"
+      }, {
+        "eventAction" : "registration",
+        "eventDate" : "2017-04-25T09:50:11-04:00"
+      } ],
+      "handle" : "YOUNS-ARIN",
+      "links" : [ {
+        "href" : "https://rdap.arin.net/registry/entity/YOUNS-ARIN",
+        "rel" : "self",
+        "type" : "application/rdap+json",
+        "value" : "https://rdap.arin.net/registry/ip/208.80.154.224"
+      }, {
+        "href" : "https://whois.arin.net/rest/poc/YOUNS-ARIN",
+        "rel" : "alternate",
+        "type" : "application/xml",
+        "value" : "https://rdap.arin.net/registry/ip/208.80.154.224"
+      } ],
+      "objectClassName" : "entity",
+      "port43" : "whois.arin.net",
+      "roles" : [ "technical" ],
+      "status" : [ "validated" ],
+      "vcardArray" : [ "vcard", [ [ "version", { }, "text", "4.0" ], [ "adr", {
+        "label" : "1 Montgomery Street\nSuite 1600\nSan Francisco\nCA\n94104\nUnited States"
+      }, "text", [ "", "", "", "", "", "", "" ] ], [ "fn", { }, "text", "Arzhel Younsi" ], [ "n", { }, "text", [ "Younsi", "Arzhel", "", "", "" ] ], [ "kind", { }, "text", "individual" ], [ "email", { }, "text", "ayounsi@wikimedia.org" ], [ "tel", {
+        "type" : [ "work", "voice" ]
+      }, "text", "+1-415-839-6885" ] ] ]
+    }, {
+      "events" : [ {
+        "eventAction" : "last changed",
+        "eventDate" : "2023-12-19T05:21:36-05:00"
+      }, {
+        "eventAction" : "registration",
+        "eventDate" : "2006-05-24T14:12:07-04:00"
+      } ],
+      "handle" : "MBE96-ARIN",
+      "links" : [ {
+        "href" : "https://rdap.arin.net/registry/entity/MBE96-ARIN",
+        "rel" : "self",
+        "type" : "application/rdap+json",
+        "value" : "https://rdap.arin.net/registry/ip/208.80.154.224"
+      }, {
+        "href" : "https://whois.arin.net/rest/poc/MBE96-ARIN",
+        "rel" : "alternate",
+        "type" : "application/xml",
+        "value" : "https://rdap.arin.net/registry/ip/208.80.154.224"
+      } ],
+      "objectClassName" : "entity",
+      "port43" : "whois.arin.net",
+      "remarks" : [ {
+        "description" : [ "ARIN has attempted to validate the data for this POC, but has received no response from the POC since 2024-12-17" ],
+        "title" : "Unvalidated POC"
+      } ],
+      "roles" : [ "technical" ],
+      "vcardArray" : [ "vcard", [ [ "version", { }, "text", "4.0" ], [ "adr", {
+        "label" : "1 Montgomery Street\nSuite 1600\nSan Francisco\nCA\n94104\nUnited States"
+      }, "text", [ "", "", "", "", "", "", "" ] ], [ "fn", { }, "text", "Mark Bergsma" ], [ "n", { }, "text", [ "Bergsma", "Mark", "", "", "" ] ], [ "kind", { }, "text", "individual" ], [ "email", { }, "text", "mark@wikimedia.org" ], [ "tel", {
+        "type" : [ "work", "voice" ]
+      }, "text", "+1-415-839-6885;ext622" ] ] ]
+    }, {
+      "events" : [ {
+        "eventAction" : "last changed",
+        "eventDate" : "2026-02-06T07:28:50-05:00"
+      }, {
+        "eventAction" : "registration",
+        "eventDate" : "2014-01-29T11:02:46-05:00"
+      } ],
+      "handle" : "WNA11-ARIN",
+      "links" : [ {
+        "href" : "https://rdap.arin.net/registry/entity/WNA11-ARIN",
+        "rel" : "self",
+        "type" : "application/rdap+json",
+        "value" : "https://rdap.arin.net/registry/ip/208.80.154.224"
+      }, {
+        "href" : "https://whois.arin.net/rest/poc/WNA11-ARIN",
+        "rel" : "alternate",
+        "type" : "application/xml",
+        "value" : "https://rdap.arin.net/registry/ip/208.80.154.224"
+      } ],
+      "objectClassName" : "entity",
+      "port43" : "whois.arin.net",
+      "roles" : [ "abuse" ],
+      "status" : [ "validated" ],
+      "vcardArray" : [ "vcard", [ [ "version", { }, "text", "4.0" ], [ "adr", {
+        "label" : "1 Sansome Street Suite 1895\nSan Francisco\nCA\n94104\nUnited States"
+      }, "text", [ "", "", "", "", "", "", "" ] ], [ "fn", { }, "text", "Wikimedia Network Abuse" ], [ "org", { }, "text", "Wikimedia Foundation, Inc." ], [ "kind", { }, "text", "group" ], [ "email", { }, "text", "abuse@wikimedia.org" ], [ "tel", {
+        "type" : [ "work", "voice" ]
+      }, "text", "+1-415-839-6885" ] ] ]
+    }, {
+      "events" : [ {
+        "eventAction" : "last changed",
+        "eventDate" : "2026-02-06T07:28:28-05:00"
+      }, {
+        "eventAction" : "registration",
+        "eventDate" : "2021-08-06T06:06:09-04:00"
+      } ],
+      "handle" : "MOONE85-ARIN",
+      "links" : [ {
+        "href" : "https://rdap.arin.net/registry/entity/MOONE85-ARIN",
+        "rel" : "self",
+        "type" : "application/rdap+json",
+        "value" : "https://rdap.arin.net/registry/ip/208.80.154.224"
+      }, {
+        "href" : "https://whois.arin.net/rest/poc/MOONE85-ARIN",
+        "rel" : "alternate",
+        "type" : "application/xml",
+        "value" : "https://rdap.arin.net/registry/ip/208.80.154.224"
+      } ],
+      "objectClassName" : "entity",
+      "port43" : "whois.arin.net",
+      "roles" : [ "technical" ],
+      "status" : [ "validated" ],
+      "vcardArray" : [ "vcard", [ [ "version", { }, "text", "4.0" ], [ "adr", {
+        "label" : "1 Sansome Street Suite 1895\nSan Francisco\nCA\n94104\nUnited States"
+      }, "text", [ "", "", "", "", "", "", "" ] ], [ "fn", { }, "text", "Cathal Mooney" ], [ "n", { }, "text", [ "Mooney", "Cathal", "", "", "" ] ], [ "kind", { }, "text", "individual" ], [ "email", { }, "text", "cmooney@wikimedia.org" ], [ "tel", {
+        "type" : [ "work", "voice" ]
+      }, "text", "+1-415-839-6885" ] ] ]
+    } ],
+    "events" : [ {
+      "eventAction" : "last changed",
+      "eventDate" : "2025-02-06T13:14:18-05:00"
+    }, {
+      "eventAction" : "registration",
+      "eventDate" : "2006-05-30T14:12:34-04:00"
+    } ],
+    "handle" : "WIKIM",
+    "links" : [ {
+      "href" : "https://rdap.arin.net/registry/entity/WIKIM",
+      "rel" : "self",
+      "type" : "application/rdap+json",
+      "value" : "https://rdap.arin.net/registry/ip/208.80.154.224"
+    }, {
+      "href" : "https://whois.arin.net/rest/org/WIKIM",
+      "rel" : "alternate",
+      "type" : "application/xml",
+      "value" : "https://rdap.arin.net/registry/ip/208.80.154.224"
+    } ],
+    "objectClassName" : "entity",
+    "port43" : "whois.arin.net",
+    "roles" : [ "registrant" ],
+    "vcardArray" : [ "vcard", [ [ "version", { }, "text", "4.0" ], [ "fn", { }, "text", "Wikimedia Foundation Inc." ], [ "adr", {
+      "label" : "1 Sansome Street\nSuite 1895\nSan Francisco\nCA\n94104\nUnited States"
+    }, "text", [ "", "", "", "", "", "", "" ] ], [ "kind", { }, "text", "org" ] ] ]
+  } ],
+  "events" : [ {
+    "eventAction" : "last changed",
+    "eventDate" : "2021-12-14T20:28:45-05:00"
+  }, {
+    "eventAction" : "registration",
+    "eventDate" : "2007-07-23T17:32:30-04:00"
+  } ],
+  "handle" : "NET-208-80-152-0-1",
+  "ipVersion" : "v4",
+  "links" : [ {
+    "href" : "https://rdap.arin.net/registry/ip/208.80.152.0",
+    "rel" : "self",
+    "type" : "application/rdap+json",
+    "value" : "https://rdap.arin.net/registry/ip/208.80.154.224"
+  }, {
+    "href" : "https://whois.arin.net/rest/net/NET-208-80-152-0-1",
+    "rel" : "alternate",
+    "type" : "application/xml",
+    "value" : "https://rdap.arin.net/registry/ip/208.80.154.224"
+  } ],
+  "name" : "WIKIMEDIA",
+  "notices" : [ {
+    "description" : [ "By using the ARIN RDAP/Whois service, you are agreeing to the RDAP/Whois Terms of Use" ],
+    "links" : [ {
+      "href" : "https://www.arin.net/resources/registry/whois/tou/",
+      "rel" : "terms-of-service",
+      "type" : "text/html",
+      "value" : "https://rdap.arin.net/registry/ip/208.80.154.224"
+    } ],
+    "title" : "Terms of Service"
+  }, {
+    "description" : [ "If you see inaccuracies in the results, please visit: " ],
+    "links" : [ {
+      "href" : "https://www.arin.net/resources/registry/whois/inaccuracy_reporting/",
+      "rel" : "inaccuracy-report",
+      "type" : "text/html",
+      "value" : "https://rdap.arin.net/registry/ip/208.80.154.224"
+    } ],
+    "title" : "Whois Inaccuracy Reporting"
+  }, {
+    "description" : [ "Copyright 1997-2026, American Registry for Internet Numbers, Ltd." ],
+    "title" : "Copyright Notice"
+  } ],
+  "objectClassName" : "ip network",
+  "parentHandle" : "NET-208-0-0-0-0",
+  "port43" : "whois.arin.net",
+  "rdapConformance" : [ "nro_rdap_profile_0", "rdap_level_0", "cidr0", "arin_originas0" ],
+  "remarks" : [ {
+    "description" : [ "http://www.wikimediafoundation.org" ],
+    "title" : "Registration Comments"
+  } ],
+  "startAddress" : "208.80.152.0",
+  "status" : [ "active" ],
+  "type" : "DIRECT ALLOCATION"
+}

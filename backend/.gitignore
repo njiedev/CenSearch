@@ -1,0 +1,16 @@
+.env
+.env.*
+!.env.example
+.venv/
+data/
+models/
+seed/
+node_modules/
+dist/
+build/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+*.tsbuildinfo

@@ -1,0 +1,342 @@
+[
+  {
+    "source": "deterministic_baseline",
+    "status": "completed",
+    "model_status": "not_used",
+    "recipients": [
+      {
+        "rung": "site",
+        "channel": "manual_web",
+        "address": "https://support.github.com/contact/report-abuse",
+        "endpoint": "https://support.github.com/contact/report-abuse",
+        "evidence": {
+          "source": "platform-registry-2026-10-10",
+          "method": "platform_registry",
+          "domain": "github.com"
+        },
+        "id": "contact-1",
+        "rank": 1
+      },
+      {
+        "rung": "search",
+        "channel": "manual_web",
+        "address": "https://support.google.com/legal/troubleshooter/1114905",
+        "endpoint": "https://support.google.com/legal/troubleshooter/1114905",
+        "evidence": {
+          "source": "platform-registry-2026-10-10",
+          "method": "search_registry",
+          "scope": "Delisting only; source remains"
+        },
+        "id": "contact-2",
+        "rank": 2
+      }
+    ],
+    "tool_calls": [
+      {
+        "tool": "fetch_page",
+        "input": {
+          "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy"
+        },
+        "result": {
+          "status": "error",
+          "error": "DecodingError",
+          "message": "Read-only lookup failed"
+        }
+      },
+      {
+        "tool": "fetch_page",
+        "input": {
+          "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy"
+        },
+        "result": {
+          "status": "error",
+          "error": "DecodingError",
+          "message": "Read-only lookup failed"
+        }
+      },
+      {
+        "tool": "find_policy_pages",
+        "input": {
+          "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy"
+        },
+        "result": {
+          "status": "error",
+          "source": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+          "links": []
+        }
+      },
+      {
+        "tool": "fetch_page",
+        "input": {
+          "url": "https://docs.github.com/"
+        },
+        "result": {
+          "status": "error",
+          "error": "DecodingError",
+          "message": "Read-only lookup failed"
+        }
+      },
+      {
+        "tool": "find_policy_pages",
+        "input": {
+          "url": "https://docs.github.com/"
+        },
+        "result": {
+          "status": "error",
+          "source": "https://docs.github.com/",
+          "links": []
+        }
+      },
+      {
+        "tool": "dns_lookup",
+        "input": {
+          "hostname": "docs.github.com"
+        },
+        "result": {
+          "hostname": "docs.github.com",
+          "status": "resolved",
+          "addresses": [
+            "185.199.108.154",
+            "185.199.109.154",
+            "185.199.110.154",
+            "185.199.111.154"
+          ],
+          "cnames": [],
+          "caution": "DNS/CDN addresses do not prove the origin hosting provider."
+        }
+      },
+      {
+        "tool": "rdap_lookup",
+        "input": {
+          "ip_or_domain": "185.199.108.154"
+        },
+        "result": {
+          "status": "error",
+          "error": "DecodingError",
+          "message": "Read-only lookup failed"
+        }
+      },
+      {
+        "tool": "platform_registry",
+        "input": {
+          "hostname": "docs.github.com"
+        },
+        "result": {
+          "version": "2026-10-10",
+          "contacts": [
+            {
+              "rung": "site",
+              "channel": "manual_web",
+              "address": "https://support.github.com/contact/report-abuse",
+              "endpoint": "https://support.github.com/contact/report-abuse",
+              "evidence": {
+                "source": "platform-registry-2026-10-10",
+                "method": "platform_registry",
+                "domain": "github.com"
+              },
+              "id": "contact-1"
+            },
+            {
+              "rung": "search",
+              "channel": "manual_web",
+              "address": "https://support.google.com/legal/troubleshooter/1114905",
+              "endpoint": "https://support.google.com/legal/troubleshooter/1114905",
+              "evidence": {
+                "source": "platform-registry-2026-10-10",
+                "method": "search_registry",
+                "scope": "Delisting only; source remains"
+              },
+              "id": "contact-2"
+            }
+          ]
+        }
+      }
+    ],
+    "requests": [
+      {
+        "url": "https://docs.github.com/robots.txt",
+        "method": "GET",
+        "error": "DecodingError"
+      },
+      {
+        "url": "https://docs.github.com/robots.txt",
+        "method": "GET",
+        "error": "DecodingError"
+      },
+      {
+        "url": "https://docs.github.com/robots.txt",
+        "method": "GET",
+        "error": "DecodingError"
+      },
+      {
+        "url": "https://data.iana.org/robots.txt",
+        "method": "GET",
+        "error": "DecodingError"
+      }
+    ],
+    "page_status": "error",
+    "limitations": [
+      "Published contacts require human review.",
+      "CDN/RDAP contacts may identify a serving network rather than the origin."
+    ],
+    "url": "https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy",
+    "wall_seconds": 0.468
+  },
+  {
+    "source": "deterministic_baseline",
+    "status": "completed",
+    "model_status": "not_used",
+    "recipients": [
+      {
+        "rung": "search",
+        "channel": "manual_web",
+        "address": "https://support.google.com/legal/troubleshooter/1114905",
+        "endpoint": "https://support.google.com/legal/troubleshooter/1114905",
+        "evidence": {
+          "source": "platform-registry-2026-10-10",
+          "method": "search_registry",
+          "scope": "Delisting only; source remains"
+        },
+        "id": "contact-1",
+        "rank": 1
+      }
+    ],
+    "tool_calls": [
+      {
+        "tool": "fetch_page",
+        "input": {
+          "url": "https://www.wikimedia.org/"
+        },
+        "result": {
+          "status": "error",
+          "error": "DecodingError",
+          "message": "Read-only lookup failed"
+        }
+      },
+      {
+        "tool": "fetch_page",
+        "input": {
+          "url": "https://www.wikimedia.org/"
+        },
+        "result": {
+          "status": "error",
+          "error": "DecodingError",
+          "message": "Read-only lookup failed"
+        }
+      },
+      {
+        "tool": "find_policy_pages",
+        "input": {
+          "url": "https://www.wikimedia.org/"
+        },
+        "result": {
+          "status": "error",
+          "source": "https://www.wikimedia.org/",
+          "links": []
+        }
+      },
+      {
+        "tool": "fetch_page",
+        "input": {
+          "url": "https://www.wikimedia.org/"
+        },
+        "result": {
+          "status": "error",
+          "error": "DecodingError",
+          "message": "Read-only lookup failed"
+        }
+      },
+      {
+        "tool": "find_policy_pages",
+        "input": {
+          "url": "https://www.wikimedia.org/"
+        },
+        "result": {
+          "status": "error",
+          "source": "https://www.wikimedia.org/",
+          "links": []
+        }
+      },
+      {
+        "tool": "dns_lookup",
+        "input": {
+          "hostname": "www.wikimedia.org"
+        },
+        "result": {
+          "hostname": "www.wikimedia.org",
+          "status": "resolved",
+          "addresses": [
+            "208.80.154.224"
+          ],
+          "cnames": [
+            "dyna.wikimedia.org."
+          ],
+          "caution": "DNS/CDN addresses do not prove the origin hosting provider."
+        }
+      },
+      {
+        "tool": "rdap_lookup",
+        "input": {
+          "ip_or_domain": "208.80.154.224"
+        },
+        "result": {
+          "status": "error",
+          "error": "DecodingError",
+          "message": "Read-only lookup failed"
+        }
+      },
+      {
+        "tool": "platform_registry",
+        "input": {
+          "hostname": "www.wikimedia.org"
+        },
+        "result": {
+          "version": "2026-10-10",
+          "contacts": [
+            {
+              "rung": "search",
+              "channel": "manual_web",
+              "address": "https://support.google.com/legal/troubleshooter/1114905",
+              "endpoint": "https://support.google.com/legal/troubleshooter/1114905",
+              "evidence": {
+                "source": "platform-registry-2026-10-10",
+                "method": "search_registry",
+                "scope": "Delisting only; source remains"
+              },
+              "id": "contact-1"
+            }
+          ]
+        }
+      }
+    ],
+    "requests": [
+      {
+        "url": "https://www.wikimedia.org/robots.txt",
+        "method": "GET",
+        "error": "DecodingError"
+      },
+      {
+        "url": "https://www.wikimedia.org/robots.txt",
+        "method": "GET",
+        "error": "DecodingError"
+      },
+      {
+        "url": "https://www.wikimedia.org/robots.txt",
+        "method": "GET",
+        "error": "DecodingError"
+      },
+      {
+        "url": "https://data.iana.org/robots.txt",
+        "method": "GET",
+        "error": "DecodingError"
+      }
+    ],
+    "page_status": "error",
+    "limitations": [
+      "Published contacts require human review.",
+      "CDN/RDAP contacts may identify a serving network rather than the origin."
+    ],
+    "url": "https://www.wikimedia.org/",
+    "wall_seconds": 0.414
+  }
+]
