@@ -1,8 +1,8 @@
 import { useId, useState } from 'react'
 
-// The eye outline never changes. Inside it, the upper lid is a curve from
-// corner to corner; its control point sets how open the eye is. The pupil is
-// clipped to the area below the lid.
+// The eye outline never changes. Inside it, the upper lid is a filled shape
+// whose lower edge curves from corner to corner; that curve's control point
+// sets how open the eye is. The pupil is clipped to the area below the lid.
 const OUTLINE = 'M9 36 Q60 -14 111 36 Q60 86 9 36 Z'
 
 const WIDE = -14 // lid tucked into the top of the outline
@@ -13,6 +13,11 @@ const SHUT = 86 // lid lies on the bottom curve
 
 function lidLine(lid: number) {
   return `M9 36 Q60 ${lid} 111 36`
+}
+
+// The lid itself: the area between the top of the outline and the lid line.
+function lidFill(lid: number) {
+  return `M9 36 Q60 -14 111 36 Q60 ${lid} 9 36 Z`
 }
 
 function visible(lid: number) {
@@ -96,6 +101,9 @@ export default function Logo() {
         <circle className="logo-pupil" cx={CENTER} cy="40" r="12" clipPath={`url(#${clipId})`}>
           {!still && <Animate attribute="cx" seconds={PUPIL_SECONDS} frames={PUPIL} format={String} />}
         </circle>
+        <path className="logo-lid-fill" d={lidFill(HALF)}>
+          {!still && <Animate attribute="d" seconds={LID_SECONDS} frames={LID} format={lidFill} />}
+        </path>
         <path className="logo-lid" d={lidLine(HALF)}>
           {!still && <Animate attribute="d" seconds={LID_SECONDS} frames={LID} format={lidLine} />}
         </path>

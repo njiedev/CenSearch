@@ -212,7 +212,8 @@ body {
   stroke-linecap: round;
 }
 
-.logo-pupil {
+.logo-pupil,
+.logo-lid-fill {
   fill: currentColor;
 }
 
