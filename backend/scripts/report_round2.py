@@ -38,7 +38,7 @@ CHANGES = {
     "censearch/config.py": "Clock, scheduler, delivery and local mock research settings.",
     "censearch/db.py": "Registers new cascading workflow tables without changing old case columns.",
     "censearch/api.py": "Workflow lifecycle, real-time scheduler and actual model/storage health state.",
-    "censearch/enrol.py": "Wrapped long lines; original enrolment behavior retained.",
+    "censearch/enroll.py": "Wrapped long lines; original enrollment behavior retained.",
     "censearch/agent/probe.py": "Wrapped long system-prompt line; original probe retained.",
     "demo-ui/src/Workflow.tsx": "Decide, Send and Verify screens with unanswered facts, approvals and refusal display.",
     "demo-ui/src/main.tsx": "Adds workflow navigation to the existing backend-only console.",

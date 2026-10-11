@@ -89,7 +89,7 @@ function App() {
     finally { setWorking(false) }
   }
 
-  async function enrol(event: React.SubmitEvent<HTMLFormElement>) {
+  async function enroll(event: React.SubmitEvent<HTMLFormElement>) {
     event.preventDefault()
     const form = event.currentTarget
     const data = new FormData(form)
@@ -132,14 +132,14 @@ function App() {
       </>}
     </CardContent></Card>
     <nav aria-label="Console screens" className="flex flex-wrap gap-2">
-      {['matches', 'enrol', 'find', 'case', 'decide', 'send', 'verify', 'agent'].map(name => <Button key={name} variant={tab === name ? 'default' : 'outline'} onClick={() => setTab(name)}>{name === 'enrol' ? 'Enrol' : name === 'find' ? 'Find' : name === 'case' ? 'Case' : name === 'agent' ? 'Agent probe' : name[0].toUpperCase() + name.slice(1)}</Button>)}
+      {['matches', 'enroll', 'find', 'case', 'decide', 'send', 'verify', 'agent'].map(name => <Button key={name} variant={tab === name ? 'default' : 'outline'} onClick={() => setTab(name)}>{name === 'enroll' ? 'Enroll' : name === 'find' ? 'Find' : name === 'case' ? 'Case' : name === 'agent' ? 'Agent probe' : name[0].toUpperCase() + name.slice(1)}</Button>)}
     </nav>
     {error !== null && <div role="alert" className="rounded border p-3"><p>Request failed</p><Readable value={error} /></div>}
     {working && <p role="status">Working...</p>}
     {tab === 'matches' && <Matches cases={cases} people={people} busy={Boolean(health?.busy)} refresh={refresh} />}
-    {tab === 'enrol' && <>
-      <Card><CardHeader><CardTitle>Enrol a person</CardTitle></CardHeader><CardContent>
-        <form onSubmit={enrol} className="space-y-4">
+    {tab === 'enroll' && <>
+      <Card><CardHeader><CardTitle>Enroll a person</CardTitle></CardHeader><CardContent>
+        <form onSubmit={enroll} className="space-y-4">
           <div><Label htmlFor="name">Name</Label><Input id="name" name="name" required /></div>
           <div><Label htmlFor="consent">Consent statement</Label><Textarea id="consent" name="consent" required placeholder="Write your consent to store and match your face locally." /></div>
           <div><Label htmlFor="references">Reference photos</Label><Input id="references" name="references" type="file" accept="image/*" multiple /><p>At least one clear, single-face reference. Webcam captures are added below.</p></div>
@@ -153,10 +153,10 @@ function App() {
           <div><Label htmlFor="originals">Owned original photos (optional)</Label><Input id="originals" name="originals" type="file" accept="image/*" multiple /></div>
           <div><Label htmlFor="ownership">Ownership statement (required with originals)</Label><Textarea id="ownership" name="ownership" /></div>
           <div className="flex items-center gap-2"><input id="fixture" type="checkbox" name="development_fixture" value="true" /><Label htmlFor="fixture">Local development fixture, not a real consent or ownership claim</Label></div>
-          <Button type="submit" disabled={disabled}>Enrol person</Button>
+          <Button type="submit" disabled={disabled}>Enroll person</Button>
         </form>
       </CardContent></Card>
-      {result && <Card><CardHeader><CardTitle>Enrolment saved</CardTitle></CardHeader><CardContent><Readable value={result} /></CardContent></Card>}
+      {result && <Card><CardHeader><CardTitle>Enrollment saved</CardTitle></CardHeader><CardContent><Readable value={result} /></CardContent></Card>}
       <Card><CardHeader><CardTitle>Enrolled people ({people.length})</CardTitle></CardHeader><CardContent className="space-y-3">
         {!people.length && <p>No people enrolled yet.</p>}
         {people.map(person => <div key={person.id} className="space-y-2 border-b pb-3"><p>{person.name} · {person.references.length} references ({person.active_reference_count} active) · {person.originals.length} originals</p>

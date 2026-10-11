@@ -1,4 +1,4 @@
-"""Real loopback HTTP enrol/crawl plus optional Playwright console acceptance."""
+"""Real loopback HTTP enroll/crawl plus optional Playwright console acceptance."""
 
 import argparse
 from contextlib import ExitStack
@@ -102,7 +102,7 @@ def browser_flow(base, person, output):
             page.on("pageerror", lambda error: errors.append(str(error)))
             page.goto(base, wait_until="networkidle")
             expect(page.get_by_test_id("health-summary")).to_contain_text("Face models: loaded")
-            page.get_by_role("button", name="Enrol", exact=True).click()
+            page.get_by_role("button", name="Enroll", exact=True).click()
             page.get_by_label("Name", exact=True).fill("Browser fixture")
             page.get_by_label("Consent statement").fill(
                 "Local fixture for browser acceptance; no real consent claim"
@@ -117,9 +117,9 @@ def browser_flow(base, person, output):
                 "Hypothetical fixture only"
             )
             page.get_by_label("Local development fixture, not a real consent or ownership claim").check()
-            page.get_by_role("button", name="Enrol person", exact=True).click()
-            expect(page.get_by_text("Enrolment saved", exact=True)).to_be_visible(timeout=15000)
-            page.screenshot(path=str(output / "console-enrol.png"), full_page=True)
+            page.get_by_role("button", name="Enroll person", exact=True).click()
+            expect(page.get_by_text("Enrollment saved", exact=True)).to_be_visible(timeout=15000)
+            page.screenshot(path=str(output / "console-enroll.png"), full_page=True)
             # Exercise actual capture plumbing with Chromium's synthetic camera.
             # It is not presented as verification on a person's live camera.
             page.get_by_role("button", name="Start webcam", exact=True).click()
@@ -147,7 +147,7 @@ def browser_flow(base, person, output):
             assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth"), (
                 "Narrow screen overflows"
             )
-            page.get_by_role("button", name="Enrol", exact=True).click()
+            page.get_by_role("button", name="Enroll", exact=True).click()
             page.get_by_role("button", name="Delete Browser fixture", exact=True).click()
             expect(page.get_by_text("No people enrolled yet.", exact=True)).to_be_visible()
             # Invalid upload must show the actual quality rejection in the screen.
@@ -158,12 +158,12 @@ def browser_flow(base, person, output):
             page.get_by_label("Reference photos", exact=True).set_input_files(
                 {"name": "blank.png", "mimeType": "image/png", "buffer": blank.getvalue()}
             )
-            page.get_by_role("button", name="Enrol person", exact=True).click()
+            page.get_by_role("button", name="Enroll person", exact=True).click()
             expect(page.get_by_role("alert")).to_contain_text("photo_rejected")
             page.screenshot(path=str(output / "console-rejected.png"), full_page=True)
             assert not errors, errors
             return {
-                "enrol": "passed",
+                "enroll": "passed",
                 "find": "passed",
                 "case": "passed",
                 "delete": "passed",

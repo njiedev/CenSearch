@@ -1,4 +1,4 @@
-"""Atomic enrolment: reject the whole set if any supplied photo fails validation."""
+"""Atomic enrollment: reject the whole set if any supplied photo fails validation."""
 
 from pathlib import Path
 import uuid
@@ -23,7 +23,7 @@ class Enrollment:
         self.evidence = evidence
         self.calibration = calibration
 
-    def enrol(self, name, consent, references, originals, ownership, development_fixture=False):
+    def enroll(self, name, consent, references, originals, ownership, development_fixture=False):
         if not name.strip() or not consent.strip():
             raise ValueError("Name and consent statement are required")
         if not references:

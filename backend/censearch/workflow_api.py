@@ -80,7 +80,7 @@ def install(app):
         workflow = app.state.workflow
         async with workflow.lock:
             if app.state.busy:
-                raise HTTPException(409, "Enrolment, deletion or crawl is in progress")
+                raise HTTPException(409, "Enrollment, deletion or crawl is in progress")
             app.state.busy = True
             try:
                 return await getattr(workflow, action)(*args)

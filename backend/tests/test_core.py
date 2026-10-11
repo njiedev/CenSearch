@@ -96,7 +96,7 @@ def test_reference_prefix_and_bands(calibration):
         active_references([])
 
 
-def test_enrolment_quality_atomic_and_no_embeddings(client, enrolled):
+def test_enrollment_quality_atomic_and_no_embeddings(client, enrolled):
     assert len(enrolled["references"]) == 1
     assert "embedding" not in json.dumps(enrolled)
     bad = BytesIO()
@@ -125,7 +125,7 @@ def test_fixture_cloud_guard(client):
     enrollment = client.app.state.enrollment
     enrollment.evidence.client = object()
     with pytest.raises(ValueError, match="Development fixtures require local storage"):
-        enrollment.enrol("fixture", "test", [("a", b"x")], [], "", True)
+        enrollment.enroll("fixture", "test", [("a", b"x")], [], "", True)
     enrollment.evidence.client = None
 
 

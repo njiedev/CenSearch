@@ -106,7 +106,7 @@ export function Matches({ cases, people, busy, refresh }: {
       {batch.items.filter((item: RecordData) => !outcomes[item.status] || !['sent', 'drafted_not_sent', 'left_alone', 'held_for_review', 'failed'].includes(item.status)).map((item: RecordData) =>
         <p key={item.case_id}>Case {item.case_id}: {item.reason}</p>)}
     </div>}
-    {!cases.length && <p className="rounded border p-8 text-center">No matches yet. Enrol a person and run Find to scan for appearances.</p>}
+    {!cases.length && <p className="rounded border p-8 text-center">No matches yet. Enroll a person and run Find to scan for appearances.</p>}
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {cases.map(item => <article key={item.id} data-testid="match-card" data-case-id={item.id} className="relative min-w-0 rounded-lg border bg-card p-3">
         <div className="mb-3 flex items-center gap-2">

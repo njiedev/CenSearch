@@ -7,7 +7,7 @@ All example photos and assertions are local development fixtures, not actual own
 
 ## Local startup
 
-For the stay-open local dataset demo, run `make demo`. It seeds, enrols a development fixture,
+For the stay-open local dataset demo, run `make demo`. It seeds, enrolls a development fixture,
 runs Find, opens the default browser and waits for Ctrl-C. Data stays under data/demo-*.
 Override photos with `make demo PHOTOS="/path/to/local-photos"`.
 For occupied ports use `make demo API_PORT=8290 BASE_PORT=8911`.
@@ -51,9 +51,9 @@ for occupied ports. Their output is in data/e2e-* and data/round2-*; screenshots
 Fixture names/files are replaced with neutral names in the temporary copy. Never upload development fixtures.
 Round 2 disables the model and remote storage in its fixture child; simulated-provider tests run only in pytest.
 
-## Enrol and find
+## Enroll and find
 
-1. GET /api/health and /api/people. Face models must be loaded before enrolment or crawl.
+1. GET /api/health and /api/people. Face models must be loaded before enrollment or crawl.
 2. POST /api/people with FormData: name, consent, repeated references files; optional originals plus ownership.
    Do not manually set multipart Content-Type. Webcam canvas blobs work as File values.
    Only explicitly local fixture runs set development_fixture=true. Examine every photo validation result.

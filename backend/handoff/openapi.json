@@ -145,13 +145,13 @@
         }
       },
       "post": {
-        "summary": "Enrol",
-        "operationId": "enrol_api_people_post",
+        "summary": "Enroll",
+        "operationId": "enroll_api_people_post",
         "requestBody": {
           "content": {
             "multipart/form-data": {
               "schema": {
-                "$ref": "#/components/schemas/Body_enrol_api_people_post"
+                "$ref": "#/components/schemas/Body_enroll_api_people_post"
               }
             }
           },
@@ -2863,7 +2863,7 @@
         ],
         "title": "BatchRequest"
       },
-      "Body_enrol_api_people_post": {
+      "Body_enroll_api_people_post": {
         "properties": {
           "name": {
             "type": "string",
@@ -2907,7 +2907,7 @@
           "consent",
           "references"
         ],
-        "title": "Body_enrol_api_people_post"
+        "title": "Body_enroll_api_people_post"
       },
       "CaseResponse": {
         "properties": {

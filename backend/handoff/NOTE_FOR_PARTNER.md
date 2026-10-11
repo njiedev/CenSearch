@@ -4,7 +4,7 @@ The product changed on 2026-10-10: the person no longer answers questions per ma
 accept one legal-responsibility warning, and the agent picks the route, finds the recipient, drafts and sends.
 
 Give your coding agent FRONTEND_AGENT_BRIEF.md and openapi.json from this folder.
-The brief was written before this change: it covers enrol, find and the older per-case screens, but not batches.
+The brief was written before this change: it covers enroll, find and the older per-case screens, but not batches.
 For the batch flow use openapi.json and copy backend/demo-ui/src/Matches.tsx, which is the working screen.
 
 The batch flow in three calls:

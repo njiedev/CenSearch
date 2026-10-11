@@ -19,7 +19,7 @@ from censearch.config import ROOT, Settings
 from censearch.copy_detect import VERSION
 from censearch.crawl import Crawler, validate_url
 from censearch.db import Case, CrawlRun, Scan, Store, now, record
-from censearch.enrol import Enrollment, EnrollmentError
+from censearch.enroll import Enrollment, EnrollmentError
 from censearch.evidence import EvidenceStore
 from censearch.face import FaceConfig, OpenCVFaceEngine
 from censearch.matching import Matcher
@@ -166,7 +166,7 @@ def create_app(settings=None):
     def idle():
         if app.state.busy:
             raise HTTPException(
-                409, "An enrolment, deletion or crawl is in progress; retry after it finishes"
+                409, "An enrollment, deletion or crawl is in progress; retry after it finishes"
             )
 
     def get_case(case_id):
@@ -227,7 +227,7 @@ def create_app(settings=None):
     @app.post(
         "/api/people", status_code=201, response_model=EnrollmentResponse, response_model_exclude_unset=True
     )
-    async def enrol(
+    async def enroll(
         name: str = Form(...),
         consent: str = Form(...),
         ownership: str = Form(""),
@@ -242,7 +242,7 @@ def create_app(settings=None):
             reference_data = await uploads(references)
             original_data = await uploads(originals)
             result = await asyncio.to_thread(
-                app.state.enrollment.enrol,
+                app.state.enrollment.enroll,
                 name,
                 consent,
                 reference_data,
