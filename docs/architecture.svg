@@ -1,0 +1,96 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 920" width="1600" height="920" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+<defs><marker id="head" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#111111"/></marker></defs>
+<rect width="1600" height="920" fill="#ffffff"/>
+<text x="60" y="58" font-size="30" font-weight="700" fill="#111111" text-anchor="start">CenSearch architecture</text>
+<text x="60" y="86" font-size="17" font-weight="400" fill="#55555f" text-anchor="start">Autonomous takedowns for your face</text>
+<rect x="60" y="330" width="300" height="190" fill="none" stroke="#111111" stroke-width="2" stroke-dasharray="3 5"/>
+<text x="210.0" y="366" font-size="23" font-weight="700" fill="#111111" text-anchor="middle">You</text>
+<text x="210.0" y="390" font-size="15" font-weight="400" fill="#55555f" text-anchor="middle">in a browser</text>
+<rect x="85" y="405" width="250" height="44" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="210.0" y="433.0" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">Landing · sign-up</text>
+<rect x="85" y="457" width="250" height="44" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="210.0" y="485.0" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">Matches · console</text>
+<rect x="520" y="40" width="560" height="240" fill="none" stroke="#111111" stroke-width="2" stroke-dasharray="3 5"/>
+<text x="800.0" y="76" font-size="23" font-weight="700" fill="#111111" text-anchor="middle">Strands Agents SDK</text>
+<text x="800.0" y="100" font-size="15" font-weight="400" fill="#55555f" text-anchor="middle">tools are plain Python functions</text>
+<rect x="545" y="115" width="245" height="60" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="667.5" y="142.0" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">Search queries</text>
+<text x="667.5" y="162.0" font-size="13" font-weight="400" fill="#55555f" text-anchor="middle">from name, handles, context</text>
+<rect x="810" y="115" width="245" height="60" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="932.5" y="142.0" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">Legal route</text>
+<text x="932.5" y="162.0" font-size="13" font-weight="400" fill="#55555f" text-anchor="middle">one per match, with a reason</text>
+<rect x="545" y="190" width="245" height="60" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="667.5" y="217.0" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">Recipient lookup</text>
+<text x="667.5" y="237.0" font-size="13" font-weight="400" fill="#55555f" text-anchor="middle">site, then host, then search</text>
+<rect x="810" y="190" width="245" height="60" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="932.5" y="217.0" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">Page and reply reading</text>
+<text x="932.5" y="237.0" font-size="13" font-weight="400" fill="#55555f" text-anchor="middle">text only</text>
+<rect x="520" y="330" width="560" height="290" fill="none" stroke="#111111" stroke-width="2" stroke-dasharray="3 5"/>
+<text x="800.0" y="366" font-size="23" font-weight="700" fill="#111111" text-anchor="middle">CenSearch backend</text>
+<text x="800.0" y="390" font-size="15" font-weight="400" fill="#55555f" text-anchor="middle">FastAPI on one Akamai Cloud instance</text>
+<rect x="545" y="405" width="510" height="50" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="800.0" y="436.0" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">API · batches · injectable clock</text>
+<rect x="545" y="468" width="160" height="60" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="625.0" y="495.0" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">Crawler</text>
+<text x="625.0" y="515.0" font-size="13" font-weight="400" fill="#55555f" text-anchor="middle">GET-only</text>
+<rect x="720" y="468" width="160" height="60" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="800.0" y="495.0" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">Face + copy</text>
+<text x="800.0" y="515.0" font-size="13" font-weight="400" fill="#55555f" text-anchor="middle">matched locally</text>
+<rect x="895" y="468" width="160" height="60" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="975.0" y="495.0" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">Delivery gate</text>
+<text x="975.0" y="515.0" font-size="13" font-weight="400" fill="#55555f" text-anchor="middle">loopback only</text>
+<rect x="545" y="541" width="245" height="55" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="667.5" y="565.5" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">SQLite</text>
+<text x="667.5" y="585.5" font-size="13" font-weight="400" fill="#55555f" text-anchor="middle">cases, notices, attestations</text>
+<rect x="810" y="541" width="245" height="55" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="932.5" y="565.5" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">Evidence capture</text>
+<text x="932.5" y="585.5" font-size="13" font-weight="400" fill="#55555f" text-anchor="middle">screenshot + bundle</text>
+<rect x="1220" y="70" width="320" height="180" fill="none" stroke="#111111" stroke-width="2" stroke-dasharray="3 5"/>
+<text x="1380.0" y="106" font-size="23" font-weight="700" fill="#111111" text-anchor="middle">Akamai hosted inference</text>
+<text x="1380.0" y="130" font-size="15" font-weight="400" fill="#55555f" text-anchor="middle">OpenAI-compatible</text>
+<rect x="1245" y="150" width="270" height="70" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="1380.0" y="182.0" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">Chat model</text>
+<text x="1380.0" y="202.0" font-size="13" font-weight="400" fill="#55555f" text-anchor="middle">sees page text and URLs only</text>
+<rect x="1220" y="330" width="320" height="290" fill="none" stroke="#111111" stroke-width="2" stroke-dasharray="3 5"/>
+<text x="1380.0" y="366" font-size="23" font-weight="700" fill="#111111" text-anchor="middle">Public web</text>
+<text x="1380.0" y="390" font-size="15" font-weight="400" fill="#55555f" text-anchor="middle">read-only, logged out</text>
+<rect x="1245" y="405" width="270" height="55" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="1380.0" y="429.5" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">Search API</text>
+<text x="1380.0" y="449.5" font-size="13" font-weight="400" fill="#55555f" text-anchor="middle">text queries, never images</text>
+<rect x="1245" y="472" width="270" height="55" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="1380.0" y="496.5" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">Real pages and images</text>
+<text x="1380.0" y="516.5" font-size="13" font-weight="400" fill="#55555f" text-anchor="middle">stops at a drafted request</text>
+<rect x="1245" y="539" width="270" height="55" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="1380.0" y="563.5" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">DNS · registry records</text>
+<text x="1380.0" y="583.5" font-size="13" font-weight="400" fill="#55555f" text-anchor="middle">who runs the site</text>
+<rect x="520" y="700" width="560" height="180" fill="none" stroke="#111111" stroke-width="2" stroke-dasharray="3 5"/>
+<text x="800.0" y="736" font-size="23" font-weight="700" fill="#111111" text-anchor="middle">Simulated delivery</text>
+<text x="800.0" y="760" font-size="15" font-weight="400" fill="#55555f" text-anchor="middle">mock administrators on loopback</text>
+<rect x="545" y="790" width="150" height="60" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="620.0" y="817.0" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">Site</text>
+<text x="620.0" y="837.0" font-size="13" font-weight="400" fill="#55555f" text-anchor="middle">mock</text>
+<rect x="725" y="790" width="150" height="60" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="800.0" y="817.0" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">Host</text>
+<text x="800.0" y="837.0" font-size="13" font-weight="400" fill="#55555f" text-anchor="middle">mock</text>
+<rect x="905" y="790" width="150" height="60" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="980.0" y="817.0" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">Search engine</text>
+<text x="980.0" y="837.0" font-size="13" font-weight="400" fill="#55555f" text-anchor="middle">mock</text>
+<polyline points="695,820 725,820" fill="none" stroke="#111111" stroke-width="2.5" marker-end="url(#head)"/>
+<polyline points="875,820 905,820" fill="none" stroke="#111111" stroke-width="2.5" marker-end="url(#head)"/>
+<text x="800" y="778" font-size="13" font-weight="400" fill="#55555f" text-anchor="middle">silence escalates up the ladder; a reasoned refusal stops</text>
+<rect x="60" y="700" width="300" height="180" fill="none" stroke="#111111" stroke-width="2" stroke-dasharray="3 5"/>
+<text x="210.0" y="736" font-size="23" font-weight="700" fill="#111111" text-anchor="middle">Akamai Object Storage</text>
+<text x="210.0" y="760" font-size="15" font-weight="400" fill="#55555f" text-anchor="middle">S3-compatible</text>
+<rect x="85" y="790" width="250" height="60" fill="#f4f3f8" stroke="#111111" stroke-width="1.5"/>
+<text x="210.0" y="826.0" font-size="18" font-weight="400" fill="#111111" text-anchor="middle">Evidence bundles</text>
+<polyline points="360,430 520,430" fill="none" stroke="#111111" stroke-width="2.5" marker-end="url(#head)" marker-start="url(#head)"/>
+<polyline points="800,280 800,330" fill="none" stroke="#111111" stroke-width="2.5" marker-end="url(#head)" marker-start="url(#head)"/>
+<polyline points="1080,160 1220,160" fill="none" stroke="#111111" stroke-width="2.5" marker-end="url(#head)" marker-start="url(#head)"/>
+<text x="1150" y="146" font-size="14" font-weight="400" fill="#55555f" text-anchor="middle">prompts</text>
+<polyline points="1080,475 1220,475" fill="none" stroke="#111111" stroke-width="2.5" marker-end="url(#head)" marker-start="url(#head)"/>
+<text x="1150" y="461" font-size="14" font-weight="400" fill="#55555f" text-anchor="middle">GET</text>
+<polyline points="975,620 975,700" fill="none" stroke="#111111" stroke-width="2.5" marker-end="url(#head)" marker-start="url(#head)"/>
+<text x="1050" y="665" font-size="14" font-weight="400" fill="#55555f" text-anchor="middle">notices · re-checks</text>
+<polyline points="520,568 210,568 210,700" fill="none" stroke="#111111" stroke-width="2.5" marker-end="url(#head)"/>
+<text x="365" y="558" font-size="14" font-weight="400" fill="#55555f" text-anchor="middle">evidence</text>
+</svg>
