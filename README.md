@@ -1,3 +1,10 @@
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/logo-dark.png">
+    <img src="docs/logo-light.png" alt="CenSearch" width="360">
+  </picture>
+</p>
+
 # CenSearch: autonomous takedowns for your face
 
 Find where your face and photos appear on the web, and get them taken down:
