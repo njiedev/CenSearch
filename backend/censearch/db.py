@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 import hashlib
 import json
 from pathlib import Path
-from sqlalchemy import ForeignKey, JSON, LargeBinary, create_engine, event, select
+from sqlalchemy import ForeignKey, JSON, LargeBinary, create_engine, event, inspect, select, text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
 
 
@@ -23,6 +23,14 @@ class Person(Base):
     consent: Mapped[str]
     development_fixture: Mapped[bool] = mapped_column(default=False)
     created_at: Mapped[str] = mapped_column(default=now)
+
+
+class WhitelistDomain(Base):
+    __tablename__ = "whitelist_domains"
+    person_id: Mapped[str] = mapped_column(
+        ForeignKey("people.id", ondelete="CASCADE"), primary_key=True
+    )
+    domain: Mapped[str] = mapped_column(primary_key=True)
 
 
 class Reference(Base):
@@ -114,6 +122,20 @@ class Store:
         from censearch import case_records  # noqa: F401  (register workflow tables)
 
         Base.metadata.create_all(self.engine)
+        # create_all adds tables but does not add columns to existing SQLite files.
+        columns = {column["name"] for column in inspect(self.engine).get_columns("batches")}
+        with self.engine.begin() as connection:
+            if "mode" not in columns:
+                connection.execute(text(
+                    "ALTER TABLE batches ADD COLUMN mode VARCHAR NOT NULL DEFAULT 'send'"
+                ))
+            if "phase" not in columns:
+                connection.execute(text(
+                    "ALTER TABLE batches ADD COLUMN phase VARCHAR NOT NULL DEFAULT 'preparing'"
+                ))
+                connection.execute(text(
+                    "UPDATE batches SET phase = 'done' WHERE status NOT IN ('queued', 'running')"
+                ))
         self.session = sessionmaker(self.engine, expire_on_commit=False)
 
     def version(self, session):

@@ -83,6 +83,8 @@ class Batch(Base):
     contact: Mapped[dict] = mapped_column(JSON)
     status: Mapped[str] = mapped_column(default="queued")
     finished_at: Mapped[str | None]
+    mode: Mapped[str] = mapped_column(default="send")
+    phase: Mapped[str] = mapped_column(default="preparing")
 
 
 class BatchItem(Base):

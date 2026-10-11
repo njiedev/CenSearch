@@ -10,6 +10,7 @@ from censearch.case_records import Attestation, Batch, BatchItem, Delivery, Noti
 from censearch.db import Case, Original, record
 from censearch.delivery import destination
 from censearch.discovery import draft_only
+from censearch.whitelist import is_whitelisted
 from censearch.workflow import site_origin
 from censearch.workflow_api import ApprovalRequest, DraftRequest, PrepareRequest
 
@@ -26,6 +27,10 @@ WARNING = (
 TERMINAL = {"sent", "drafted_not_sent", "left_alone", "held_for_review", "failed"}
 
 
+class BatchPhaseError(ValueError):
+    pass
+
+
 class Batches:
     def __init__(self, workflow):
         self.workflow = workflow
@@ -39,11 +44,18 @@ class Batches:
         if any(not value.strip() for value in request.contact.model_dump().values()):
             raise ValueError("All contact fields are required for autonomous route selection")
         with self.store.session.begin() as session:
+            blocked = []
             for case_id in request.case_ids:
-                if session.get(Case, case_id) is None:
+                case = session.get(Case, case_id)
+                if case is None:
                     raise LookupError(f"Case {case_id} not found")
+                if is_whitelisted(session, case):
+                    blocked.append(case_id)
+            if blocked:
+                raise ValueError(f"Cases {blocked} are on the whitelist")
             batch = Batch(
                 id=uuid4().hex,
+                mode=request.mode,
                 accepted_by=request.accepted_by,
                 accepted_at=self.workflow.now(),
                 accepted_warning=True,
@@ -70,7 +82,14 @@ class Batches:
             return record(batch) | {
                 "items": items,
                 "total": len(items),
-                "completed": sum(item["status"] in TERMINAL for item in items),
+                "completed": sum(
+                    item["status"] in TERMINAL
+                    or (
+                        batch.phase in ("preparing", "awaiting_review")
+                        and item["status"] == "ready_to_send"
+                    )
+                    for item in items
+                ),
             }
 
     def update(self, item_id, status, reason, **values):
@@ -87,6 +106,9 @@ class Batches:
             for batch in session.scalars(
                 select(Batch).where(Batch.status.in_(("queued", "running")))
             ):
+                if batch.phase == "awaiting_review":
+                    continue
+                batch.phase = "done"
                 batch.status = "interrupted"
                 batch.finished_at = self.workflow.now()
                 for item in session.scalars(
@@ -126,10 +148,16 @@ class Batches:
                 group.create_task(run_site(items))
         with self.store.session.begin() as session:
             batch_row = session.get(Batch, batch_id)
+            ready = session.scalar(select(BatchItem.id).where(
+                BatchItem.batch_id == batch_id, BatchItem.status == "ready_to_send"
+            ))
+            batch_row.phase = "awaiting_review" if ready is not None else "done"
             batch_row.status = "completed"
-            batch_row.finished_at = self.workflow.now()
+            batch_row.finished_at = self.workflow.now() if ready is None else None
 
     async def run_case(self, batch, item, site_cache=None):
+        if self.leave_whitelisted(item):
+            return
         workflow = self.workflow
         case_id, item_id = item["case_id"], item["id"]
         self.update(item_id, "reviewing", "Choosing a legal route")
@@ -245,6 +273,8 @@ class Batches:
         if not candidates:
             raise ValueError("Recipient lookup found no site recipient")
         recipient = min(candidates, key=lambda row: row.get("rank", 9999))
+        if self.leave_whitelisted(item):
+            return
         self.update(item_id, "drafting", "Preparing the fixed notice", recipient=recipient)
         await workflow.approve_draft(
             case_id,
@@ -267,6 +297,84 @@ class Batches:
         except ValueError as error:
             self.update(item_id, "drafted_not_sent", str(error))
             return
+        if batch["mode"] == "prepare":
+            self.update(item_id, "ready_to_send", "Drafted. Waiting for your review.")
+            return
+        await self.deliver(batch, item, notice, authorization)
+
+    def leave_whitelisted(self, item):
+        with self.store.session.begin() as session:
+            case = session.get(Case, item["case_id"])
+            if not is_whitelisted(session, case):
+                return False
+            case.state = "left_alone"
+        self.update(item["id"], "left_alone", "Site is on your whitelist.")
+        return True
+
+    def start_send(self, batch_id, case_ids=None):
+        """Validate the entire selection before making the send phase visible."""
+        with self.store.session.begin() as session:
+            batch = session.get(Batch, batch_id)
+            if batch is None:
+                raise LookupError("Batch not found")
+            if batch.phase != "awaiting_review":
+                raise BatchPhaseError("Batch is not awaiting review")
+            items = list(session.scalars(select(BatchItem).where(BatchItem.batch_id == batch_id)))
+            ready = {item.case_id for item in items if item.status == "ready_to_send"}
+            selected = ready if case_ids is None else set(case_ids)
+            if selected - ready:
+                raise ValueError(f"Cases {sorted(selected - ready)} are not ready_to_send in this batch")
+            if case_ids is not None and len(case_ids) != len(selected):
+                raise ValueError("Duplicate case IDs are not allowed")
+            for item in items:
+                if item.status == "ready_to_send" and item.case_id not in selected:
+                    item.status = "drafted_not_sent"
+                    item.reason = "Not sent. You left this one out."
+            batch.phase = "sending"
+            batch.status = "running"
+            batch.finished_at = None
+        return self.view(batch_id)
+
+    async def send(self, batch_id):
+        batch = self.view(batch_id)
+        for item in batch["items"]:
+            if item["status"] != "ready_to_send":
+                continue
+            try:
+                if self.leave_whitelisted(item):
+                    continue
+                with self.store.session() as session:
+                    notice = session.get(Notice, item["notice_id"])
+                    if notice is None or notice.case_id != item["case_id"]:
+                        raise ValueError("Prepared notice is missing or belongs to another case")
+                    notice = record(notice)
+                    attestation = session.scalar(select(Attestation).where(
+                        Attestation.case_id == item["case_id"],
+                        Attestation.question == "batch_legal_responsibility",
+                    ).order_by(Attestation.id.desc()))
+                    if attestation is None or attestation.value.get("batch_id") != batch_id:
+                        raise ValueError("Batch attestation is missing or superseded")
+                    authorization = attestation.value
+                await self.deliver(batch, item, notice, authorization)
+            except Exception as error:
+                self.update(item["id"], "failed", f"{type(error).__name__}: {error}")
+        with self.store.session.begin() as session:
+            row = session.get(Batch, batch_id)
+            row.phase = "done"
+            row.status = "completed"
+            row.finished_at = self.workflow.now()
+
+    async def deliver(self, batch, item, notice, authorization):
+        if self.leave_whitelisted(item):
+            return
+        workflow = self.workflow
+        case_id, item_id = item["case_id"], item["id"]
+        # Recheck eligibility after review, independent of the legacy external flag.
+        with self.store.session() as session:
+            case = session.get(Case, case_id)
+            if draft_only(case):
+                raise ValueError("Real source · draft only; the person sends this draft themselves")
+        destination(notice["recipient"]["endpoint"], allow_external=False)
         await workflow.approve_notice(
             case_id,
             ApprovalRequest(
@@ -299,6 +407,7 @@ def case_summary(session, case):
         select(BatchItem).where(BatchItem.case_id == case.id).order_by(BatchItem.id.desc())
     )
     return record(case) | {
+        "whitelisted": is_whitelisted(session, case),
         "matched_image_url": f"/api/cases/{case.id}/image",
         "possible_action": possible_action(record(case)),
         "batch_outcome": record(latest) if latest else None,

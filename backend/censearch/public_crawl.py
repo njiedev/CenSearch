@@ -10,7 +10,7 @@ from sqlalchemy import select
 from censearch.agent.discovery import discover
 from censearch.agent.web import loopback, validate_read_url
 from censearch.batches import case_summary
-from censearch.crawl import BudgetExceeded, Crawler, USER_AGENT, extract, origin
+from censearch.crawl import BudgetExceeded, Crawler, ScanCancelled, USER_AGENT, extract, origin
 from censearch.db import Case, CrawlRun, Scan, now, record
 from censearch.discovery import (
     MATCH_LABEL,
@@ -42,7 +42,7 @@ def local_settings(settings):
 
 
 class PublicCrawler(Crawler):
-    def __init__(self, settings, store, matcher, run_id, request, fixture=False):
+    def __init__(self, settings, store, matcher, run_id, request, fixture=False, cancel_event=None):
         scoped = local_settings(settings).model_copy(
             update={
                 "allow_public_crawl": request.allow_public_fetch and not fixture,
@@ -68,7 +68,7 @@ class PublicCrawler(Crawler):
             "public_search": True,
             "request": request.model_dump(),
         }
-        super().__init__(scoped, store, matcher, run_id, config)
+        super().__init__(scoped, store, matcher, run_id, config, cancel_event)
         self.request = request
         self.fixture = fixture
         self.pages = []
@@ -112,6 +112,7 @@ class PublicCrawler(Crawler):
         super().progress(status)
 
     def check_deadline(self):
+        self.check_cancel()
         if time.monotonic() >= self.deadline:
             raise TimeoutError("Public run time limit reached")
 
@@ -144,7 +145,9 @@ class PublicCrawler(Crawler):
                 ) as client:
                     self.client = client
                     if self.request.mode != "supplied_urls":
-                        self.search_session = SearchSession(self.settings, client, self.progress)
+                        self.search_session = SearchSession(
+                            self.settings, client, self.progress, self.check_cancel
+                        )
                         # Reserve time for fetching sources if the model/provider stalls.
                         try:
                             async with asyncio.timeout(
@@ -207,6 +210,8 @@ class PublicCrawler(Crawler):
         except TimeoutError:
             self.metrics["time_budget_exhausted"] = 1
             status = "completed_with_limits"
+        except ScanCancelled:
+            status = "cancelled"
         except asyncio.CancelledError:
             status = "interrupted"
             raise

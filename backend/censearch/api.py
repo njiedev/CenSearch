@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 import hashlib
 import json
 import logging
+from threading import Event
 from urllib.parse import urlsplit
 import cv2
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
@@ -13,14 +14,14 @@ from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from PIL import Image
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy import select, text
+from sqlalchemy import delete, select, text
 from censearch.agent.probe import Probe
 from censearch.agent.web import loopback
 from censearch.batches import Batches, case_summary
 from censearch.config import ROOT, Settings
 from censearch.copy_detect import VERSION
 from censearch.crawl import Crawler, validate_url
-from censearch.db import Case, CrawlRun, Person, Scan, Store, now, record
+from censearch.db import Case, CrawlRun, Person, Scan, Store, WhitelistDomain, now, record
 from censearch.discovery import PublicSearchRequest
 from censearch.public_crawl import PublicCrawler, public_view
 from censearch.enroll import Enrollment, EnrollmentError
@@ -29,7 +30,11 @@ from censearch.face import FaceConfig, OpenCVFaceEngine
 from censearch.matching import Matcher
 from censearch.workflow import Workflow
 from censearch.workflow_api import install
+from censearch.scan_history import history
+from censearch.whitelist import domains_for, normalize_domain
 from censearch.schemas import (
+    PersonScanResponse,
+    WhitelistResponse,
     CaseResponse,
     CrawlResponse,
     DeletedResponse,
@@ -52,6 +57,11 @@ class CrawlRequest(BaseModel):
     max_pages: int = Field(default=100, ge=1, le=1000)
 
 
+class WhitelistRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    domains: list[str] = Field(max_length=200)
+
+
 class ProbeRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     hostname: str = Field(min_length=1, max_length=253, pattern=r"^[A-Za-z0-9.:-]+$")
@@ -67,6 +77,7 @@ def create_app(settings=None):
         app.state.settings = settings
         app.state.busy = False
         app.state.tasks = set()
+        app.state.scan_cancels = {}
         app.state.face = None
         app.state.face_error = None
         app.state.calibration_sha256 = None
@@ -280,6 +291,35 @@ def create_app(settings=None):
         except LookupError as error:
             raise HTTPException(404, str(error)) from error
 
+    @app.get("/api/people/{person_id}/whitelist", response_model=WhitelistResponse)
+    def get_whitelist(person_id: str):
+        with app.state.store.session() as session:
+            if session.get(Person, person_id) is None:
+                raise HTTPException(404, "Person not found")
+            return {"domains": domains_for(session, person_id)}
+
+    @app.put("/api/people/{person_id}/whitelist", response_model=WhitelistResponse)
+    async def put_whitelist(person_id: str, request: WhitelistRequest):
+        # A short synchronous transaction can run between batch awaits. Each item
+        # rechecks the current list before drafting and delivery.
+        with app.state.store.session.begin() as session:
+            if session.get(Person, person_id) is None:
+                raise HTTPException(404, "Person not found")
+            try:
+                domains = sorted({normalize_domain(entry) for entry in request.domains})
+            except ValueError as error:
+                raise HTTPException(422, str(error)) from error
+            session.execute(delete(WhitelistDomain).where(WhitelistDomain.person_id == person_id))
+            session.add_all(WhitelistDomain(person_id=person_id, domain=domain) for domain in domains)
+        return {"domains": domains}
+
+    @app.get("/api/people/{person_id}/scans", response_model=list[PersonScanResponse])
+    def person_scans(person_id: str):
+        with app.state.store.session() as session:
+            if session.get(Person, person_id) is None:
+                raise HTTPException(404, "Person not found")
+            return history(session, person_id)
+
     @app.delete("/api/people/{person_id}", response_model=DeletedResponse)
     async def delete_person(person_id: str):
         ready()
@@ -310,13 +350,17 @@ def create_app(settings=None):
             session.flush()
             result = record(row)
         app.state.busy = True
+        cancel_event = app.state.scan_cancels[row.id] = Event()
 
         async def worker():
             try:
-                crawler = Crawler(settings, app.state.store, app.state.matcher, row.id, config)
+                crawler = Crawler(
+                    settings, app.state.store, app.state.matcher, row.id, config, cancel_event
+                )
                 # CPU-bound OpenCV work and the crawler event loop live off the API loop.
                 await asyncio.to_thread(lambda: asyncio.run(crawler.run()))
             finally:
+                app.state.scan_cancels.pop(row.id, None)
                 app.state.busy = False
 
         task = asyncio.create_task(worker())
@@ -345,14 +389,16 @@ def create_app(settings=None):
             session.flush()
             run_id, fixture = row.id, person.development_fixture
         app.state.busy = True
+        cancel_event = app.state.scan_cancels[run_id] = Event()
 
         async def worker():
             try:
                 crawler = PublicCrawler(
-                    settings, app.state.store, app.state.matcher, run_id, request, fixture
+                    settings, app.state.store, app.state.matcher, run_id, request, fixture, cancel_event
                 )
                 await asyncio.to_thread(lambda: asyncio.run(crawler.run()))
             finally:
+                app.state.scan_cancels.pop(run_id, None)
                 app.state.busy = False
 
         task = asyncio.create_task(worker())
@@ -376,6 +422,26 @@ def create_app(settings=None):
             return public_view(app.state.store, run_id)
         except LookupError as error:
             raise HTTPException(404, str(error)) from error
+
+    def cancel_scan(run_id, public=False):
+        with app.state.store.session() as session:
+            run = session.get(CrawlRun, run_id)
+            if run is None or (public and not run.config.get("public_search")):
+                raise HTTPException(404, "Scan run not found")
+            flag = app.state.scan_cancels.get(run_id)
+            if run.status != "running" or flag is None:
+                raise HTTPException(409, "Scan is not running")
+            flag.set()
+            return record(run)
+
+    @app.post("/api/public-searches/{run_id}/cancel", status_code=202)
+    async def cancel_public_search(run_id: int) -> dict:
+        cancel_scan(run_id, public=True)
+        return public_view(app.state.store, run_id)
+
+    @app.post("/api/crawls/{run_id}/cancel", status_code=202, response_model=CrawlResponse)
+    async def cancel_crawl(run_id: int):
+        return cancel_scan(run_id)
 
     @app.get("/api/crawls", response_model=list[CrawlResponse])
     def crawls():

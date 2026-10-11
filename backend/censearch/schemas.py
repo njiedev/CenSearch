@@ -63,6 +63,7 @@ class CrawlResponse(BaseModel):
         "completed_with_limits",
         "failed",
         "interrupted",
+        "cancelled",
     ]
     started_at: str
     finished_at: str | None
@@ -79,6 +80,21 @@ class ScanResponse(BaseModel):
     identity_version: str
     scanned_at: str
     status: Literal["discovered", "matched", "no_match", "cached_no_match", "blocked", "error"]
+
+
+class BatchItemResponse(BaseModel):
+    id: int
+    batch_id: str
+    case_id: int
+    status: Literal[
+        "queued", "reviewing", "capturing", "researching", "drafting", "ready_to_send",
+        "sending", "sent", "drafted_not_sent", "left_alone", "held_for_review", "failed",
+    ]
+    reason: str
+    decision: dict[str, Any]
+    recipient: dict[str, Any]
+    notice_id: int | None
+    delivery_id: int | None
 
 
 class CaseResponse(BaseModel):
@@ -106,7 +122,8 @@ class CaseResponse(BaseModel):
     verification_checks: list[dict[str, Any]]
     matched_image_url: str
     possible_action: dict[str, Any]
-    batch_outcome: dict[str, Any] | None
+    batch_outcome: BatchItemResponse | None
+    whitelisted: bool
 
 
 class ProbeResponse(BaseModel):
@@ -161,3 +178,37 @@ class ErrorDetail(BaseModel):
 
 class ErrorResponse(BaseModel):
     error: ErrorDetail
+
+
+class WhitelistResponse(BaseModel):
+    domains: list[str]
+
+
+class PersonScanResponse(BaseModel):
+    run_id: int
+    kind: Literal["public_search", "crawl"]
+    status: Literal["queued", "running", "completed", "failed", "cancelled"]
+    started_at: str | None
+    finished_at: str | None
+    label: str
+    pages_fetched: int
+    images_checked: int
+    match_count: int
+    possible_count: int
+    whitelisted_count: int
+
+
+class BatchResponse(BaseModel):
+    id: str
+    accepted_by: str
+    accepted_at: str
+    accepted_warning: bool
+    warning: str
+    contact: dict[str, Any]
+    status: str
+    finished_at: str | None
+    mode: Literal["send", "prepare"]
+    phase: Literal["preparing", "awaiting_review", "sending", "done"]
+    total: int
+    completed: int
+    items: list[BatchItemResponse]

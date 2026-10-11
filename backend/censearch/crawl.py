@@ -6,6 +6,7 @@ import hashlib
 import ipaddress
 import re
 import time
+from threading import Event
 from urllib.parse import urldefrag, urljoin, urlsplit
 from urllib.robotparser import RobotFileParser
 import httpx
@@ -135,8 +136,13 @@ class BudgetExceeded(ValueError):
     pass
 
 
+class ScanCancelled(asyncio.CancelledError):
+    """Cooperative user cancellation, distinct from task/process interruption."""
+
+
 class Crawler:
-    def __init__(self, settings, store, matcher, run_id, config):
+    def __init__(self, settings, store, matcher, run_id, config, cancel_event=None):
+        self.cancel_event = cancel_event or Event()
         self.settings = settings
         self.store = store
         self.matcher = matcher
@@ -151,13 +157,19 @@ class Crawler:
         self.client = None
         self.browser_context = None
 
+    def check_cancel(self):
+        if self.cancel_event.is_set():
+            raise ScanCancelled()
+
     async def raw(self, url):
+        self.check_cancel()
         validate_url(url, self.settings.allow_public_crawl)
         host = origin(url)
         async with self.locks.setdefault(host, asyncio.Lock()):
             if self.metrics["network_requests"] >= self.settings.crawl_request_budget:
                 raise BudgetExceeded("Crawl request budget exhausted")
             await asyncio.sleep(max(0, self.next_request.get(host, 0) - time.monotonic()))
+            self.check_cancel()
             delay = self.config["delay"]
             if self.settings.respect_robots and host in self.robots:
                 delay = max(delay, self.robots[host].crawl_delay(USER_AGENT) or 0)
@@ -230,7 +242,7 @@ class Crawler:
                 await route.fulfill(
                     status=response.status_code, headers=dict(response.headers), body=response.content
                 )
-        except (httpx.HTTPError, ValueError):
+        except (ScanCancelled, httpx.HTTPError, ValueError):
             await route.abort()
 
     async def render(self, url):
@@ -347,7 +359,10 @@ class Crawler:
             status = "completed_with_errors" if self.errors else "completed"
             if self.metrics["page_budget_exhausted"] or self.metrics["request_budget_exhausted"]:
                 status = "completed_with_limits"
+            self.check_cancel()
             self.progress(status)
+        except ScanCancelled:
+            self.progress("cancelled")
         except BaseException as error:
             self.errors.append({"error": type(error).__name__ + ": " + str(error)})
             self.progress("failed")
@@ -358,6 +373,7 @@ class Crawler:
         queue = deque((url, url, {}) for url in self.config["seeds"])
         visited = set()
         while queue and len(visited) < self.config["max_pages"]:
+            self.check_cancel()
             url, parent, parent_context = queue.popleft()
             if url in visited or origin(url) not in self.origins:
                 continue
@@ -375,6 +391,7 @@ class Crawler:
                 images, links, context, styles, has_scripts = extract(response.text, final_url)
                 if has_scripts and self.browser_context:
                     html, computed = await self.render(final_url)
+                    self.check_cancel()
                     images, links, context, styles, _ = extract(html, final_url, computed)
                 for stylesheet in styles:
                     sheet = await self.fetch(stylesheet)

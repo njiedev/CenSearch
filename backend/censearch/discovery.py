@@ -158,7 +158,8 @@ def build_queries(full_name, handles=(), context="", limit=8):
 class SearchSession:
     """One shared, sequential allowance for the agent and fallback; no pagination or retries."""
 
-    def __init__(self, settings, client, progress=None):
+    def __init__(self, settings, client, progress=None, check_cancel=None):
+        self.check_cancel = check_cancel or (lambda: None)
         self.settings = settings
         self.client = client
         self.progress = progress or (lambda: None)
@@ -169,6 +170,7 @@ class SearchSession:
         self.status = "ready" if settings.serpapi_api_key.get_secret_value() else "not_configured"
 
     async def search(self, query, kind="web", reason=""):
+        self.check_cancel()
         query = text_input(query)
         if not query or len(query) > 600 or kind not in ("web", "images"):
             raise ValueError("A bounded text query and web/images kind are required")

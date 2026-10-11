@@ -5,6 +5,7 @@ from typing import Literal
 from fastapi import APIRouter, HTTPException
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, ConfigDict, Field
+from censearch.schemas import BatchResponse
 
 
 class Strict(BaseModel):
@@ -67,10 +68,15 @@ class AdvanceRequest(Strict):
 
 
 class BatchRequest(Strict):
+    mode: Literal["send", "prepare"] = "send"
     case_ids: list[int] = Field(min_length=1)
     contact: Contact
     accepted_by: str = Field(min_length=1, max_length=300, pattern=r".*\S.*")
     accepted_warning: bool = False
+
+
+class BatchSendRequest(Strict):
+    case_ids: list[int] | None = None
 
 
 def install(app):
@@ -98,7 +104,7 @@ def install(app):
         from censearch.batches import WARNING
         return {"warning": WARNING}
 
-    @router.post("/batches", status_code=202)
+    @router.post("/batches", status_code=202, response_model=BatchResponse)
     async def create_batch(request: BatchRequest) -> dict:
         if app.state.busy:
             raise HTTPException(409, "Another operation is in progress")
@@ -125,12 +131,43 @@ def install(app):
             task.add_done_callback(app.state.tasks.discard)
             return result
 
-    @router.get("/batches/{batch_id}")
+    @router.get("/batches/{batch_id}", response_model=BatchResponse)
     async def get_batch(batch_id: str) -> dict:
         try:
             return app.state.batches.view(batch_id)
         except LookupError as error:
             raise HTTPException(404, str(error)) from error
+
+    @router.post("/batches/{batch_id}/send", status_code=202, response_model=BatchResponse)
+    async def send_batch(batch_id: str, request: BatchSendRequest | None = None) -> dict:
+        from censearch.batches import BatchPhaseError
+
+        if app.state.busy:
+            raise HTTPException(409, "Another operation is in progress")
+        async with app.state.workflow.lock:
+            if app.state.busy:
+                raise HTTPException(409, "Another operation is in progress")
+            try:
+                result = app.state.batches.start_send(batch_id, request.case_ids if request else None)
+            except LookupError as error:
+                raise HTTPException(404, str(error)) from error
+            except BatchPhaseError as error:
+                raise HTTPException(409, str(error)) from error
+            except ValueError as error:
+                raise HTTPException(422, str(error)) from error
+            app.state.busy = True
+
+            async def worker():
+                try:
+                    async with app.state.workflow.lock:
+                        await app.state.batches.send(batch_id)
+                finally:
+                    app.state.busy = False
+
+            task = asyncio.create_task(worker())
+            app.state.tasks.add(task)
+            task.add_done_callback(app.state.tasks.discard)
+            return result
 
     @router.get("/cases/{case_id}/workflow")
     async def view(case_id: int) -> dict:
