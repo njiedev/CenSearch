@@ -9,6 +9,7 @@ from botocore.config import Config
 
 class EvidenceStore:
     def __init__(self, settings):
+        self.settings = settings
         self.root = settings.data_dir
         self.bucket = settings.obj_bucket
         self.client = None
@@ -64,14 +65,14 @@ class EvidenceStore:
 
 
 async def capture_page(storage, person_id, case_id, page_url, image_record, captured_at):
-    """All browser requests are fulfilled through the same GET-only robots guard."""
+    """Fulfill browser requests through bounded GETs with optional robots enforcement."""
     import asyncio
     import json
     import uuid
     from playwright.async_api import async_playwright
     from censearch.agent.web import ReadOnlyWeb, UA
 
-    web = ReadOnlyWeb(limit=60)
+    web = ReadOnlyWeb(limit=60, settings=storage.settings)
     capture_id = uuid.uuid4().hex
     prefix = f"evidence/case-{case_id}-{capture_id}"
     page_headers = {}

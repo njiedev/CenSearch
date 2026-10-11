@@ -21,7 +21,7 @@ CHANGES = {
         "health flag."
     ),
     "censearch/recipients.py": "Clearly labelled deterministic recipient baseline using the same agent tools.",
-    "censearch/agent/web.py": "Bounded robots-aware GET session, traces, contact provenance and private-network guard.",
+    "censearch/agent/web.py": "Bounded GET session with optional robots enforcement, traces, contact provenance and private-network guard.",
     "censearch/agent/tools.py": (
         "Five tested Strands tools; strict per-form reporting detection and IANA RDAP "
         "bootstrap."

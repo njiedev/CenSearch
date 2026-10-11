@@ -147,6 +147,7 @@ class HealthResponse(BaseModel):
     object_storage: StorageHealth
     external_delivery_enabled: bool
     public_crawl_enabled: bool
+    respect_robots: bool
     busy: bool
     mock_seeds: list[str]
 

@@ -64,7 +64,7 @@ def test_all_tools_recorded_real_pages(replay, settings, monkeypatch, url, ip, a
         "run",
         lambda *args, **kwargs: type("Result", (), {"returncode": 0, "stdout": ""})(),
     )
-    with lookup_session(url, settings, ReadOnlyWeb(transport=transport, delay=0)) as session:
+    with lookup_session(url, settings, ReadOnlyWeb(transport=transport, delay=0, respect_robots=True)) as session:
         page = fetch_page(url)
         assert page["status"] == 200 and page["title"] and page["text"]
         assert len(page["text"]) <= 12000
@@ -124,7 +124,7 @@ def test_robots_budget_and_redirects():
             return httpx.Response(302, headers={"location": "/private"})
         return httpx.Response(200, text="ok")
 
-    web = ReadOnlyWeb(limit=3, transport=httpx.MockTransport(respond), delay=0)
+    web = ReadOnlyWeb(limit=3, transport=httpx.MockTransport(respond), delay=0, respect_robots=True)
     try:
         with pytest.raises(ValueError, match="robots"):
             web.get("http://localhost/redirect")

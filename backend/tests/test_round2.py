@@ -313,7 +313,10 @@ def test_approval_duplicate_send_and_escalation(workflow_case, monkeypatch):
     post(client, cid, "draft", {"recipient_id": "contact-1"}, expected=422)
     post(client, cid, "draft", {"recipient_id": "contact-1", "rung": "host"}, expected=422)
     post(client, cid, "answers", {"answered_by": "Operator", "answers": FACTS}, expected=422)
-    monkeypatch.setattr(module, "check", lambda *args: {"outcome": "still_present", "source_removed": False})
+    monkeypatch.setattr(
+        module, "check",
+        lambda *args, **kwargs: {"outcome": "still_present", "source_removed": False},
+    )
     client.app.state.workflow.clock.offset = 172801
     tick = client.post("/api/scheduler/tick").json()
     assert tick[0]["next_rung"] == "host"
@@ -578,7 +581,10 @@ def test_background_scheduler_uses_persisted_deadlines(workflow_case, monkeypatc
         {"notice_id": notice["id"], "sha256": notice["sha256"], "approved_by": "Operator"},
     )
     monkeypatch.setattr(module, "send", lambda *args: {"status": "awaiting_response"})
-    monkeypatch.setattr(module, "check", lambda *args: {"outcome": "still_present", "source_removed": False})
+    monkeypatch.setattr(
+        module, "check",
+        lambda *args, **kwargs: {"outcome": "still_present", "source_removed": False},
+    )
     delivery = post(client, cid, "send")
     with client.app.state.store.session.begin() as session:
         session.get(Delivery, delivery["id"]).deadline = (

@@ -121,7 +121,7 @@ class Crawler:
                 raise BudgetExceeded("Crawl request budget exhausted")
             await asyncio.sleep(max(0, self.next_request.get(host, 0) - time.monotonic()))
             delay = self.config["delay"]
-            if host in self.robots:
+            if self.settings.respect_robots and host in self.robots:
                 delay = max(delay, self.robots[host].crawl_delay(USER_AGENT) or 0)
             self.next_request[host] = time.monotonic() + delay
             self.metrics["network_requests"] += 1
@@ -145,6 +145,8 @@ class Crawler:
         if page and host not in self.origins:
             self.metrics["out_of_scope_pages"] += 1
             return False
+        if not self.settings.respect_robots:
+            return True
         async with self.locks.setdefault("robots:" + host, asyncio.Lock()):
             if host not in self.robots:
                 response = await self.raw(host + "/robots.txt")

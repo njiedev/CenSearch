@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     obj_access_key: SecretStr = SecretStr("")
     obj_secret_key: SecretStr = SecretStr("")
     allow_public_crawl: bool = False
+    respect_robots: bool = False
     crawl_delay: float = Field(default=0.05, ge=0.01)
     crawl_request_budget: int = Field(default=400, ge=1, le=2000)
     mock_base_port: int = Field(default=8811, ge=1024, le=65527)

@@ -1,4 +1,4 @@
-"""Bounded, robots-aware GET transport shared by research, evidence and checks."""
+"""Bounded GET transport with optional robots enforcement for research, evidence and checks."""
 
 from contextlib import contextmanager
 from contextvars import ContextVar
@@ -9,6 +9,7 @@ import time
 from urllib.parse import urljoin, urlsplit
 from urllib.robotparser import RobotFileParser
 import httpx
+from censearch.config import Settings
 
 UA = "LikenessGuard/0.2 (read-only recipient research)"
 ACTIVE = ContextVar("recipient_lookup", default=None)
@@ -38,7 +39,19 @@ def validate_read_url(url):
 
 
 class ReadOnlyWeb:
-    def __init__(self, limit=20, timeout=8, delay=0.05, transport=None, recorder=None):
+    def __init__(
+        self,
+        limit=20,
+        timeout=8,
+        delay=None,
+        transport=None,
+        recorder=None,
+        *,
+        settings=None,
+        respect_robots=None,
+    ):
+        settings = settings or Settings()
+        self.respect_robots = settings.respect_robots if respect_robots is None else respect_robots
         self.client = httpx.Client(
             timeout=timeout,
             trust_env=False,
@@ -47,7 +60,7 @@ class ReadOnlyWeb:
             transport=transport,
         )
         self.limit = limit
-        self.delay = delay
+        self.delay = settings.crawl_delay if delay is None else delay
         self.count = 0
         self.trace = []
         self.robots = {}
@@ -65,7 +78,7 @@ class ReadOnlyWeb:
             raise ValueError("Read-only request budget exhausted")
         p = urlsplit(url)
         origin = f"{p.scheme}://{p.netloc}"
-        parser = self.robots.get(origin)
+        parser = self.robots.get(origin) if self.respect_robots else None
         delay = max(self.delay, (parser.crawl_delay(UA) or 0) if parser else 0)
         time.sleep(max(0, self.last.get(origin, 0) + delay - time.monotonic()))
         self.count += 1
@@ -106,27 +119,31 @@ class ReadOnlyWeb:
             for _ in range(6):
                 parsed = validate_read_url(url)
                 origin = f"{parsed.scheme}://{parsed.netloc}"
-                if origin not in self.robots:
-                    robot_url = origin + "/robots.txt"
-                    response = self.raw(robot_url)
-                    # Redirecting robots files are fetched without granting access to the page.
-                    for _ in range(4):
-                        if not response.is_redirect:
-                            break
-                        robot_url = urljoin(robot_url, response.headers["location"])
+                if self.respect_robots:
+                    if origin not in self.robots:
+                        robot_url = origin + "/robots.txt"
                         response = self.raw(robot_url)
-                    parser = RobotFileParser()
-                    lines = (
-                        response.text.splitlines()
-                        if response.status_code == 200
-                        else ["User-agent: *", "Allow: /" if response.status_code == 404 else "Disallow: /"]
-                    )
-                    parser.parse(lines)
-                    self.robots[origin] = parser
-                allowed = self.robots[origin].can_fetch(UA, url)
-                self.trace.append({"url": url, "robots_allowed": allowed})
-                if not allowed:
-                    raise ValueError("robots.txt disallows " + url)
+                        # Redirecting robots files are fetched without granting access to the page.
+                        for _ in range(4):
+                            if not response.is_redirect:
+                                break
+                            robot_url = urljoin(robot_url, response.headers["location"])
+                            response = self.raw(robot_url)
+                        parser = RobotFileParser()
+                        lines = (
+                            response.text.splitlines()
+                            if response.status_code == 200
+                            else [
+                                "User-agent: *",
+                                "Allow: /" if response.status_code == 404 else "Disallow: /",
+                            ]
+                        )
+                        parser.parse(lines)
+                        self.robots[origin] = parser
+                    allowed = self.robots[origin].can_fetch(UA, url)
+                    self.trace.append({"url": url, "robots_allowed": allowed})
+                    if not allowed:
+                        raise ValueError("robots.txt disallows " + url)
                 response = self.raw(url)
                 if response.is_redirect:
                     url = urljoin(url, response.headers["location"])
@@ -146,7 +163,7 @@ class LookupSession:
     def __init__(self, url, settings=None, web=None):
         self.url = url
         self.settings = settings
-        self.web = web or ReadOnlyWeb()
+        self.web = web or ReadOnlyWeb(settings=settings)
         self.calls = []
         self.candidates = []
         self.lock = threading.RLock()

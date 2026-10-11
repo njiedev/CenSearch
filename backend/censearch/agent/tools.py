@@ -111,7 +111,7 @@ def parse_page(response, session):
 
 @tool
 def fetch_page(url: str) -> dict:
-    """GET a page with robots checks and a shared request budget. Return text, links and forms.
+    """GET a page with a shared request budget and optional robots enforcement (off by default). Return text, links and forms.
 
     Args:
         url: Public or loopback HTTP(S) page URL. Never an upload or submission.

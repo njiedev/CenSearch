@@ -251,6 +251,7 @@ def test_extraction_scope_and_busy(client):
 
 
 def test_robots_redirect_and_budget(client, settings):
+    settings.respect_robots = True
     import asyncio
     import httpx
     from censearch.crawl import BudgetExceeded
@@ -276,6 +277,7 @@ def test_robots_redirect_and_budget(client, settings):
         async with httpx.AsyncClient(transport=httpx.MockTransport(respond)) as transport:
             crawler.client = transport
             assert await crawler.fetch("http://127.0.0.1:8811/private/photo") is None
+            assert crawler.metrics["robots_denied"] == 1
             with pytest.raises(ValueError, match="Public crawling"):
                 await crawler.fetch("http://127.0.0.1:8811/redirect")
             settings.crawl_request_budget = len(requests)

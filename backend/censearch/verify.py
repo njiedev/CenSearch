@@ -42,10 +42,10 @@ def classify(page_status, image_status, same_image=None, origin_status=None, is_
     return "unreachable"
 
 
-def check(case, original_bytes, calibration, web=None):
+def check(case, original_bytes, calibration, web=None, *, settings=None):
     from urllib.parse import urlsplit
 
-    web = web or ReadOnlyWeb(limit=16, timeout=3)
+    web = web or ReadOnlyWeb(limit=16, timeout=3, settings=settings)
     result = {"outcome": "unreachable", "source_removed": False}
     try:
         page = web.get(case["page_url"], cache=False)

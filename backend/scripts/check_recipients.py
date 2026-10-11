@@ -1,4 +1,4 @@
-"""Small read-only real-domain run; save full GET/robots/tool trace and replayable pages."""
+"""Small read-only real-domain run; save GET/tool traces, optional robots decisions and replayable pages."""
 
 import hashlib
 import json
@@ -22,7 +22,7 @@ def main():
         url = str(response.url)
         identifier = hashlib.sha256(url.encode()).hexdigest()[:20]
         name = identifier + ".txt"
-        # Only HTML/robots/RDAP JSON was requested; no face downloads.
+        # Only page, optional robots and RDAP content is requested; no face downloads.
         (records / name).write_bytes(response.content)
         manifest[url] = {"file": name, "status": response.status_code, "headers": dict(response.headers)}
 

@@ -3475,6 +3475,10 @@
             "type": "boolean",
             "title": "Public Crawl Enabled"
           },
+          "respect_robots": {
+            "type": "boolean",
+            "title": "Respect Robots"
+          },
           "busy": {
             "type": "boolean",
             "title": "Busy"
@@ -3496,6 +3500,7 @@
           "object_storage",
           "external_delivery_enabled",
           "public_crawl_enabled",
+          "respect_robots",
           "busy",
           "mock_seeds"
         ],

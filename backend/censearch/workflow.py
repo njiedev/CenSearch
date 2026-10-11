@@ -380,7 +380,7 @@ class Workflow:
             case, _ = self.context(session, case_id)
             data = record(case)
         payload = (self.storage.root / data["evidence"]["image"]["path"]).read_bytes()
-        result = await asyncio.to_thread(check, data, payload, self.calibration)
+        result = await asyncio.to_thread(check, data, payload, self.calibration, settings=self.settings)
         result["checked_at"] = self.now()
         with self.store.session.begin() as session:
             case, _ = self.context(session, case_id)

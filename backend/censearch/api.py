@@ -207,6 +207,7 @@ def create_app(settings=None):
             },
             "external_delivery_enabled": settings.allow_external_delivery,
             "public_crawl_enabled": settings.allow_public_crawl,
+            "respect_robots": settings.respect_robots,
             "busy": app.state.busy,
             "mock_seeds": [f"http://127.0.0.1:{settings.mock_base_port + index}/" for index in range(4)],
         }
