@@ -14,12 +14,8 @@ import webbrowser
 
 from e2e import ROOT, Recorder, await_crawl, wait_ready
 from fixture_input import select_person
-from mockweb.run import available, running, stop
+from mockweb.run import available, ignore_shutdown_signals, interrupted, running, stop
 from mockweb.seed import photos, seed
-
-
-def interrupted(signum, frame):
-    raise KeyboardInterrupt
 
 
 def main():
@@ -28,6 +24,7 @@ def main():
     parser.add_argument("--api-port", type=int, default=8490)
     parser.add_argument("--base-port", type=int, default=9111)
     parser.add_argument("--model", action="store_true", help="use the model key from backend/.env")
+    parser.add_argument("--no-browser", action="store_true", help="run without opening the console")
     args = parser.parse_args()
     source = select_person(args.photos)
     ports = [args.api_port, *range(args.base_port, args.base_port + 8)]
@@ -76,6 +73,9 @@ def main():
             stack.callback(stop, process)
             api = Recorder(base)
             stack.callback(api.client.close)
+            # First callback on unwind: protect the entire ExitStack, even if
+            # cleanup began because of a startup error instead of a signal.
+            stack.callback(ignore_shutdown_signals)
             wait_ready(api, process)
             files = [
                 (kind, (path.name, path.read_bytes(), "image/jpeg"))
@@ -104,7 +104,7 @@ def main():
                 raise RuntimeError(f"Find did not produce cases; inspect {output / 'api.log'}")
             print(f"READY: {base} | {len(cases)} cases | Ctrl-C stops the demo.", flush=True)
             print(f"Local fixture data retained at {output}", flush=True)
-            if not webbrowser.open(base):
+            if not args.no_browser and not webbrowser.open(base):
                 print("Browser did not open automatically; open the console URL above.", flush=True)
             while True:
                 if any(child.poll() is not None for child in [process, *children]):

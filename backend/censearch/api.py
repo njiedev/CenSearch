@@ -99,6 +99,8 @@ def create_app(settings=None):
                 if app.state.busy:
                     continue
                 async with app.state.workflow.lock:
+                    if app.state.busy:
+                        continue
                     app.state.busy = True
                     try:
                         await app.state.workflow.tick()

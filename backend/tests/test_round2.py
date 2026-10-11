@@ -494,13 +494,17 @@ def test_provision_storage_reuses_scoped_remote_secret(monkeypatch, capsys):
 
     def cli(*args):
         cli_calls.append(args)
-        if args[0] == "buckets-create":
-            return [{"s3_endpoint": "us-ord-10.linodeobjects.com"}]
         assert args[0] == "keys-list"
         return [
             {"label": "test-bucket-app", "access_key": "test-access", "limited": True, "bucket_access": scope}
         ]
 
+    def create_bucket(label, region):
+        assert (label, region) == ("test-bucket", "us-ord")
+        cli_calls.append(("create_bucket", label, region))
+        return {"s3_endpoint": "us-ord-10.linodeobjects.com"}
+
+    monkeypatch.setattr(module, "create_bucket", create_bucket)
     monkeypatch.setattr(module, "command", command)
     monkeypatch.setattr(module, "cli", cli)
     monkeypatch.setattr(
@@ -533,8 +537,6 @@ def test_provision_storage_creates_bucket_scoped_key(monkeypatch, capsys):
 
     def cli(*args):
         calls.append(args)
-        if args[0] == "buckets-create":
-            return [{"s3_endpoint": "us-ord-10.linodeobjects.com"}]
         if args[0] == "keys-list":
             return []
         assert args[0] == "keys-create"
@@ -543,13 +545,19 @@ def test_provision_storage_creates_bucket_scoped_key(monkeypatch, capsys):
         ]
         return [{"access_key": "access-fixture", "secret_key": "secret-fixture"}]
 
+    def create_bucket(label, region):
+        assert (label, region) == ("test-bucket", "us-ord")
+        calls.append(("create_bucket", label, region))
+        return {"s3_endpoint": "us-ord-10.linodeobjects.com"}
+
+    monkeypatch.setattr(module, "create_bucket", create_bucket)
     monkeypatch.setattr(module, "command", command)
     monkeypatch.setattr(module, "cli", cli)
     monkeypatch.setattr(
         sys, "argv", ["provision", "--host", "root@test", "--ssh-key", "/test/key", "--bucket", "test-bucket"]
     )
     module.main()
-    assert [call[0] for call in calls] == ["buckets-create", "keys-list", "keys-create"]
+    assert [call[0] for call in calls] == ["create_bucket", "keys-list", "keys-create"]
     assert written[0]["OBJ_SECRET_KEY"] == "secret-fixture"
     assert "secret-fixture" not in capsys.readouterr().out
 

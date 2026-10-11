@@ -8,6 +8,7 @@ import socket
 import subprocess
 import sys
 import time
+import threading
 
 SITES = ("pixboard", "friendlink", "localnews", "shadygallery", "host", "search")
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,14 +30,40 @@ def available(ports):
             listener.close()
 
 
+def ignore_shutdown_signals():
+    """Cleanup is non-interruptible, including a second signal forwarded by uv."""
+    if threading.current_thread() is threading.main_thread():
+        for signum in (signal.SIGINT, signal.SIGTERM):
+            signal.signal(signum, signal.SIG_IGN)
+
+
+@contextmanager
+def cleanup_signals():
+    main = threading.current_thread() is threading.main_thread()
+    previous = {s: signal.getsignal(s) for s in (signal.SIGINT, signal.SIGTERM)} if main else {}
+    ignore_shutdown_signals()
+    try:
+        yield
+    finally:
+        for signum, handler in previous.items():
+            signal.signal(signum, handler)
+
+
+def interrupted(signum, frame):
+    # Ignore repeats before raising, not after the stack starts unwinding.
+    ignore_shutdown_signals()
+    raise KeyboardInterrupt
+
+
 def stop(process):
-    if process.poll() is None:
-        process.terminate()
-        try:
-            process.wait(timeout=10)
-        except subprocess.TimeoutExpired:
-            process.kill()
-            process.wait(timeout=5)
+    with cleanup_signals():
+        if process.poll() is None:
+            process.terminate()
+            try:
+                process.wait(timeout=10)
+            except subprocess.TimeoutExpired:
+                process.kill()
+                process.wait(timeout=5)
 
 
 @contextmanager
@@ -124,10 +151,13 @@ def running(root, base_port=8811, logs=None, extended=False):
                     time.sleep(0.05)
         yield children
     finally:
-        for child in reversed(children):
-            stop(child)
-        for stream in streams:
-            stream.close()
+        with cleanup_signals():
+            try:
+                for child in reversed(children):
+                    stop(child)
+            finally:
+                for stream in streams:
+                    stream.close()
 
 
 def main():
@@ -136,9 +166,7 @@ def main():
     parser.add_argument("--base-port", type=int, default=8811)
     args = parser.parse_args()
 
-    def interrupted(signum, frame):
-        raise KeyboardInterrupt
-
+    signal.signal(signal.SIGINT, interrupted)
     signal.signal(signal.SIGTERM, interrupted)
     try:
         with running(args.root.resolve(), args.base_port):

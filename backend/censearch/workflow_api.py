@@ -78,6 +78,8 @@ def install(app):
 
     async def invoke(action, *args):
         workflow = app.state.workflow
+        if app.state.busy:
+            raise HTTPException(409, "Another operation is in progress")
         async with workflow.lock:
             if app.state.busy:
                 raise HTTPException(409, "Enrollment, deletion or crawl is in progress")
@@ -101,6 +103,8 @@ def install(app):
         if app.state.busy:
             raise HTTPException(409, "Another operation is in progress")
         async with app.state.workflow.lock:
+            if app.state.busy:
+                raise HTTPException(409, "Another operation is in progress")
             try:
                 result = app.state.batches.create(request)
             except LookupError as error:
@@ -130,11 +134,12 @@ def install(app):
 
     @router.get("/cases/{case_id}/workflow")
     async def view(case_id: int) -> dict:
-        async with app.state.workflow.lock:
-            try:
-                return app.state.workflow.view(case_id)
-            except LookupError as error:
-                raise HTTPException(404, str(error)) from error
+        # A synchronous, short DB transaction cannot interleave with the batch's
+        # writes on this event loop. Progress stays readable while its lock is held.
+        try:
+            return app.state.workflow.view(case_id)
+        except LookupError as error:
+            raise HTTPException(404, str(error)) from error
 
     @router.post("/cases/{case_id}/answers")
     async def answer(case_id: int, request: AnswerRequest) -> dict:

@@ -1,6 +1,8 @@
 """Persistent Decide → approved request → delivery → verification workflow."""
 
 import asyncio
+from copy import deepcopy
+from urllib.parse import urlsplit
 from datetime import timedelta
 import json
 from sqlalchemy import select
@@ -177,7 +179,25 @@ class Workflow:
             case, _ = self.context(session, case_id)
             url = case.page_url
         result = await lookup(url, self.settings)
+        result = result | {"reused": False, "source_case_id": case_id, "source_page_url": url}
         self.live_call_verified |= result["model_status"] == "completed"
+        return self.save_lookup(case_id, result)
+
+    def reuse_recipients(self, case_id, source):
+        with self.store.session() as session:
+            case = session.get(Case, case_id)
+            if site_origin(case.page_url) != site_origin(source["source_page_url"]):
+                raise ValueError("Recipient reuse requires the same scheme, host and port")
+        result = deepcopy(source)
+        result.update(
+            reused=True,
+            reuse_reason=f"Reused site research from case {source['source_case_id']} in this batch",
+            source_model_metrics=result.get("model_metrics", {}),
+            model_metrics={"turns": 0, "requests": 0, "rate_limit_responses": 0},
+        )
+        return self.save_lookup(case_id, result)
+
+    def save_lookup(self, case_id, result):
         with self.store.session.begin() as session:
             case, state = self.context(session, case_id)
             state.lookup = result
@@ -456,3 +476,8 @@ class Workflow:
                     }
                 )
         return results
+
+
+def site_origin(url):
+    parsed = urlsplit(url)
+    return (parsed.scheme.lower(), parsed.hostname, parsed.port or (443 if parsed.scheme == "https" else 80))

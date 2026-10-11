@@ -1,12 +1,11 @@
 """Text-only route selection with strict output validation and a non-model guard."""
 
-import asyncio
 import json
 from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 from strands import Agent
 from strands.types.agent import Limits
-from censearch.agent.model import build_model
+from censearch.agent.model import build_model, model_metrics
 
 LABELS = {
     "copyright_notice": "Copyright notice (DMCA 512(c))",
@@ -94,26 +93,23 @@ async def pick_route(case, page_text, settings, model=None):
     if model is None and not settings.model_configured:
         return fallback
     try:
-        agent = Agent(
-            model=model or build_model(settings), callback_handler=None, system_prompt=PROMPT
-        )
-        result = await asyncio.wait_for(
-            agent.invoke_async(
-                json.dumps(
-                    {
-                        "page_url": case["page_url"],
-                        "page_text": page_text[:12000],
-                        "match_evidence": match_evidence(case),
-                    }
-                ),
-                limits=Limits(turns=1),
+        model = model or build_model(settings)
+        agent = Agent(model=model, callback_handler=None, system_prompt=PROMPT)
+        result = await agent.invoke_async(
+            json.dumps(
+                {
+                    "page_url": case["page_url"],
+                    "page_text": page_text[:12000],
+                    "match_evidence": match_evidence(case),
+                }
             ),
-            timeout=35,
+            limits=Limits(turns=1),
         )
         answer = RouteAnswer.model_validate_json(str(result))
         if answer.route == "copyright_notice" and not copyright_supported(case):
             return fallback | {
                 "model_status": "guard_downgraded",
+                "model_metrics": model_metrics(model),
                 "proposed_route": answer.route,
                 "reason": "Copyright downgraded: no verified copy of an enrolled original. "
                 + fallback["reason"],
@@ -124,6 +120,10 @@ async def pick_route(case, page_text, settings, model=None):
             "reason": answer.reason,
             "source": "agent",
             "model_status": "completed",
+            "model_metrics": model_metrics(model),
         }
     except Exception as error:
-        return fallback | {"model_status": "model_error", "error": type(error).__name__}
+        return fallback | {
+            "model_status": "model_error", "error": type(error).__name__,
+            "model_metrics": model_metrics(model),
+        }

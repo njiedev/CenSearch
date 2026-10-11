@@ -1,4 +1,4 @@
-"""Persisted batch authorization and sequential, independently failing case workers."""
+"""Persisted batch authorization and bounded site workers with independently failing cases."""
 
 import asyncio
 from uuid import uuid4
@@ -9,6 +9,7 @@ from censearch.agent.web import lookup_session
 from censearch.case_records import Attestation, Batch, BatchItem, Delivery, Notice
 from censearch.db import Case, Original, record
 from censearch.delivery import destination
+from censearch.workflow import site_origin
 from censearch.workflow_api import ApprovalRequest, DraftRequest, PrepareRequest
 
 WARNING = (
@@ -98,17 +99,36 @@ class Batches:
         with self.store.session.begin() as session:
             session.get(Batch, batch_id).status = "running"
         batch = self.view(batch_id)
-        for item in batch["items"]:
-            try:
-                await self.run_case(batch, item)
-            except Exception as error:
-                self.update(item["id"], "failed", f"{type(error).__name__}: {error}")
+        sites = {}
+        with self.store.session() as session:
+            for item in batch["items"]:
+                case = session.get(Case, item["case_id"])
+                sites.setdefault(site_origin(case.page_url), []).append(item)
+        limit = asyncio.Semaphore(4)
+
+        async def run_site(items):
+            # Only successful research is cached. A failed/empty/model-error
+            # lookup is retried afresh by the next actionable case on this site.
+            # Cache lifetime is this batch; same-site cases preserve input order.
+            cache = {}
+            async with limit:
+                for item in items:
+                    try:
+                        await self.run_case(batch, item, cache)
+                    except Exception as error:
+                        self.update(item["id"], "failed", f"{type(error).__name__}: {error}")
+
+        # The outer workflow lock still excludes manual mutations and scheduler
+        # ticks. Workers own separate cases, sessions and browser instances.
+        async with asyncio.TaskGroup() as group:
+            for items in sites.values():
+                group.create_task(run_site(items))
         with self.store.session.begin() as session:
             batch_row = session.get(Batch, batch_id)
             batch_row.status = "completed"
             batch_row.finished_at = self.workflow.now()
 
-    async def run_case(self, batch, item):
+    async def run_case(self, batch, item, site_cache=None):
         workflow = self.workflow
         case_id, item_id = item["case_id"], item["id"]
         self.update(item_id, "reviewing", "Choosing a legal route")
@@ -208,7 +228,17 @@ class Batches:
         self.update(item_id, "capturing", "Capturing evidence before drafting")
         await workflow.capture(case_id)
         self.update(item_id, "researching", "Looking up the site recipient")
-        lookup = await workflow.recipients(case_id)
+        if site_cache is not None and "lookup" in site_cache:
+            lookup = workflow.reuse_recipients(case_id, site_cache["lookup"])
+        else:
+            lookup = await workflow.recipients(case_id)
+            if (
+                site_cache is not None
+                and lookup.get("status") == "completed"
+                and lookup.get("model_status") != "model_error"
+                and any(row["rung"] == "site" for row in lookup["recipients"])
+            ):
+                site_cache["lookup"] = lookup
         candidates = [row for row in lookup["recipients"] if row["rung"] == "site"]
         if not candidates:
             raise ValueError("Recipient lookup found no site recipient")
