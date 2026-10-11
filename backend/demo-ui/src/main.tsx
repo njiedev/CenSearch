@@ -9,6 +9,7 @@ import './index.css'
 import { Workflow } from './Workflow'
 import { Readable } from './Readable'
 import { Matches } from './Matches'
+import { PublicWeb } from './PublicWeb'
 
 type Json = Record<string, any>
 
@@ -63,9 +64,11 @@ function App() {
     ])
     setPeople(p)
     setCases(c)
-    setRuns(r)
-    setScans(s)
-    setRun(r[0] ?? null)
+    const mockRuns = r.filter((item: Json) => !item.config.public_search)
+    const mockIds = new Set(mockRuns.map((item: Json) => item.id))
+    setRuns(mockRuns)
+    setScans(s.filter((item: Json) => mockIds.has(item.run_id)))
+    setRun(mockRuns[0] ?? null)
   }
 
   useEffect(() => {
@@ -122,6 +125,7 @@ function App() {
     setCaptures(current => [...current, new File([blob], `webcam-${Date.now()}.jpg`, { type: 'image/jpeg' })])
   }
 
+  const legacyCases = cases.filter(item => !item.evidence.context?.discovery)
   const disabled = working || Boolean(health?.busy)
   return <main className="mx-auto max-w-6xl space-y-4 p-4 text-sm">
     <h1 className="text-2xl font-medium">Likeness Guard</h1>
@@ -132,11 +136,12 @@ function App() {
       </>}
     </CardContent></Card>
     <nav aria-label="Console screens" className="flex flex-wrap gap-2">
-      {['matches', 'enroll', 'find', 'case', 'decide', 'send', 'verify', 'agent'].map(name => <Button key={name} variant={tab === name ? 'default' : 'outline'} onClick={() => setTab(name)}>{name === 'enroll' ? 'Enroll' : name === 'find' ? 'Find' : name === 'case' ? 'Case' : name === 'agent' ? 'Agent probe' : name[0].toUpperCase() + name.slice(1)}</Button>)}
+      {['matches', 'enroll', 'public', 'find', 'case', 'decide', 'send', 'verify', 'agent'].map(name => <Button key={name} variant={tab === name ? 'default' : 'outline'} onClick={() => setTab(name)}>{name === 'public' ? 'Public web' : name === 'enroll' ? 'Enroll' : name === 'find' ? 'Find' : name === 'case' ? 'Case' : name === 'agent' ? 'Agent probe' : name[0].toUpperCase() + name.slice(1)}</Button>)}
     </nav>
     {error !== null && <div role="alert" className="rounded border p-3"><p>Request failed</p><Readable value={error} /></div>}
     {working && <p role="status">Working...</p>}
     {tab === 'matches' && <Matches cases={cases} people={people} busy={Boolean(health?.busy)} refresh={refresh} />}
+    {tab === 'public' && <PublicWeb people={people} busy={Boolean(health?.busy)} openCase={item => { setSelected(item); setTab('decide') }} />}
     {tab === 'enroll' && <>
       <Card><CardHeader><CardTitle>Enroll a person</CardTitle></CardHeader><CardContent>
         <form onSubmit={enroll} className="space-y-4">
@@ -166,7 +171,7 @@ function App() {
       </CardContent></Card>
     </>}
     {tab === 'find' && <>
-      <Card><CardHeader><CardTitle>Find appearances</CardTitle></CardHeader><CardContent className="space-y-3">
+      <Card><CardHeader><CardTitle>Find appearances · simulated web</CardTitle></CardHeader><CardContent className="space-y-3">
         <Label htmlFor="seeds">Starting URLs (one per line)</Label><Textarea id="seeds" value={seeds} onChange={event => setSeeds(event.target.value)} />
         <div className="flex items-center gap-2"><input id="rendered" type="checkbox" checked={rendered} onChange={event => setRendered(event.target.checked)} /><Label htmlFor="rendered">Render JavaScript pages</Label></div>
         <Button disabled={disabled || !people.length} onClick={() => perform(async () => {
@@ -178,9 +183,9 @@ function App() {
         <details><summary>All crawl runs ({runs.length})</summary><Readable value={runs} /></details>
         <details><summary>Scan metadata ({scans.length}), including nonmatches</summary><Readable value={scans} /></details>
       </CardContent></Card>
-      <h2 className="text-lg">Cases ({cases.length})</h2>
-      {!cases.length && <p>No cases found yet.</p>}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{cases.map(item => <Card key={item.id} data-testid="case-card"><CardHeader><CardTitle>Case {item.id}</CardTitle></CardHeader><CardContent className="space-y-2">
+      <h2 className="text-lg">Simulated delivery · loopback mock administrator ({legacyCases.length})</h2>
+      {!legacyCases.length && <p>No cases found yet.</p>}
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{legacyCases.map(item => <Card key={item.id} data-testid="case-card"><CardHeader><CardTitle>Case {item.id}</CardTitle></CardHeader><CardContent className="space-y-2">
         <img src={item.matched_image_url} alt={`Matched evidence for case ${item.id}`} className="h-48 w-full object-contain" />
         <p className="break-all">Page: {item.page_url}</p>
         <p>{item.match_type} · {item.band} · score {item.score.toFixed(4)}</p>

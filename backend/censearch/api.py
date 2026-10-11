@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 import hashlib
 import json
 import logging
+from urllib.parse import urlsplit
 import cv2
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.exceptions import RequestValidationError
@@ -14,11 +15,14 @@ from PIL import Image
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import select, text
 from censearch.agent.probe import Probe
+from censearch.agent.web import loopback
 from censearch.batches import Batches, case_summary
 from censearch.config import ROOT, Settings
 from censearch.copy_detect import VERSION
 from censearch.crawl import Crawler, validate_url
-from censearch.db import Case, CrawlRun, Scan, Store, now, record
+from censearch.db import Case, CrawlRun, Person, Scan, Store, now, record
+from censearch.discovery import PublicSearchRequest
+from censearch.public_crawl import PublicCrawler, public_view
 from censearch.enroll import Enrollment, EnrollmentError
 from censearch.evidence import EvidenceStore
 from censearch.face import FaceConfig, OpenCVFaceEngine
@@ -319,6 +323,59 @@ def create_app(settings=None):
         app.state.tasks.add(task)
         task.add_done_callback(app.state.tasks.discard)
         return result
+
+    @app.post("/api/public-searches", status_code=202)
+    async def start_public_search(request: PublicSearchRequest) -> dict:
+        ready()
+        idle()
+        with app.state.store.session.begin() as session:
+            person = session.get(Person, request.person_id)
+            if person is None:
+                raise HTTPException(404, "Enrolled person not found")
+            real_urls = any(not loopback(urlsplit(url).hostname) for url in request.supplied_urls)
+            if person.development_fixture and (request.mode != "supplied_urls" or real_urls):
+                raise HTTPException(422, "Local fixtures can only check supplied loopback URLs")
+            if (real_urls or request.mode != "supplied_urls") and not request.allow_public_fetch:
+                raise HTTPException(422, "Enable public fetching explicitly for this run")
+            row = CrawlRun(
+                config={"public_search": True, "request": request.model_dump()},
+                identity_version=app.state.store.version(session) + ":person:" + person.id,
+            )
+            session.add(row)
+            session.flush()
+            run_id, fixture = row.id, person.development_fixture
+        app.state.busy = True
+
+        async def worker():
+            try:
+                crawler = PublicCrawler(
+                    settings, app.state.store, app.state.matcher, run_id, request, fixture
+                )
+                await asyncio.to_thread(lambda: asyncio.run(crawler.run()))
+            finally:
+                app.state.busy = False
+
+        task = asyncio.create_task(worker())
+        app.state.tasks.add(task)
+        task.add_done_callback(app.state.tasks.discard)
+        return public_view(app.state.store, run_id)
+
+    @app.get("/api/public-searches")
+    def public_searches() -> list[dict]:
+        with app.state.store.session() as session:
+            ids = [
+                row.id
+                for row in session.scalars(select(CrawlRun).order_by(CrawlRun.id.desc()))
+                if row.config.get("public_search")
+            ]
+        return [public_view(app.state.store, run_id) for run_id in ids]
+
+    @app.get("/api/public-searches/{run_id}")
+    def public_search(run_id: int) -> dict:
+        try:
+            return public_view(app.state.store, run_id)
+        except LookupError as error:
+            raise HTTPException(404, str(error)) from error
 
     @app.get("/api/crawls", response_model=list[CrawlResponse])
     def crawls():

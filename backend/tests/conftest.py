@@ -31,7 +31,7 @@ def photo_folder():
 
 @pytest.fixture
 def settings(tmp_path, monkeypatch):
-    for key in ("OPENAI_API_KEY", "OBJ_ENDPOINT", "OBJ_BUCKET", "OBJ_ACCESS_KEY", "OBJ_SECRET_KEY"):
+    for key in ("SERPAPI_API_KEY", "OPENAI_API_KEY", "OBJ_ENDPOINT", "OBJ_BUCKET", "OBJ_ACCESS_KEY", "OBJ_SECRET_KEY"):
         monkeypatch.setenv(key, "")
     return Settings(
         _env_file=None,

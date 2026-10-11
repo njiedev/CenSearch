@@ -49,6 +49,7 @@ export function Workflow({ cases, screen, initialId }: { cases: Json[], screen: 
   const post = (path: string, body?: unknown) => api(`/api/cases/${id}/${path}`, body)
   const latest = flow?.notices?.at(-1)
   const selected = cases.find(item => item.id === id)
+  const publicSource = Boolean(selected?.evidence.context?.discovery?.draft_only)
   const rung = flow?.next_rung ?? 'site'
   const candidates = flow?.lookup?.recipients?.filter((item: Json) => item.rung === rung) ?? []
   const chosen = recipient || candidates[0]?.id || ''
@@ -63,6 +64,7 @@ export function Workflow({ cases, screen, initialId }: { cases: Json[], screen: 
       </select>
       {error && <p role="alert">{error}</p>}
       {working && <p role="status">Working...</p>}
+      {selected?.evidence.context?.discovery && <p>{selected.evidence.context.discovery.source_label} · {selected.evidence.context.discovery.label}</p>}
       {flow && <>
         <p>State: <strong data-testid="workflow-state">{flow.state}</strong> · Next rung: {rung}</p>
         {screen === 'decide' && <>
@@ -106,7 +108,7 @@ export function Workflow({ cases, screen, initialId }: { cases: Json[], screen: 
             <p className="break-all">Recipient: {latest.recipient.address} · SHA256: {latest.sha256}</p>
             {latest.recipient.channel.startsWith('manual') && <p>The person sends this real-site draft themselves. Automatic delivery is disabled.</p>}
             <Button disabled={working || !actor.trim()} onClick={() => action(() => post('approve', { notice_id: latest.id, sha256: latest.sha256, approved_by: actor }))}>Approve this exact request</Button>
-            <Button disabled={working || !latest.approved_by || latest.recipient.channel.startsWith('manual')} onClick={() => action(() => post('send'))}>Send approved mock request</Button>
+            <Button disabled={working || publicSource || !latest.approved_by || latest.recipient.channel.startsWith('manual')} onClick={() => action(() => post('send'))}>Send approved mock request</Button>
           </>}
         </>}
         {screen === 'verify' && <>

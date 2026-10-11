@@ -9,6 +9,7 @@ from censearch.agent.web import lookup_session
 from censearch.case_records import Attestation, Batch, BatchItem, Delivery, Notice
 from censearch.db import Case, Original, record
 from censearch.delivery import destination
+from censearch.discovery import draft_only
 from censearch.workflow import site_origin
 from censearch.workflow_api import ApprovalRequest, DraftRequest, PrepareRequest
 
@@ -141,6 +142,7 @@ class Batches:
                     "An existing notice or delivery requires review; batch will not resend it"
                 )
             data = record(case)
+            real_source = draft_only(case)
             original = session.get(Original, case.original_id) if case.original_id else None
             if original and original.person_id != case.person_id:
                 raise ValueError("Original does not belong to this enrolled person")
@@ -255,6 +257,8 @@ class Batches:
         notice = await workflow.draft(case_id, DraftRequest(recipient_id=recipient["id"]))
         self.update(item_id, "drafting", "Checking delivery eligibility", notice_id=notice["id"])
         try:
+            if real_source:
+                raise ValueError("Real source · draft only; the person sends this draft themselves")
             # This batch always stops at a draft for real sites, even if a developer enables
             # the legacy external-delivery flag. The existing gate also runs again at send.
             if recipient["channel"] not in ("smtp", "http_form"):

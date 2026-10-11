@@ -15,6 +15,7 @@ from censearch.agent.web import lookup_session
 from censearch.case_records import Attestation, CaseEvent, CaseWorkflow, Delivery, DraftApproval, Notice
 from censearch.db import Case, Original, Person, record
 from censearch.delivery import destination, send
+from censearch.discovery import draft_only, provenance
 from censearch.evidence import capture_page
 from censearch.notices import digest, render
 from censearch.routing import EXTRA_QUESTIONS, QUESTIONS, decide
@@ -160,13 +161,18 @@ class Workflow:
         with self.store.session.begin() as session:
             case, state = self.context(session, case_id)
             person = session.get(Person, case.person_id)
-            if person.development_fixture and self.storage.client:
+            if person.development_fixture and self.storage.client and not provenance(case):
                 raise ValueError("Fixture evidence must not be uploaded to third-party storage")
             if self.latest(session, Notice, case_id):
                 raise ValueError("Evidence is frozen once a notice exists")
             data = record(case)
+        storage = self.storage
+        if provenance(case):
+            from censearch.public_crawl import local_settings
+            from censearch.evidence import EvidenceStore
+            storage = EvidenceStore(local_settings(self.settings))
         bundle = await capture_page(
-            self.storage, data["person_id"], case_id, data["page_url"], data["evidence"]["image"], self.now()
+            storage, data["person_id"], case_id, data["page_url"], data["evidence"]["image"], self.now()
         )
         with self.store.session.begin() as session:
             _, state = self.context(session, case_id)
@@ -348,6 +354,8 @@ class Workflow:
         try:
             with self.store.session.begin() as session:
                 case, state = self.context(session, case_id)
+                if draft_only(case):
+                    raise ValueError("Real source · draft only; the person sends this draft themselves")
                 notice = self.latest(session, Notice, case_id)
                 if (
                     notice is None

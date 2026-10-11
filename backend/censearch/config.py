@@ -24,6 +24,10 @@ class Settings(BaseSettings):
     obj_access_key: SecretStr = SecretStr("")
     obj_secret_key: SecretStr = SecretStr("")
     allow_public_crawl: bool = False
+    serpapi_api_key: SecretStr = Field(default=SecretStr(""), validation_alias="SERPAPI_API_KEY")
+    discovery_max_queries: int = Field(default=8, ge=1, le=8)
+    discovery_results_per_query: int = Field(default=10, ge=1, le=25)
+    discovery_timeout: float = Field(default=90, gt=0, le=90)
     respect_robots: bool = False
     crawl_delay: float = Field(default=0.05, ge=0.01)
     crawl_request_budget: int = Field(default=400, ge=1, le=2000)

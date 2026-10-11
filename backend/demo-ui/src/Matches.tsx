@@ -107,8 +107,12 @@ export function Matches({ cases, people, busy, refresh }: {
         <p key={item.case_id}>Case {item.case_id}: {item.reason}</p>)}
     </div>}
     {!cases.length && <p className="rounded border p-8 text-center">No matches yet. Enroll a person and run Find to scan for appearances.</p>}
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {cases.map(item => <article key={item.id} data-testid="match-card" data-case-id={item.id} className="relative min-w-0 rounded-lg border bg-card p-3">
+    {[false, true].map(real => {
+      const group = cases.filter(item => Boolean(item.evidence.context?.discovery?.draft_only) === real)
+      if (!group.length) return null
+      return <section key={String(real)} className="space-y-3"><h3 className="text-lg">{real ? 'Real source · draft only' : 'Simulated delivery · loopback mock administrator'}</h3>
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {group.map(item => <article key={item.id} data-testid="match-card" data-case-id={item.id} className="relative min-w-0 rounded-lg border bg-card p-3">
         <div className="mb-3 flex items-center gap-2">
           <Checkbox id={`select-match-${item.id}`} aria-label={`Select match ${item.id}`} checked={selected.includes(item.id)} disabled={running}
             onCheckedChange={checked => setSelected(current => checked ? [...current, item.id] : current.filter(id => id !== item.id))} />
@@ -118,13 +122,16 @@ export function Matches({ cases, people, busy, refresh }: {
         <button type="button" aria-label={`Open match ${item.id}`} className="w-full space-y-3 rounded text-left focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4" onClick={() => setDetailId(item.id)}>
           <img src={item.matched_image_url} alt={`Matched image ${item.id}`} className="h-48 w-full rounded bg-muted object-contain" />
           <p className="break-all font-medium">{site(item)}</p>
+          <p>{item.evidence.context?.discovery?.source_label ?? 'Simulated delivery · loopback mock administrator'}</p>
+          {item.evidence.context?.discovery && <p>{item.evidence.context.discovery.label} · Possible match · review needed</p>}
           <Badge variant="secondary" className="whitespace-normal text-left">{action(item).possible ? 'Possible: ' : ''}{action(item).label}</Badge>
           <p className="text-xs text-muted-foreground">{source(action(item).source)}</p>
           <Badge variant="outline" data-testid="match-status">{outcomes[item.batch_outcome?.status] ?? item.state.replaceAll('_', ' ')}</Badge>
           {item.batch_outcome && <p data-testid="match-outcome" className="break-words text-sm">{item.batch_outcome.reason}</p>}
         </button>
       </article>)}
-    </div>
+    </div></section>
+    })}
 
     <Dialog open={detailId !== null} onOpenChange={open => { if (!open) setDetailId(null) }}>
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
@@ -152,6 +159,7 @@ export function Matches({ cases, people, busy, refresh }: {
           <ul className="max-h-44 space-y-2 overflow-y-auto rounded border p-3" data-testid="batch-selection">
             {selectedCases.map(item => <li key={item.id}>Match {item.id} · {site(item)} · Intended: {item.possible_action.label}</li>)}
           </ul>
+          <p>Real source cases stop at a named recipient and a draft. Only loopback mock administrators receive requests.</p>
           <p>The agent reviews these possible actions and may choose another legal basis or hold a match for review.</p>
           <p className="rounded border p-3" data-testid="legal-warning">{warning}</p>
           <div className="grid gap-3 sm:grid-cols-2">
