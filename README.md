@@ -49,13 +49,8 @@ contact.
     opens by different amounts, blinks, and glances left and right.
   - Under the wordmark, a short headline, one line on what we do, and a
     "Start here" button that jumps to sign-up.
-  - "About" is a camera viewfinder drawn straight over the blurred feed, with corner
-    brackets, a blinking "Recording without your permission" light, a live
-    clock, a running timecode, and a large pixel-art snake eye whose slit pupil follows the cursor in whole
-    art-pixel steps.
-  - Its copy types itself out in a monospace font.
-  - "Sign up" sits in the same viewfinder frame and shares one blur layer with
-    "About", so there's no seam between them. It enrolls your face: name, face
+  - "Sign up" sits inside camera-viewfinder brackets over the blurred feed.
+    It enrolls your face: name, face
     photos, optional owned originals,
     and explicit consent and ownership statements. It posts to the real
     backend enrollment endpoint and shows which photos were accepted.

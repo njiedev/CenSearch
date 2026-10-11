@@ -549,7 +549,8 @@ body {
   justify-items: center;
   align-content: center;
   min-height: 100svh;
-  padding: 64px 16px 120px;
+  /* Starts below the blur's 160px fade-in. */
+  padding: 192px 16px 120px;
 }
 
 .su-panel {
