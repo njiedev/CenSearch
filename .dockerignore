@@ -1,0 +1,15 @@
+.git
+**/.env
+**/.env.*
+**/.venv
+**/node_modules
+**/dist
+**/__pycache__
+**/.pytest_cache
+**/.ruff_cache
+**/*.md
+backend/data
+backend/models
+backend/seed
+backend/handoff
+frontend/public/photos

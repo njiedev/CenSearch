@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Adapted from akamai-developers/akamai-workshop-hackmidwest/scripts/deploy_linode.sh.
 # Run only when the owner explicitly requests cloud deployment.
 set -euo pipefail
 backend_root=$(cd "$(dirname "$0")/.." && pwd)
@@ -75,9 +74,7 @@ lines = [line for line in lines if not line.startswith('APP_HOST=')]
 lines.append('APP_HOST=' + sys.argv[3] + '.sslip.io')
 Path(sys.argv[2]).write_text('\n'.join(lines) + '\n')
 PY
-COPYFILE_DISABLE=1 tar --exclude='__pycache__' --exclude='*.pyc' --exclude='node_modules' --exclude='dist' --exclude='*.md' \
-    -czf "$bundle" -C "$backend_root" pyproject.toml uv.lock .python-version .dockerignore \
-    censearch mockweb scripts/setup_models.py reports/calibration.json demo-ui deploy
+bash "$backend_root/deploy/package.sh" "$bundle"
 scp "${ssh_options[@]}" -q "$bundle" "root@$ip:/opt/censearch/code.tar.gz"
 scp "${ssh_options[@]}" -q "$remote_env" "root@$ip:/opt/censearch/.env.next"
 # Preserve prior remote Object Storage credentials on repeat deploys.
@@ -97,6 +94,6 @@ incoming.replace(current)
 PYREMOTE
 python3 "$backend_root/deploy/provision_storage.py" --host "root@$ip" --ssh-key "$ssh_key" \
     --region "$region" --bucket "${OBJ_BUCKET_LABEL:-${label}-evidence}"
-ssh "${ssh_options[@]}" "root@$ip" 'cd /opt/censearch && tar -xzf code.tar.gz && docker compose -f deploy/compose.yaml up -d --build > deploy.log 2>&1'
+ssh "${ssh_options[@]}" "root@$ip" 'cd /opt/censearch && tar -xzf code.tar.gz && install -m 0600 .env backend/.env && docker compose -f backend/deploy/compose.yaml up -d --build > deploy.log 2>&1'
 echo "Started deployment at https://$ip.sslip.io (username demo). Inspect /opt/censearch/deploy.log if startup failed."
 echo 'Mock sites start empty. Seed them only with owner-approved photos copied separately; local fixtures were not uploaded.'
