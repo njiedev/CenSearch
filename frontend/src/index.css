@@ -7,7 +7,14 @@
   --accent-dark: #4c1d95;
   --pixel: 'Geist Pixel', ui-monospace, monospace;
   --mono: 'Geist Mono', ui-monospace, monospace;
+  --sans: 'Geist', 'Helvetica Neue', Arial, sans-serif;
   color-scheme: dark;
+}
+
+@font-face {
+  font-family: 'Geist';
+  src: url('./fonts/Geist-Regular.woff2') format('woff2');
+  font-display: swap;
 }
 
 @font-face {
@@ -163,6 +170,78 @@ body {
   display: grid;
   place-items: center;
   min-height: 100svh;
+}
+
+/* A dark pool behind the copy so it reads over the photo grid. */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 60% 55% at center, rgb(0 0 0 / 0.75), transparent);
+  pointer-events: none;
+}
+
+.hero-copy {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 32px;
+  padding: 0 24px;
+  text-align: center;
+}
+
+.hero .logo {
+  font-size: clamp(2.25rem, 8vw, 7rem);
+}
+
+.hero-headline {
+  margin: 0;
+  font: 400 clamp(2rem, 5vw, 4.25rem) / 1.1 var(--sans);
+  letter-spacing: -0.02em;
+  color: #fafafa;
+  text-shadow: 0 0 40px rgb(0 0 0 / 0.8);
+}
+
+.pixel-word {
+  font-family: var(--pixel);
+  letter-spacing: 0;
+}
+
+.hero-sub {
+  max-width: 40ch;
+  margin: 0;
+  font: clamp(1rem, 1.6vw, 1.25rem) / 1.5 var(--sans);
+  color: #a1a1aa;
+}
+
+.hero-cta {
+  display: inline-grid;
+  place-items: center;
+  min-height: 56px;
+  padding: 0 48px;
+  border-radius: 6px;
+  background: var(--accent);
+  color: #fff;
+  font: 18px/1 var(--mono);
+  text-decoration: none;
+  box-shadow: 0 0 32px rgb(124 58 237 / 0.45);
+  transition:
+    background 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.hero-cta:hover {
+  background: var(--accent-hover);
+  box-shadow: 0 0 48px rgb(139 92 246 / 0.6);
+}
+
+.hero-cta:active {
+  background: var(--accent-dark);
+}
+
+.hero-cta:focus-visible {
+  outline: 2px solid var(--accent-light);
+  outline-offset: 3px;
 }
 
 .scroll-hint {

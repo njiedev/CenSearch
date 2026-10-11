@@ -42,11 +42,13 @@ contact.
   - The landing page is a dimmed, grayscale wall of faces.
   - Cells occasionally light up as a match or a flag, or dissolve into dust.
 - **Palette:** black, white, and one purple accent.
-- **Type:** Geist Pixel Square and Geist Mono (SIL Open Font License), bundled
-  locally.
+- **Type:** Geist, Geist Pixel Square and Geist Mono (SIL Open Font License),
+  bundled locally. Headlines mix Geist with pixel words.
 - **Details:**
   - The wordmark draws the A in CENSEARCH as an eye with an eyelid. It
     opens by different amounts, blinks, and glances left and right.
+  - Under the wordmark, a short headline, one line on what we do, and a
+    "Start here" button that jumps to sign-up.
   - "About" is a camera viewfinder drawn straight over the blurred feed, with corner
     brackets, a blinking "Recording without your permission" light, a live
     clock, a running timecode, and a large pixel-art snake eye whose slit pupil follows the cursor in whole
