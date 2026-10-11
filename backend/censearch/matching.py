@@ -18,10 +18,13 @@ class Matcher:
         self.calibration = calibration
         self.calibration_sha256 = calibration_sha256
 
-    def gallery(self):
+    def gallery(self, person_id=None):
         result = []
         with self.store.session() as session:
-            for person in session.scalars(select(Person)):
+            people = select(Person)
+            if person_id is not None:
+                people = people.where(Person.id == person_id)
+            for person in session.scalars(people):
                 references = list(
                     session.scalars(
                         select(Reference).where(Reference.person_id == person.id).order_by(Reference.id)

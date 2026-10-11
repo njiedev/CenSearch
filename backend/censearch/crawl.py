@@ -42,7 +42,7 @@ def validate_url(url, allow_public=False):
         raise ValueError("Public crawling is disabled; use a loopback mock URL")
 
 
-def extract(html, page_url, computed=()):
+def extract(html, page_url, computed=(), *, prefer_original=False):
     soup = BeautifulSoup(html, "html.parser")
     title = soup.title.get_text(" ", strip=True) if soup.title else ""
     author = soup.select_one('meta[name="author"]')
@@ -64,14 +64,50 @@ def extract(html, page_url, computed=()):
             )
         images.setdefault(url, context)
 
-    for node in soup.select("img, source"):
-        for attr in ("src", "data-src", "data-original"):
-            if node.get(attr):
-                add(node[attr], node, attr)
-        for attr in ("srcset", "data-srcset"):
-            for option in node.get(attr, "").split(","):
-                if option.strip():
-                    add(option.strip().split()[0], node, attr)
+    suppressed = set()
+    if prefer_original:
+        for node in soup.select("img, source"):
+            if node.name == "source" and node.find_parent("picture"):
+                continue
+            variants = []
+            picture = node.find_parent("picture")
+            nodes = [node, *(picture.select("source") if picture else [])]
+            for source in nodes:
+                for attr in ("srcset", "data-srcset"):
+                    for option in source.get(attr, "").split(","):
+                        parts = option.strip().split()
+                        if parts:
+                            size = re.search(r"([0-9.]+)[wx]$", parts[-1])
+                            variants.append((float(size[1]) if size else 1, parts[0]))
+            aliases = {
+                absolute(page_url, node[attr])
+                for attr in ("src", "data-src", "data-original")
+                if node.get(attr)
+            }
+            aliases.update(absolute(page_url, url) for _, url in variants)
+            anchor = node.find_parent("a", href=True)
+            linked = None
+            if anchor and re.search(
+                r"\.(jpe?g|png|webp|gif|avif|bmp)$", urlsplit(anchor["href"]).path, re.I
+            ):
+                linked = anchor["href"]
+            largest = max(variants, key=lambda item: item[0])[1] if variants else None
+            chosen = (
+                linked or node.get("data-original") or largest
+                or node.get("data-src") or node.get("src")
+            )
+            if chosen:
+                add(chosen, node, "preferred_original")
+                suppressed.update(aliases - {absolute(page_url, chosen)})
+    else:
+        for node in soup.select("img, source"):
+            for attr in ("src", "data-src", "data-original"):
+                if node.get(attr):
+                    add(node[attr], node, attr)
+            for attr in ("srcset", "data-srcset"):
+                for option in node.get(attr, "").split(","):
+                    if option.strip():
+                        add(option.strip().split()[0], node, attr)
     for node in soup.select('meta[property="og:image"], meta[name="og:image"]'):
         if node.get("content"):
             add(node["content"], method="og:image")
@@ -90,6 +126,8 @@ def extract(html, page_url, computed=()):
         else:
             links.append(target)
     styles = [absolute(page_url, node["href"]) for node in soup.select('link[rel="stylesheet"][href]')]
+    for variant in suppressed:
+        images.pop(variant, None)
     return images, links, common, [url for url in styles if url], bool(soup.find("script"))
 
 
@@ -240,6 +278,7 @@ class Crawler:
                     if response is None:
                         scan.status = "blocked"
                         return
+                    self.metrics["images_fetched"] += 1
                     payload = response.content
                     scan.sha256 = hashlib.sha256(payload).hexdigest()
                     previous = session.scalar(
@@ -252,7 +291,7 @@ class Crawler:
                         )
                         .limit(1)
                     )
-                    if previous:
+                    if previous and not self.config.get("public_search"):
                         scan.status = "cached_no_match"
                         self.metrics["cached_no_match"] += 1
                     else:
@@ -268,6 +307,7 @@ class Crawler:
                         )
                         self.metrics["analysed"] += 1
                         self.metrics["matches"] += result["matches"]
+                        self.metrics["usable_faces"] += result["detected_faces"]
                         for reason in result["skip_reasons"]:
                             self.metrics["skip_" + reason] += 1
                 except (httpx.HTTPError, ValueError) as error:
