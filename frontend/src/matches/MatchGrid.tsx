@@ -47,7 +47,7 @@ function MatchCard({ item, checked, locked, onToggle, onOpen }: {
           : <img src={item.matched_image_url} alt="Candidate image" />}
         <span className="mx-site">{hostname(item.page_url)}</span>
         {item.match_type === 'facecheck' && <span className="mx-muted">
-          FaceCheck · Score {item.provider_score} · Not locally verified
+          FaceCheck · Score {item.provider_score}
         </span>}
         {showAction && <span className="mx-action">
           {action.possible && <span className="mx-possible">Possible: </span>}

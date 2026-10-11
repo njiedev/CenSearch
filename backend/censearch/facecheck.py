@@ -12,7 +12,7 @@ from censearch.imaging import decode
 
 BASE_URL = "https://facecheck.id"
 MAX_RESPONSE_BYTES = 20_000_000
-MIN_SCORE_EXCLUSIVE = 90
+MIN_SCORE = 88
 
 
 class FaceCheckError(RuntimeError):
@@ -53,7 +53,7 @@ def result_items(items, *, include_thumbnails=False):
             parsed = urlsplit(url)
             if parsed.scheme not in ("http", "https") or not parsed.hostname:
                 continue
-            if parsed.username or parsed.password or not MIN_SCORE_EXCLUSIVE < score <= 100:
+            if parsed.username or parsed.password or not MIN_SCORE <= score <= 100:
                 continue
         except ValueError:
             continue

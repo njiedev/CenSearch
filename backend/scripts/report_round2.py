@@ -40,8 +40,6 @@ CHANGES = {
     "censearch/api.py": "Workflow lifecycle, real-time scheduler and actual model/storage health state.",
     "censearch/enroll.py": "Wrapped long lines; original enrollment behavior retained.",
     "censearch/agent/probe.py": "Wrapped long system-prompt line; original probe retained.",
-    "demo-ui/src/Workflow.tsx": "Decide, Send and Verify screens with unanswered facts, approvals and refusal display.",
-    "demo-ui/src/main.tsx": "Adds workflow navigation to the existing backend-only console.",
     "mockweb/server.py": "Independent administrator validation, reasoned refusal and controllable adverse responses.",
     "mockweb/mail_receiver.py": "SMTP forwarding to independent site and host administrators.",
     "mockweb/run.py": "Optional separate refusal site and child cleanup; host SMTP route supplied.",

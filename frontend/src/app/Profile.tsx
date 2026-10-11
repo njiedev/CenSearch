@@ -85,7 +85,7 @@ export default function Profile({ person, onUpdated }: { person: Person; onUpdat
   }
   return <>
     <Card className="settings-section profile-info">
-      <div className="profile-identity"><span className="profile-avatar"><UserRound aria-hidden="true" /></span><div><h2>{current.name}</h2><p>{current.development_fixture ? 'Local test enrollment' : 'Your enrollment'}</p></div></div>
+      <div className="profile-identity"><span className="profile-avatar"><UserRound aria-hidden="true" /></span><div><h2>{current.name}</h2><p>Your enrollment</p></div></div>
       <dl className="profile-facts">
         <div><dt>Enrolled</dt><dd>{current.created_at ? new Date(current.created_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) : 'Sample profile'}</dd></div>
         <div><dt>Face photos</dt><dd>{current.references.length}</dd></div>

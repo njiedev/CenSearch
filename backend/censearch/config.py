@@ -15,7 +15,6 @@ class Settings(BaseSettings):
         default=ROOT / "reports/calibration.json", validation_alias="LIKENESS_CALIBRATION_PATH"
     )
     frontend_dir: Path = Field(default=ROOT.parent / "frontend/dist", validation_alias="LIKENESS_FRONTEND_DIR")
-    console_dir: Path = Field(default=ROOT / "demo-ui/dist", validation_alias="LIKENESS_CONSOLE_DIR")
     model_provider: str = "openai_compatible"
     openai_base_url: str = "https://ws.akamai-workshops.com/v1"
     openai_api_key: SecretStr = SecretStr("")
@@ -41,14 +40,13 @@ class Settings(BaseSettings):
     scheduler_poll: float = Field(default=30, ge=0.1, validation_alias="LIKENESS_SCHEDULER_POLL")
     smtp_relay: str = Field(default="", validation_alias="LIKENESS_SMTP_RELAY")
     email_enabled: bool = Field(default=False, validation_alias="CENSEARCH_EMAIL_ENABLED")
-    demo_resend: bool = Field(default=False, validation_alias="CENSEARCH_DEMO_RESEND")
     email_from: str = Field(default="", validation_alias="CENSEARCH_EMAIL_FROM")
     resend_api_key: SecretStr = SecretStr("")
     rdap_bootstrap: str = Field(default="", validation_alias="LIKENESS_RDAP_BOOTSTRAP")
     search_endpoint: str = Field(default="", validation_alias="LIKENESS_SEARCH_ENDPOINT")
     upload_limit_bytes: int = Field(default=20_000_000, ge=1024)
 
-    @field_validator("data_dir", "models_dir", "calibration_path", "frontend_dir", "console_dir")
+    @field_validator("data_dir", "models_dir", "calibration_path", "frontend_dir")
     @classmethod
     def absolute_path(cls, value: Path) -> Path:
         return value if value.is_absolute() else ROOT / value

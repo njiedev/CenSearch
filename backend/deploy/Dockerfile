@@ -1,10 +1,3 @@
-FROM node:24.14.1-bookworm-slim AS console
-WORKDIR /console
-COPY backend/demo-ui/package.json backend/demo-ui/package-lock.json ./
-RUN npm ci
-COPY backend/demo-ui/ ./
-RUN npm run build
-
 FROM node:24.14.1-bookworm-slim AS frontend
 WORKDIR /frontend
 COPY frontend/package.json frontend/package-lock.json ./
@@ -24,7 +17,6 @@ RUN uv sync --frozen --no-dev
 COPY backend/reports/calibration.json reports/calibration.json
 COPY backend/scripts/setup_models.py scripts/setup_models.py
 RUN uv run --no-sync python scripts/setup_models.py
-COPY --from=console /console/dist demo-ui/dist
 COPY --from=frontend /frontend/dist /frontend/dist
 ENV LIKENESS_DATA_DIR=/app/data LIKENESS_FRONTEND_DIR=/frontend/dist
 EXPOSE 8000

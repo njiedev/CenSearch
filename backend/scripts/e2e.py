@@ -1,10 +1,9 @@
-"""Real loopback HTTP enroll/crawl plus optional Playwright console acceptance."""
+"""Real loopback HTTP enroll/crawl acceptance."""
 
 import argparse
 from contextlib import ExitStack
 from datetime import datetime
 import hashlib
-from io import BytesIO
 import json
 import os
 from pathlib import Path
@@ -13,8 +12,6 @@ import subprocess
 import sys
 import time
 import httpx
-from PIL import Image
-from playwright.sync_api import sync_playwright, expect
 from mockweb.run import available, running, stop
 from fixture_input import select_person
 from mockweb.seed import photos, seed
@@ -89,100 +86,12 @@ def await_crawl(api, identifier):
     raise TimeoutError("Crawl exceeded 100 seconds")
 
 
-def browser_flow(base, person, output):
-    """Uses the brief's explicitly requested local Playwright workflow."""
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch(
-            args=["--use-fake-ui-for-media-stream", "--use-fake-device-for-media-stream"]
-        )
-        try:
-            context = browser.new_context(viewport={"width": 1280, "height": 900}, permissions=["camera"])
-            page = context.new_page()
-            errors = []
-            page.on("pageerror", lambda error: errors.append(str(error)))
-            page.goto(base + "/console/", wait_until="networkidle")
-            expect(page.get_by_test_id("health-summary")).to_contain_text("Face models: loaded")
-            page.get_by_role("button", name="Enroll", exact=True).click()
-            page.get_by_label("Name", exact=True).fill("Browser fixture")
-            page.get_by_label("Consent statement").fill(
-                "Local fixture for browser acceptance; no real consent claim"
-            )
-            page.get_by_label("Reference photos", exact=True).set_input_files(
-                str(photos(person / "reference")[0])
-            )
-            page.get_by_label("Owned original photos (optional)").set_input_files(
-                str(photos(person / "originals")[0])
-            )
-            page.get_by_label("Ownership statement (required with originals)").fill(
-                "Hypothetical fixture only"
-            )
-            page.get_by_label("Local development fixture, not a real consent or ownership claim").check()
-            page.get_by_role("button", name="Enroll person", exact=True).click()
-            expect(page.get_by_text("Enrollment saved", exact=True)).to_be_visible(timeout=15000)
-            page.screenshot(path=str(output / "console-enroll.png"), full_page=True)
-            # Exercise actual capture plumbing with Chromium's synthetic camera.
-            # It is not presented as verification on a person's live camera.
-            page.get_by_role("button", name="Start webcam", exact=True).click()
-            expect(page.get_by_label("Webcam preview")).to_be_visible()
-            page.wait_for_function("document.querySelector('video').videoWidth > 0")
-            page.get_by_role("button", name="Capture reference", exact=True).click()
-            expect(page.get_by_role("button", name="Remove capture 1")).to_be_visible()
-            page.get_by_role("button", name="Remove capture 1").click()
-            page.get_by_role("button", name="Stop webcam", exact=True).click()
-            page.get_by_role("button", name="Find", exact=True).click()
-            page.get_by_role("button", name="Start crawl", exact=True).click()
-            expect(page.get_by_test_id("crawl-status")).to_have_text("Crawl 2: completed", timeout=100000)
-            expect(page.get_by_test_id("case-card").first).to_be_visible()
-            expect(page.get_by_test_id("case-card").first.locator("img")).to_be_visible()
-            page.wait_for_function(
-                "[...document.querySelectorAll('[data-testid=case-card] img')]"
-                ".every(i => i.complete && i.naturalWidth > 0)"
-            )
-            page.screenshot(path=str(output / "console-find.png"), full_page=True)
-            page.get_by_role("button", name="Open case", exact=False).first.click()
-            expect(page.get_by_text("Case record", exact=True)).to_be_visible()
-            page.screenshot(path=str(output / "console-case.png"), full_page=True)
-            page.set_viewport_size({"width": 390, "height": 844})
-            page.screenshot(path=str(output / "console-mobile.png"), full_page=True)
-            assert page.evaluate("document.documentElement.scrollWidth <= window.innerWidth"), (
-                "Narrow screen overflows"
-            )
-            page.get_by_role("button", name="Enroll", exact=True).click()
-            page.get_by_role("button", name="Delete Browser fixture", exact=True).click()
-            expect(page.get_by_text("No people enrolled yet.", exact=True)).to_be_visible()
-            # Invalid upload must show the actual quality rejection in the screen.
-            page.get_by_label("Name", exact=True).fill("Rejected browser fixture")
-            page.get_by_label("Consent statement").fill("Local test")
-            blank = BytesIO()
-            Image.new("RGB", (250, 250), "white").save(blank, "PNG")
-            page.get_by_label("Reference photos", exact=True).set_input_files(
-                {"name": "blank.png", "mimeType": "image/png", "buffer": blank.getvalue()}
-            )
-            page.get_by_role("button", name="Enroll person", exact=True).click()
-            expect(page.get_by_role("alert")).to_contain_text("photo_rejected")
-            page.screenshot(path=str(output / "console-rejected.png"), full_page=True)
-            assert not errors, errors
-            return {
-                "enroll": "passed",
-                "find": "passed",
-                "case": "passed",
-                "delete": "passed",
-                "rejection": "passed",
-                "webcam": "synthetic Chromium capture passed; physical camera untested",
-                "page_errors": errors,
-                "narrow_overflow": False,
-            }
-        finally:
-            browser.close()
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--photos", type=Path, required=True)
     parser.add_argument("--person", help="Folder name; defaults to first person, without name-specific rules")
     parser.add_argument("--base-port", type=int, default=8811)
     parser.add_argument("--api-port", type=int, default=8190)
-    parser.add_argument("--browser", action="store_true")
     args = parser.parse_args()
     started = time.monotonic()
     output = ROOT / "data" / ("e2e-" + datetime.now().strftime("%Y%m%d-%H%M%S"))
@@ -219,7 +128,7 @@ def main():
         OBJ_ACCESS_KEY="",
         OBJ_SECRET_KEY="",
     )
-    summary = {"output": str(output), "browser": "not requested"}
+    summary = {"output": str(output)}
     try:
         with ExitStack() as stack:
             stack.enter_context(running(output / "mockweb", args.base_port, output / "logs"))
@@ -352,9 +261,6 @@ def main():
             assert response.status_code == 200
             assert api.client.get("/api/cases").json() == []
             assert not (output / "backend/people" / enrolled["id"]).exists()
-            if args.browser:
-                summary["browser"] = browser_flow(base, fixture_folder / "demo-person", output)
-                print("BROWSER", json.dumps(summary["browser"]), flush=True)
     finally:
         api.client.close()
         (output / "api-examples.json").write_text(json.dumps(api.examples, indent=2))

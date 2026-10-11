@@ -2,6 +2,7 @@
 
 import json
 import base64
+from copy import deepcopy
 import time
 from io import BytesIO
 
@@ -109,7 +110,7 @@ def test_face_scan_filters_before_fetch_and_preserves_scores(
                             "score": score,
                             "base64": "never-save-this",
                         }
-                        for score in (89, 90, 91, 99)
+                        for score in (87, 88, 90, 99)
                     ],
                 }
             },
@@ -120,51 +121,33 @@ def test_face_scan_filters_before_fetch_and_preserves_scores(
     assert response.status_code == 202, response.text
     run = wait(client, response.json()["id"])
     assert run["status"] == "completed", run
-    assert [item["score"] for item in run["facecheck"]["items"]] == [91, 99]
-    assert set(pages) == {"https://example.com/91", "https://example.com/99"}
-    assert [row["provider_score"] for row in run["candidates"]] == [91, 99]
+    assert [item["score"] for item in run["facecheck"]["items"]] == [88, 90, 99]
+    assert set(pages) == {"https://example.com/88", "https://example.com/90", "https://example.com/99"}
+    assert [row["provider_score"] for row in run["candidates"]] == [88, 90, 99]
     assert all(row["discovery_method"] == "face_search" for row in run["candidates"])
-    assert len(run["results"]) == 2
+    assert len(run["results"]) == 3
     for row in run["results"]:
         assert row["match_type"] == "facecheck" and row["band"] == "possible"
         assert row["face_score"] is None and row["face_band"] == "not_checked"
-        assert row["possible_action"]["route"] == "hold_for_review"
+        assert row["possible_action"]["route"] == "privacy_request"
         assert row["thumbnail_available"] is False
         assert client.get(row["matched_image_url"]).status_code == 404
     assert run["agent"]["source"] == "facecheck"
     assert calls == ["/api/info", "/api/upload_pic", "/api/search"]
     assert "never-save-this" not in json.dumps(run) and "local-test-token" not in json.dumps(run)
     history = client.get(f"/api/people/{identity}/scans").json()
-    assert history[0]["label"] == "FaceCheck · score above 90"
+    assert history[0]["label"] == "FaceCheck · scores 88+"
     assert client.post(f"/api/public-searches/{run['id']}/resume").status_code == 409
-    summary = client.get(f"/api/people/{identity}/face-search-cache").json()
-    assert summary["available"] and summary["count"] == 2
-    assert summary["run_id"] == run["id"] and summary["saved_at"]
-    # A cached scan is readable offline, with no provider key or loaded face models.
-    settings.facecheck_api_token = SecretStr("")
-    client.app.state.face = None
-    saved = start(
-        client,
-        identity,
-        facecheck_source="cache",
-        facecheck_consent=False,
-        allow_public_fetch=False,
-    )
-    assert saved.status_code == 202, saved.text
-    assert saved.json()["id"] == run["id"] and saved.json()["cache_hit"] is True
-    assert calls == ["/api/info", "/api/upload_pic", "/api/search"]
-    assert len(pages) == 2
-    assert [row["id"] for row in saved.json()["results"]] == [row["id"] for row in run["results"]]
 
 
 def test_provider_thumbnails_reviewable_when_page_blocked(client, settings, identity, monkeypatch):
-    from test_round3 import await_batch, payload
+    from test_round3 import await_batch, isolated_workflow, payload
     from censearch.agent.route import match_evidence
 
     images = []
     for color in ("red", "blue"):
         stream = BytesIO()
-        Image.new("RGB", (32, 32), color).save(stream, format="JPEG")
+        Image.new("RGB", (32, 32), color).save(stream, format="WEBP")
         images.append(base64.b64encode(stream.getvalue()).decode())
 
     def handler(request):
@@ -174,8 +157,8 @@ def test_provider_thumbnails_reviewable_when_page_blocked(client, settings, iden
             return httpx.Response(200, json={"id_search": "thumbnails"})
         return httpx.Response(200, json={"output": {"demo": False, "items": [
             {"url": "https://example.com/gallery", "score": score, "base64": image}
-            for score, image in [(99, images[0]), (95, "data:image/jpeg;base64," + images[1]),
-                                 (99, images[0]), (90, images[0])]
+            for score, image in [(99, images[0]), (95, "data:image/webp;base64, " + images[1]),
+                                 (99, images[0]), (87, images[0])]
         ]}})
 
     intercept(monkeypatch, handler)
@@ -204,11 +187,14 @@ def test_provider_thumbnails_reviewable_when_page_blocked(client, settings, iden
     cases = client.get(f"/api/cases?person_id={identity}&run_id={run['id']}")
     assert cases.status_code == 200 and len(cases.json()) == 2
 
-    # Review uses real persisted IDs and the existing fallback, without provider calls.
+    # Review and drafting use persisted IDs; all capture and delivery I/O stays stubbed.
+    sent = isolated_workflow(client, monkeypatch)
     batch = client.post("/api/batches", json=payload([run["results"][0]["id"]]))
     assert batch.status_code == 202, batch.text
     finished = await_batch(client, batch.json()["id"])
-    assert finished["items"][0]["status"] == "held_for_review"
+    assert finished["items"][0]["status"] == "drafted_not_sent"
+    assert finished["items"][0]["decision"]["route"] == "privacy_request"
+    assert not sent
     # Merely opening the details panel must not prevent cache deletion.
     assert client.get(f"/api/cases/{run['results'][1]['id']}/workflow").status_code == 200
     assert client.delete(f"/api/people/{identity}/face-search-cache").status_code == 200
@@ -218,15 +204,37 @@ def test_provider_thumbnails_reviewable_when_page_blocked(client, settings, iden
     assert client.get(f"/api/batches/{batch.json()['id']}").json()["items"] == finished["items"]
 
 
-def test_old_cache_materializes_missing_thumbnail_once(client, identity):
+def test_recovered_thumbnail_preserves_case_id_and_review_state(client, settings, identity):
+    from censearch.face_review import materialize, thumbnail_bytes
+
     run_id = saved_run(client, identity)
+    with client.app.state.store.session.begin() as session:
+        run = session.get(CrawlRun, run_id)
+        config = deepcopy(run.config)
+        config["facecheck"]["items"] = materialize(session, run, config["facecheck"]["items"], settings)
+        run.config = config
+        case_id = config["facecheck"]["items"][0]["case_id"]
+    stream = BytesIO()
+    Image.new("RGB", (32, 32), "blue").save(stream, format="WEBP")
+    encoded = base64.b64encode(stream.getvalue()).decode()
+    assert thumbnail_bytes("data:image/webp;base64, !" + encoded) is None
+    assert thumbnail_bytes("data:image/webp," + encoded) is None
+
     for _ in range(2):
-        result = start(client, identity, facecheck_source="cache", facecheck_consent=False,
-                       allow_public_fetch=False)
-        assert result.status_code == 202
-        assert len(result.json()["results"]) == 1
-        assert result.json()["results"][0]["thumbnail_available"] is False
-    assert len(client.get(f"/api/cases?run_id={run_id}").json()) == 1
+        with client.app.state.store.session.begin() as session:
+            run = session.get(CrawlRun, run_id)
+            item = run.config["facecheck"]["items"][0]
+            saved = materialize(session, run, [item | {
+                "base64": "data:image/webp;base64, " + encoded,
+            }], settings)
+            assert saved[0]["case_id"] == case_id
+        cases = client.get(f"/api/cases?run_id={run_id}").json()
+        assert len(cases) == 1 and cases[0]["id"] == case_id
+        assert cases[0]["state"] == "needs_review"
+        assert cases[0]["thumbnail_available"] is True
+        response = client.get(cases[0]["matched_image_url"])
+        assert response.status_code == 200
+        assert Image.open(BytesIO(response.content)).size == (32, 32)
 
 
 def saved_run(client, identity, *, photo_sha256="test", status="completed", demo=False):
@@ -266,51 +274,24 @@ def saved_run(client, identity, *, photo_sha256="test", status="completed", demo
 def test_delete_clears_all_provider_copies_and_prevents_fallback(client, identity):
     ids = [saved_run(client, identity), saved_run(client, identity)]
     path = f"/api/people/{identity}/face-search-cache"
-    assert client.get(path).json()["run_id"] == ids[-1]
     client.app.state.busy = True
     assert client.delete(path).status_code == 409
     client.app.state.busy = False
     assert client.delete(path).json() == {"deleted": 2}
-    assert client.get(path).json() == {"available": False, "count": 0}
     for run_id in ids:
         run = client.get(f"/api/public-searches/{run_id}").json()
         assert run["facecheck"]["status"] == "cache_deleted"
         assert run["facecheck"]["items"] == [] and run["candidates"] == []
         assert "old-search" not in json.dumps(run)
         assert client.post(f"/api/public-searches/{run_id}/resume").status_code == 422
-    assert (
-        start(
-            client,
-            identity,
-            facecheck_source="cache",
-            facecheck_consent=False,
-            allow_public_fetch=False,
-        ).status_code
-        == 404
-    )
     assert client.delete(path).json() == {"deleted": 0}
-
-
-@pytest.mark.parametrize(
-    "kwargs",
-    [
-        {"photo_sha256": "different-photo"},
-        {"status": "pending"},
-        {"demo": True},
-    ],
-)
-def test_ineligible_results_are_not_cached(client, identity, kwargs):
-    saved_run(client, identity, **kwargs)
-    assert client.get(f"/api/people/{identity}/face-search-cache").json()["available"] is False
 
 
 def test_cache_isolation_and_identity_deletion(client, identity):
     run_id = saved_run(client, identity)
     with client.app.state.store.session.begin() as session:
         session.add(Person(id="other", name="Other", consent="Synthetic"))
-    assert client.get("/api/people/other/face-search-cache").json()["available"] is False
     assert client.delete("/api/people/other/face-search-cache").json() == {"deleted": 0}
-    assert client.get(f"/api/people/{identity}/face-search-cache").json()["available"] is True
     assert client.delete(f"/api/people/{identity}").status_code == 200
     assert (
         client.get(f"/api/public-searches/{run_id}").json()["facecheck"]["status"]

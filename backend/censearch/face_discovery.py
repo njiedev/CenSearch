@@ -7,7 +7,7 @@ from sqlalchemy import select
 
 from censearch.db import CrawlRun, Person, Reference, now
 from censearch.discovery import Candidate, canonical_url, dedupe
-from censearch.facecheck import FaceCheckClient, FaceCheckError, MIN_SCORE_EXCLUSIVE, result_items
+from censearch.facecheck import FaceCheckClient, FaceCheckError, MIN_SCORE, result_items
 from censearch.face_review import materialize
 
 
@@ -31,7 +31,7 @@ def discover_faces(crawler):
         {
             "status": "uploading",
             "items": [],
-            "score_above": MIN_SCORE_EXCLUSIVE,
+            "min_score": MIN_SCORE,
             "testing_mode": False,
             "consented_at": now(),
             "photo_id": photo.id,
@@ -82,7 +82,7 @@ def discover_faces(crawler):
     candidates = []
     for rank, item in enumerate(state["items"], 1):
         # Defense in depth: this gate also covers alternate/injected client implementations.
-        if not MIN_SCORE_EXCLUSIVE < item["score"] <= 100:
+        if not MIN_SCORE <= item["score"] <= 100:
             continue
         try:
             candidates.append(

@@ -1,6 +1,6 @@
 import { sample } from './sample'
 import { signOut } from './session'
-import type { Batch, BatchRequest, Case, FaceCache, Person, PhotoKind, Run, Scan, SearchRequest, Workflow, WorkflowNotice } from './types'
+import type { Batch, BatchRequest, Case, Person, PhotoKind, Run, Scan, SearchRequest, Workflow, WorkflowNotice } from './types'
 
 export class ApiError extends Error {
   status: number
@@ -109,11 +109,9 @@ export const api = {
     request<Run>(`/public-searches/${id}/cancel`, () => sample.cancel(id), json('POST')),
   resumeFaceSearch: (id: number) =>
     request<Run>(`/public-searches/${id}/resume`, () => sample.run(id), json('POST')),
-  faceCache: (id: string) =>
-    request<FaceCache>(`${personPath(id)}/face-search-cache`, () => ({ available: false, count: 0 })),
   deleteFaceCache: (id: string) =>
     request<{ deleted: number }>(`${personPath(id)}/face-search-cache`, () => ({ deleted: 0 }), json('DELETE')),
-  warning: () => request<{ warning: string; email_delivery?: { ready: boolean; demo_test_recipient?: boolean } }>('/batches/warning', sample.warning),
+  warning: () => request<{ warning: string; email_delivery?: { ready: boolean } }>('/batches/warning', sample.warning),
   prepare: (body: BatchRequest) => request<Batch>('/batches', () => sample.prepare(body), json('POST', body)),
   batch: (id: string) => request<Batch>(`/batches/${encodeURIComponent(id)}`, () => sample.batch(id)),
   send: (id: string, ids: number[]) =>

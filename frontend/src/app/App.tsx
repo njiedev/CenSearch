@@ -128,8 +128,6 @@ function Dashboard() {
       const result = await api.warning()
       setWarning(result.warning)
       setDeliveryNote(isSample() ? 'Sample mode: deliveries are simulated. No email is sent.'
-        : result.email_delivery?.demo_test_recipient
-          ? 'Local demo: the request is sent through Resend to its test recipient. Delivery events are simulated; no website is taken down.'
         : result.email_delivery?.ready ? ''
         : 'The sending account is not connected yet. Email requests will be saved as drafts.')
     } catch (failure) {
@@ -270,7 +268,7 @@ function Dashboard() {
     )
   } else if (route === 'new')
     view = (
-      <NewScan personId={session.id} onStart={(run) => {
+      <NewScan key={session.id} personId={session.id} onStart={(run) => {
         refresh()
         navigate(`scan/${run.id}/running`)
       }} />

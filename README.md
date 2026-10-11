@@ -21,9 +21,9 @@ For a password-free local preview, see below.
    linked matches and request records.
 2. **Find.** Search by face, name/handle, or supplied page URLs. FaceCheck requires
    explicit consent to upload the first enrolled face photo and spend three
-   credits. Only provider scores strictly above 90 appear. Provider candidates
-   remain distinguishable from locally verified face/copy matches; a provider
-   score is not proof of identity, misuse or copyright ownership.
+   credits. Provider scores of 88 or higher appear and can proceed to agent review and
+   authorized email delivery without a second local face check. A provider
+   score is not proof of misuse or copyright ownership.
 3. **Decide.** Select matches and accept responsibility for the batch. Strands
    chooses a copyright notice, impersonation report, intimate-image report,
    voluntary privacy request, leave-alone decision, or hold for review.
@@ -37,8 +37,8 @@ For a password-free local preview, see below.
 
 Whitelist entries apply to a domain and its subdomains. The current list blocks
 new drafts and deliveries, including individual actions. It cannot recall a
-request already sent. Saved FaceCheck scans can be reopened without another
-upload or charge, or deleted independently of enrollment and notice history.
+request already sent. Stored FaceCheck results can be deleted independently of enrollment
+and notice history. Existing scans can be opened from the sidebar or All scans.
 
 ## Strands and Akamai
 
@@ -70,14 +70,13 @@ are dated **2026-10-11 UTC**, not continuous monitoring.
 
 | Check | Evidence and boundary |
 | --- | --- |
-| Current backend | 272 tests passed in 32.63 seconds using local-only fixtures |
-| Current frontends | Product build/lint and operator-console build passed |
+| Current backend | 270 tests passed in 29.22 seconds using local-only fixtures |
+| Current frontend | Product build passed |
 | Local end-to-end | Built signup → two matched URLs → reviewed mock send → removal check → approved host follow-up passed in 16.71 seconds; no external calls |
 | Profile and whitelist | Real local API browser check passed photo persistence, upload/removal gates, domain/subdomain exclusion, reload, keyboard and 360–1440px layouts |
 | Hosted app, fresh health read | SQLite healthy, face models loaded, model configured; public HTTPS returned 401 as expected without the password |
 | Hosted Strands inference | Earlier saved deployment validation completed a live DNS tool call; current health retains `live_call_verified: true` |
 | Akamai Object Storage | Earlier saved deployment validation recorded synthetic text write/read/delete; current process health reports `remote_verified: false` |
-| Resend demo | Saved report records one API-accepted email and a provider `delivered` event for Resend's **simulated test recipient**; no real inbox delivery or takedown is established |
 
 The hosted build still has external delivery and public crawling disabled in
 its health response and predates the current email/profile changes. Hosted
@@ -102,12 +101,11 @@ cp -n backend/.env.example backend/.env
 make -C backend api
 ```
 
-`setup` installs dependencies, face models, Chromium and both frontend builds.
+`setup` installs dependencies, face models, Chromium and the frontend build.
 It does not download face datasets. Preserve any existing `.env`.
 Open [the local dashboard](http://127.0.0.1:8190/app/) or
 [the sample interface](http://127.0.0.1:8190/app/?sample=1), which needs no provider
-keys and performs no real search or delivery. Enrollment is at `/signup.html`;
-the operator console is at `/console/`.
+keys and performs no real search or delivery. Enrollment is at `/signup.html`.
 
 For frontend development, run `npm --prefix frontend run dev` in a second shell.
 Vite proxies `/api` to port 8190. Rebuild with `npm --prefix frontend run build`
@@ -141,37 +139,20 @@ inbox delivery or removal. Uncertain timeouts are not automatically retried;
 persistent deduplication and provider idempotency keys guard against duplicates.
 Inbox synchronization and bounce webhooks are not implemented.
 
-### Local mock demo
+### Staged pages
 
-Supply authorized local fixtures arranged as
-`<person>/{reference,originals,wild}/*.jpg` (optionally under `people/`).
-
-```sh
-make -C backend demo PHOTOS=/absolute/path/to/fixtures
-# Optional hosted inference for page text only:
-make -C backend demo PHOTOS=/absolute/path/to/fixtures MODEL=1
-```
-
-The launcher prints its URLs, enables an accelerated demo clock, and stops its
-servers on Ctrl-C. Mock sites act as independent administrators over HTTP/SMTP.
-The backend never reads their ground truth. Fixtures stay local. Override
-`API_PORT` and `BASE_PORT` if the defaults are occupied.
-
-For the three-match agent scenario, configure the model and run:
+Two staged pages show an unauthorized resale and a licensed exhibition of the
+same fixture person. Supply authorized local fixtures arranged as
+`<person>/originals/*.jpg`, then seed and serve them on loopback:
 
 ```sh
-make -C backend demo-three PHOTOS=/absolute/path/to/fixtures
-# Opt in to a real Resend API call to its simulated test recipient:
-make -C backend demo-three PHOTOS=/absolute/path/to/fixtures RESEND=1
+cd backend
+uv run python -m mockweb.seed_three --photos /absolute/path/to/person --output data/pages
+make mock MOCK_ROOT=data/pages
 ```
 
-This scenario presents unauthorized resale, licensed exhibition and disputed
-rights. Decisions come from the agent. The opt-in relay sends fictional notice
-text with a demo disclaimer from `onboarding@resend.dev` to
-`delivered+censearch-demo@resend.dev`. No photos leave the machine. Provider logs
-are real but delivery events are simulated; pages stay unchanged in this mode.
-Regular fixtures cannot send real email to real recipients. Test submissions
-consume Resend quota. Without `RESEND=1`, delivery stays within the local mock.
+Mock sites act as independent administrators over HTTP/SMTP. The backend never
+reads their ground truth. Fixtures stay local.
 
 ### Checks and deployment
 
@@ -179,7 +160,6 @@ consume Resend quota. Without `RESEND=1`, delivery stays within the local mock.
 LIKENESS_TEST_PHOTOS=/absolute/path/to/fixtures make -C backend test
 npm --prefix frontend run build
 npm --prefix frontend run lint
-npm --prefix backend/demo-ui run build
 backend/.venv/bin/python frontend/tests/profile_browser.py
 make -C backend e2e-app PHOTOS=/absolute/path/to/fixtures
 ```

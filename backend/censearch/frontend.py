@@ -1,4 +1,4 @@
-"""Serve the built product and the optional operator console on the API origin."""
+"""Serve the built product on the API origin."""
 
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
@@ -15,8 +15,6 @@ class FrontendFiles(StaticFiles):
 
 def install_frontend(app, settings):
     # API routes are installed first so missing assets never hide API failures.
-    if (settings.console_dir / "index.html").is_file():
-        app.mount("/console", FrontendFiles(directory=settings.console_dir, html=True), name="console")
     if (settings.frontend_dir / "index.html").is_file():
         app.mount("/", FrontendFiles(directory=settings.frontend_dir, html=True), name="frontend")
     else:

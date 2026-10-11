@@ -168,7 +168,7 @@ def test_auto_batch_records_exact_notice_and_never_sends_twice(workflow_case, mo
 @pytest.mark.parametrize("change,expected", [
     ("disabled", "drafted_not_sent"), ("unconfigured", "drafted_not_sent"),
     ("fixture", "drafted_not_sent"), ("fallback", "held_for_review"),
-    ("provider_only", "drafted_not_sent"), ("possible", "drafted_not_sent"),
+    ("possible", "drafted_not_sent"),
 ])
 def test_auto_email_stops_before_transport(workflow_case, monkeypatch, change, expected):
     client, cid = workflow_case
@@ -177,19 +177,39 @@ def test_auto_email_stops_before_transport(workflow_case, monkeypatch, change, e
         workflow.settings.email_enabled = False
     elif change == "unconfigured":
         workflow.settings.resend_api_key = SecretStr("")
-    elif change in ("provider_only", "possible"):
+    elif change == "possible":
         with workflow.store.session.begin() as session:
             case = session.get(Case, cid)
             case.band = "possible"
-            if change == "provider_only":
-                case.match_type = "facecheck"
-                case.evidence = {"locally_verified": False}
     calls = intercept(monkeypatch, lambda request: pytest.fail("Unexpected email transport"))
     response = client.post("/api/batches", json=payload([cid]))
     batch = await_batch(client, response.json()["id"])
     assert batch["items"][0]["status"] == expected and not calls
     with workflow.store.session() as session:
         assert session.scalar(select(Delivery)) is None
+
+
+@pytest.mark.parametrize("score,expected", [(87.99, "drafted_not_sent"), (88, "sent"), (90, "sent"), (99, "sent"), (101, "drafted_not_sent")])
+def test_facecheck_email_uses_provider_score_without_local_check(workflow_case, monkeypatch, score, expected):
+    client, cid = workflow_case
+    workflow = setup_email_case(client, cid, monkeypatch)
+    with workflow.store.session.begin() as session:
+        case = session.get(Case, cid)
+        case.match_type = "facecheck"
+        case.band = "possible"
+        case.score = score
+        case.image_url = ""
+        case.original_id = None
+        case.photo_relation = "uncertain"
+        case.copy_relation = "uncertain"
+        # Previously saved results must also work without a second image check.
+        case.evidence = {"locally_verified": False}
+    calls = intercept(monkeypatch, lambda request: httpx.Response(200, json={"id": "provider-facecheck"}))
+    response = client.post("/api/batches", json=payload([cid]) | {"mode": "send"})
+    assert response.status_code == 202
+    batch = await_batch(client, response.json()["id"])
+    assert batch["items"][0]["status"] == expected, batch
+    assert len(calls) == (1 if expected == "sent" else 0)
 
 
 def test_prepare_does_not_send_and_disable_is_rechecked(workflow_case, monkeypatch):

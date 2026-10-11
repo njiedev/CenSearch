@@ -27,7 +27,7 @@ from censearch.public_crawl import PublicCrawler, public_view
 from censearch.enroll import Enrollment, EnrollmentError
 from censearch.evidence import EvidenceStore
 from censearch.face import FaceConfig, OpenCVFaceEngine
-from censearch.face_cache import cached_run, cache_summary, delete_cache
+from censearch.face_cache import delete_cache
 from censearch.matching import Matcher
 from censearch.workflow import Workflow
 from censearch.workflow_api import install
@@ -429,25 +429,6 @@ def create_app(settings=None):
 
     @app.post("/api/public-searches", status_code=202)
     async def start_public_search(request: PublicSearchRequest) -> dict:
-        if request.mode == "face_search" and request.facecheck_source == "cache":
-            with app.state.store.session.begin() as session:
-                person = session.get(Person, request.person_id)
-                if person is None:
-                    raise HTTPException(404, "Enrolled person not found")
-                if person.development_fixture:
-                    raise HTTPException(422, "Local fixtures cannot use FaceCheck")
-                saved = cached_run(session, person.id)
-                if saved is None:
-                    raise HTTPException(404, "No saved FaceCheck scan for this photo. Choose a new search explicitly.")
-                saved_id = saved.id
-                from copy import deepcopy
-                from censearch.face_review import materialize
-                config = deepcopy(saved.config)
-                config["facecheck"]["items"] = materialize(
-                    session, saved, config["facecheck"]["items"], settings
-                )
-                saved.config = config
-            return public_view(app.state.store, saved_id) | {"cache_hit": True}
         ready()
         idle()
         with app.state.store.session.begin() as session:
@@ -473,13 +454,6 @@ def create_app(settings=None):
             run_id, fixture = row.id, person.development_fixture
         launch_public_search(run_id, request, fixture)
         return public_view(app.state.store, run_id)
-
-    @app.get("/api/people/{person_id}/face-search-cache")
-    def face_search_cache(person_id: str):
-        with app.state.store.session() as session:
-            if session.get(Person, person_id) is None:
-                raise HTTPException(404, "Enrolled person not found")
-            return cache_summary(session, person_id)
 
     @app.delete("/api/people/{person_id}/face-search-cache")
     async def delete_face_search_cache(person_id: str):

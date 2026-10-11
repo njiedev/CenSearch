@@ -8,7 +8,7 @@ from sqlalchemy import select
 
 from censearch.db import Case, Scan
 from censearch.evidence import EvidenceStore
-from censearch.facecheck import MIN_SCORE_EXCLUSIVE, prepare_photo
+from censearch.facecheck import MIN_SCORE, prepare_photo
 
 
 def thumbnail_bytes(value):
@@ -19,7 +19,8 @@ def thumbnail_bytes(value):
         if not separator or not header.endswith(";base64"):
             return None
     try:
-        return prepare_photo(base64.b64decode(value, validate=True), 1_500_000)
+        # FaceCheck's WebP data URLs include a space after the comma.
+        return prepare_photo(base64.b64decode(value.strip(), validate=True), 1_500_000)
     except (ValueError, binascii.Error):
         return None
 
@@ -34,7 +35,7 @@ def materialize(session, run, items, settings):
     }
     saved = []
     for item in items:
-        if not MIN_SCORE_EXCLUSIVE < item["score"] <= 100:
+        if not MIN_SCORE <= item["score"] <= 100:
             continue
         payload = thumbnail_bytes(item.get("base64"))
         fingerprint = hashlib.sha256(payload).hexdigest() if payload else "missing"
@@ -60,17 +61,27 @@ def materialize(session, run, items, settings):
                 evidence={
                     "score_basis": "facecheck_provider_score",
                     "provider_item_key": key,
-                    "locally_verified": False,
                     "image": image | {"source": "facecheck_thumbnail"},
                     "context": {"discovery": {
                         "run_id": run.id, "draft_only": True, "simulated": False,
                         "methods": ["face_search"],
-                        "match_label": "FaceCheck candidate · not locally verified",
+                        "match_label": "Found by FaceCheck",
                     }},
                 },
             )
             session.add(case)
             session.flush()
+            existing[key] = case
+        elif payload and not case.evidence.get("image", {}).get("path"):
+            image = storage.put(
+                run.config["request"]["person_id"], f"facecheck/{run.id}-{key}.jpg", payload
+            )
+            case.evidence = case.evidence | {
+                "provider_item_key": key,
+                "image": image | {"source": "facecheck_thumbnail"},
+            }
+            scan = session.get(Scan, case.scan_id)
+            scan.sha256 = image["sha256"]
             existing[key] = case
         row = {name: item[name] for name in ("url", "score", "label") if name in item}
         row["case_id"] = case.id

@@ -80,8 +80,8 @@ def test_submit_once_and_filter_thumbnails(monkeypatch):
                     "items": [
                         {"url": "https://example.com/a", "score": 91, "base64": "PRIVATE-IMAGE"},
                         {"url": {"value": "https://example.com/b"}, "score": 92},
-                        {"url": "https://example.com/cutoff", "score": 90},
-                        {"url": "https://example.com/low", "score": 89},
+                        {"url": "https://example.com/cutoff", "score": 88},
+                        {"url": "https://example.com/low", "score": 87.99},
                         {"url": "javascript:bad", "score": 90},
                         {"url": "https://example.com/c", "score": 150},
                     ],
@@ -92,8 +92,8 @@ def test_submit_once_and_filter_thumbnails(monkeypatch):
     result = client_for(handler).search("search-123")
     assert [row["status_only"] for row in calls] == [False, True]
     assert all(row["demo"] is True for row in calls)
-    assert len(result["items"]) == 2
-    assert [item["score"] for item in result["items"]] == [91, 92]
+    assert len(result["items"]) == 3
+    assert [item["score"] for item in result["items"]] == [91, 92, 88]
     assert "PRIVATE-IMAGE" not in json.dumps(result)
 
 

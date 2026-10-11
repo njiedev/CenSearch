@@ -25,8 +25,8 @@ export default function DeleteFaceCache({ personId, onDeleted }: {
   return <div className="grid gap-3">
     {confirm ? <section aria-label="Confirm cache deletion" className="grid gap-3">
       <p>Delete all saved FaceCheck candidates for this person? They cannot be reused afterward.
-        Unreviewed FaceCheck cases and thumbnails are deleted. Cases already reviewed, locally verified
-        cases and notice history stay saved. A new search costs 3 credits.</p>
+        Unreviewed FaceCheck cases and thumbnails are deleted. Reviewed cases, other scan results,
+        and notice history stay saved. A new search costs 3 credits.</p>
       <div className="flex flex-wrap gap-3">
         <Button type="button" variant="destructive" disabled={busy} onClick={() => void remove()}>
           {busy ? 'Deleting…' : 'Confirm delete cache'}

@@ -92,7 +92,7 @@ export default function AuthorizeBatch({ cases, onRun, onCancel, warning = WARNI
                 <span className="mx-mono">Match {item.id}</span>
                 <span>{hostname(item.page_url)}
                   {item.match_type === 'facecheck' && <span className="mx-muted block text-xs">
-                    FaceCheck · Score {item.provider_score} · Not locally verified
+                    FaceCheck · Score {item.provider_score}
                   </span>}
                 </span>
                 <span className="mx-muted">{item.possible_action.label}</span>

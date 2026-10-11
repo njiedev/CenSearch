@@ -12,7 +12,6 @@ import signal
 import subprocess
 import sys
 import time
-from playwright.sync_api import sync_playwright, expect
 from e2e import Recorder, await_crawl, wait_ready
 from mockweb.run import available, running, stop
 from fixture_input import select_person
@@ -38,125 +37,9 @@ FACTS = {
 }
 
 
-def browser_case(base, cid, output, recorder):
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch()
-        try:
-            page = browser.new_page(viewport={"width": 1280, "height": 900})
-            errors = []
-            page.on("pageerror", lambda error: errors.append(str(error)))
-
-            def capture(response):
-                if "/api/" not in response.url or "application/json" not in response.headers.get(
-                    "content-type", ""
-                ):
-                    return
-                request = response.request
-                recorder.examples.append(
-                    {
-                        "method": request.method,
-                        "path": response.url.removeprefix(base),
-                        "request": {"json": request.post_data_json} if request.post_data else {},
-                        "status": response.status,
-                        "response": response.json(),
-                    }
-                )
-
-            page.on("response", capture)
-            page.goto(base + "/console/", wait_until="networkidle")
-            page.get_by_role("button", name="Decide", exact=True).click()
-            expect(page.get_by_label("Choose workflow case")).to_have_value(str(cid))
-            expect(page.get_by_test_id("page-description")).to_contain_text("Model not configured")
-            page.get_by_label("Your name for these answers and approvals").fill("Demo operator")
-            for key in (
-                "identity_confirmed",
-                "owns_photo",
-                "good_faith",
-                "accurate",
-                "authority_under_perjury",
-            ):
-                page.locator(f"#answer-{key}").select_option("yes")
-            page.locator("#answer-authorized_use").select_option("no")
-            page.get_by_label("Description of your copyrighted work").fill(FACTS["work_description"])
-            for key, value in CONTACT.items():
-                page.get_by_label("Contact " + key, exact=True).fill(value)
-
-            def click(name, endpoint):
-                with page.expect_response(
-                    lambda response: response.url.endswith(endpoint) and response.request.method == "POST"
-                ) as pending:
-                    page.get_by_role("button", name=name, exact=True).click()
-                assert pending.value.status == 200, pending.value.text()
-                expect(page.get_by_role("button", name=name, exact=True)).to_be_enabled()
-
-            click("Save answers and route", "/answers")
-            expect(page.get_by_test_id("route-result")).to_contain_text("copyright_notice")
-            click("Capture evidence", "/evidence")
-            expect(page.get_by_alt_text("Full page evidence screenshot")).to_be_visible()
-            page.screenshot(path=str(output / "console-decide.png"), full_page=True)
-            page.get_by_role("button", name="Send", exact=True).click()
-            click("Look up recipients", "/recipients")
-            expect(page.get_by_test_id("lookup-source")).to_contain_text("deterministic_baseline")
-            trace = page.get_by_test_id("lookup-trace")
-            for tool in ("fetch_page", "find_policy_pages", "dns_lookup", "rdap_lookup", "platform_registry"):
-                expect(trace.locator("[data-readable-content]").get_by_text(tool, exact=True).first).to_be_visible()
-            expect(trace.locator("pre")).not_to_be_visible()
-            trace.get_by_text("Show raw data", exact=True).click()
-            expect(trace.locator("pre")).to_be_visible()
-            trace.get_by_text("Show raw data", exact=True).click()
-            expect(trace.locator("pre")).not_to_be_visible()
-            page.get_by_label("Your name for approval", exact=True).fill("Demo operator")
-            click("Approve preparation for site", "/approve-draft")
-            click("Create draft for site", "/draft")
-            expect(page.get_by_test_id("notice-body")).to_contain_text("Under penalty of perjury")
-            # Collapse verbose trace for a readable screenshot; it remains inspectable.
-            page.get_by_text("Lookup trace", exact=True).click()
-            page.screenshot(path=str(output / "console-send.png"), full_page=True)
-            click("Approve this exact request", "/approve")
-            with page.expect_response(
-                lambda r: r.url.endswith("/send") and r.request.method == "POST"
-            ) as pending:
-                page.get_by_role("button", name="Send approved mock request", exact=True).click()
-            assert pending.value.status == 200
-            page.get_by_role("button", name="Verify", exact=True).click()
-            click("Check source now", "/verify")
-            expect(page.get_by_test_id("verification-checks").get_by_text("removed", exact=True).first).to_be_visible()
-            click("Advance clock and check deadlines", "/clock/advance")
-            page.screenshot(path=str(output / "console-verify.png"), full_page=True)
-            page.set_viewport_size({"width": 390, "height": 844})
-            page.screenshot(path=str(output / "console-round2-mobile.png"), full_page=True)
-            assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
-            assert not errors, errors
-            return {"decide": "passed", "send": "passed", "verify": "passed", "readable_trace": "five tool names visible; raw toggle passed", "page_errors": errors}
-        finally:
-            browser.close()
-
-
-def browser_refusal(base, case_id, output):
-    """Save refusal UI evidence without opening the screenshot in a model-backed viewer."""
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch()
-        try:
-            page = browser.new_page(viewport={"width": 1280, "height": 900})
-            page.goto(base + "/console/", wait_until="networkidle")
-            page.get_by_role("button", name="Verify", exact=True).click()
-            page.get_by_label("Choose workflow case").select_option(str(case_id))
-            expect(page.get_by_test_id("refusal-decision")).to_be_visible()
-            expect(page.get_by_test_id("workflow-state")).to_have_text("decision_required")
-            page.get_by_label("Reply text for optional advisory reading").fill("Licensed editorial use")
-            page.get_by_role("button", name="Read reply (advisory)", exact=True).click()
-            expect(page.get_by_test_id("reply-advisory")).to_contain_text("model_not_configured")
-            expect(page.get_by_test_id("workflow-state")).to_have_text("decision_required")
-            page.screenshot(path=str(output / "console-refusal.png"), full_page=True)
-            return {"reasoned_refusal_decision": "passed", "reply_advisory_absence": "passed"}
-        finally:
-            browser.close()
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--photos", type=Path, required=True)
-    parser.add_argument("--browser", action="store_true")
     parser.add_argument("--api-port", type=int, default=8190)
     parser.add_argument("--base-port", type=int, default=8911)
     args = parser.parse_args()
@@ -193,7 +76,6 @@ def main():
     env.pop("LIKENESS_ALLOW_EXTERNAL_DELIVERY", None)
     summary = {
         "passed": False,
-        "browser": "not requested",
         "live_model_call_made": False,
         "disclaimer": "Hypothetical scripted assertions over local research fixtures, not real claims.",
     }
@@ -313,9 +195,6 @@ def main():
                 post(cid, "send", expected=422)
                 return delivery
 
-            if args.browser:
-                summary["browser"] = browser_case(base, primary, output, api)
-                print("BROWSER", json.dumps(summary["browser"]), flush=True)
             actions = [
                 ("0001.html", {"owns_photo": True}),
                 ("0002.html", {"impersonates_me": True}),
@@ -326,8 +205,6 @@ def main():
             ]
             for filename, values in actions:
                 cid = by_path[filename]["id"]
-                if filename == "0001.html" and args.browser:
-                    continue
                 description = post(cid, "description")
                 assert description["status"] == "model_not_configured"
                 view = post(
@@ -401,9 +278,6 @@ def main():
             assert len(receipts["editorial"]) == 1 and results[-1]["state"] == "decision_required"
             advisory = post(by_path["0006.html"]["id"], "reply-analysis", {"text": "Licensed editorial use"})
             assert advisory["status"] == "model_not_configured" and advisory["advisory"] is True
-            if args.browser:
-                summary["browser"].update(browser_refusal(base, by_path["0006.html"]["id"], output))
-                print("REFUSAL_BROWSER", json.dumps(summary["browser"]), flush=True)
             call("GET", f"/api/cases/{primary}/draft")
             schema = api.client.get("/openapi.json").json()
             (output / "openapi.json").write_text(json.dumps(schema, indent=2) + "\n")

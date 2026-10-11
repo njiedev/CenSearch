@@ -28,7 +28,7 @@ from censearch.discovery import (
 from censearch.evidence import EvidenceStore
 from censearch.matching import Matcher
 from censearch.face_discovery import discover_faces
-from censearch.facecheck import FaceCheckError, MIN_SCORE_EXCLUSIVE
+from censearch.facecheck import FaceCheckError, MIN_SCORE
 
 COUNTS = (
     "queries_run",
@@ -231,7 +231,7 @@ class PublicCrawler(Crawler):
         except FaceCheckError as error:
             self.errors.append({"error": "FaceCheckError", "message": str(error)})
             self.config.setdefault("facecheck", {
-                "items": [], "score_above": MIN_SCORE_EXCLUSIVE, "testing_mode": False,
+                "items": [], "min_score": MIN_SCORE, "testing_mode": False,
             })["status"] = "error"
             status = "failed"
         except asyncio.CancelledError:

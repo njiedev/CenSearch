@@ -14,11 +14,9 @@ import subprocess
 import threading
 import time
 from unittest.mock import patch
-from urllib.parse import urlsplit
 import httpx
 import openai
 import uvicorn
-from playwright.sync_api import expect, sync_playwright
 from strands.models.openai import OpenAIModel
 from censearch.api import create_app
 from censearch.agent.route import pick_route
@@ -32,105 +30,11 @@ from mockweb.seed import photos
 from mockweb.seed_round2 import seed_round2
 
 
-def browser_batch(base, cases, contact):
-    with sync_playwright() as playwright:
-        browser = playwright.chromium.launch()
-        try:
-            page = browser.new_page(viewport={"width": 1280, "height": 900})
-            errors = []
-            page.on("pageerror", lambda error: errors.append(str(error)))
-            page.goto(base + "/console/", wait_until="networkidle")
-            cards = page.get_by_test_id("match-card")
-            expect(cards).to_have_count(len(cases))
-            expect(page.get_by_test_id("match-total")).to_have_text(f"({len(cases)})")
-            expect(cards.filter(has_text="Possible match")).to_have_count(1)
-            page.get_by_role("button", name=f"Open match {cases[0]['id']}", exact=True).click()
-            dialog = page.get_by_role("dialog")
-            expect(
-                dialog.get_by_role("heading", name=urlsplit(cases[0]["page_url"]).hostname)
-            ).to_be_visible()
-            expect(dialog).to_contain_text(cases[0]["possible_action"]["label"])
-            expect(dialog).to_contain_text("Rule fallback")
-            link = dialog.get_by_role("link", name="Open source page")
-            expect(link).to_have_attribute("href", cases[0]["page_url"])
-            expect(link).to_have_attribute("target", "_blank")
-            expect(link).to_have_attribute("rel", "noreferrer")
-            page.keyboard.press("Escape")
-            page.get_by_role("button", name="Select all", exact=True).click()
-            expect(page.get_by_test_id("selected-count")).to_have_text(f"{len(cases)} selected")
-            for item in cases:
-                expect(
-                    page.get_by_role("checkbox", name=f"Select match {item['id']}", exact=True)
-                ).to_be_checked()
-            page.get_by_role("button", name="Clear selection").click()
-            expect(page.get_by_test_id("selected-count")).to_have_text("0 selected")
-            page.get_by_role("button", name="Select all", exact=True).click()
-            page.get_by_role("button", name="Auto review / send", exact=True).click()
-            expect(page.get_by_test_id("batch-selection").locator("li")).to_have_count(len(cases))
-            for key, value in contact.items():
-                page.get_by_label(f"Batch contact {key}", exact=True).fill(value)
-            page.get_by_label("Who accepts responsibility").fill("Round 3 fixture operator")
-            run = page.get_by_role("button", name="Run authorized batch")
-            expect(run).to_be_disabled()
-            expect(page.get_by_test_id("legal-warning")).to_contain_text("penalty of perjury")
-            page.get_by_role(
-                "checkbox",
-                name="I accept the legal-responsibility warning and authorize this batch.",
-            ).check()
-            expect(run).to_be_enabled()
-            with page.expect_response(
-                lambda response: (
-                    response.url.endswith("/api/batches") and response.request.method == "POST"
-                )
-            ) as pending:
-                run.click()
-            assert pending.value.status == 202, pending.value.text()
-            batch_id = pending.value.json()["id"]
-            expect(page.get_by_test_id("batch-progress")).to_contain_text(
-                "Batch completed", timeout=60000
-            )
-            for card in cards.all():
-                expect(card.get_by_test_id("match-outcome")).to_be_visible()
-                assert card.get_by_test_id("match-status").inner_text() in (
-                    "Sent",
-                    "Failed",
-                    "Drafted, not sent",
-                    "Held for review",
-                    "Left alone",
-                )
-            page.get_by_role("button", name=f"Open match {cases[0]['id']}", exact=True).click()
-            expect(page.get_by_test_id("match-notice")).to_contain_text("Removal request:")
-            saved = page.request.get(f"{base.rstrip('/')}/api/cases/{cases[0]['id']}").json()
-            assert (
-                page.get_by_test_id("match-notice").inner_text()
-                == saved["drafted_request"]["payload"]["body"]
-            )
-            expect(page.get_by_role("dialog")).to_contain_text("Recipient:")
-            page.keyboard.press("Escape")
-            page.set_viewport_size({"width": 390, "height": 844})
-            assert page.evaluate("document.documentElement.scrollWidth <= innerWidth")
-            page.get_by_role("button", name=f"Open match {cases[0]['id']}", exact=True).click()
-            assert page.get_by_role("dialog").evaluate("el => el.scrollWidth <= el.clientWidth")
-            assert not errors, errors
-            return batch_id, {
-                "grid": len(cases),
-                "select_all": "passed",
-                "warning_gate": "passed",
-                "detail": "passed",
-                "outcomes": "passed",
-                "narrow_overflow": "passed",
-                "page_errors": errors,
-            }
-        finally:
-            browser.close()
-
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--photos", type=Path, required=True)
     parser.add_argument("--api-port", type=int, default=8490)
     parser.add_argument("--base-port", type=int, default=9111)
-    parser.add_argument("--browser", action="store_true")
     args = parser.parse_args()
     start = time.monotonic()
     output = ROOT / "data" / ("round3-" + datetime.now().strftime("%Y%m%d-%H%M%S"))
@@ -320,13 +224,9 @@ def main():
             stack.enter_context(patch.object(app.state.workflow, "recipients", controlled_lookup))
             stack.enter_context(patch("censearch.batches.pick_route", controlled_pick))
             stack.enter_context(patch.object(socket.socket, "connect", local_connect))
-            if args.browser:
-                batch_id, browser = browser_batch(str(api.client.base_url), cases, CONTACT)
-                summary["browser"] = browser
-            else:
-                batch_id = call(
-                    "POST", "/api/batches", 202, json=body | {"accepted_warning": True}
-                )["id"]
+            batch_id = call(
+                "POST", "/api/batches", 202, json=body | {"accepted_warning": True}
+            )["id"]
             deadline = time.monotonic() + 60
             batch = call("GET", f"/api/batches/{batch_id}")
             while batch["status"] in ("queued", "running") and time.monotonic() < deadline:
@@ -381,8 +281,6 @@ def main():
                 "ROUND3 6/6 checks passed; 4/4 independent recipient receipts; 2/2 removals verified",
                 flush=True,
             )
-            if args.browser:
-                print("BROWSER", json.dumps(summary["browser"]), flush=True)
     finally:
         api.client.close()
         summary["seconds"] = round(time.monotonic() - start, 3)

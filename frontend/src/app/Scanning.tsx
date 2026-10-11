@@ -9,7 +9,7 @@ import { usePoll } from './hooks'
 import type { Run } from './types'
 import FaceSearchResults from './FaceSearchResults'
 
-function ScanAnimation() {
+export function ScanAnimation() {
   const stage = useRef<HTMLDivElement>(null)
   const canvas = useRef<HTMLCanvasElement>(null)
   const tiles = useRef<(HTMLDivElement | null)[]>([])
@@ -186,8 +186,8 @@ export default function Scanning({
         {stopped && <p>Start a new scan, or inspect any matches already found.</p>}
         {run.facecheck && !stopped && <p>
           {run.facecheck.status === 'completed'
-            ? `${run.facecheck.items.length} candidates above 90 · checking public pages`
-            : `FaceCheck ${run.facecheck.progress ?? 0}% · keeping scores above 90 only`}
+            ? `${run.facecheck.items.length} candidates scoring 88+ · checking public pages`
+            : `FaceCheck ${run.facecheck.progress ?? 0}% · keeping scores 88 or higher only`}
         </p>}
         <details className="scan-details">
           <summary>Scan details · {elapsed}s</summary>
@@ -207,11 +207,6 @@ export default function Scanning({
             </span>
           </div>
         </details>
-        {run.errors?.length > 0 && (
-          <p className="field-error">
-            {run.errors.map((item) => item.message || item.error || 'A page could not be checked.').join(' ')}
-          </p>
-        )}
       </div>
       {error && <ErrorBox error={error} retry={retry} />}
       {stopped && run.facecheck && <FaceSearchResults run={run} onResumed={() => {

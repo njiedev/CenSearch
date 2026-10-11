@@ -16,6 +16,7 @@ from censearch.case_records import Attestation, CaseEvent, CaseWorkflow, Deliver
 from censearch.db import Case, Original, Person, record
 from censearch.delivery import destination, send
 from censearch.email_delivery import EMAIL_CHANNELS, check_email, mailbox, send_email
+from censearch.facecheck import MIN_SCORE
 from censearch.discovery import draft_only, provenance
 from censearch.evidence import capture_page
 from censearch.notices import digest, render
@@ -363,12 +364,11 @@ class Workflow:
             person = session.get(Person, case.person_id)
             if person is None or person.development_fixture:
                 raise ValueError("Development fixtures cannot send real email")
-            if (
-                case.match_type not in ("face", "copy", "both")
-                or case.band != "match"
-                or case.evidence.get("locally_verified") is False
-            ):
-                raise ValueError("Local image verification is required before sending email")
+            if case.match_type == "facecheck":
+                if case.score is None or not MIN_SCORE <= case.score <= 100:
+                    raise ValueError(f"FaceCheck score must be {MIN_SCORE} or higher")
+            elif case.match_type not in ("face", "copy", "both") or case.band != "match":
+                raise ValueError("A qualifying image match is required before sending email")
             check_email(recipient, self.settings)
             mailbox(contact["email"])
             return

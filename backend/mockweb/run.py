@@ -24,7 +24,7 @@ def available(ports):
             try:
                 listener.bind(("127.0.0.1", port))
             except OSError:
-                raise SystemExit(f"Port {port} is unavailable; choose API_PORT=<free port> and BASE_PORT=<free mock range> for make demo.") from None
+                raise SystemExit(f"Port {port} is unavailable; choose API_PORT=<free port> and BASE_PORT=<free mock range>.") from None
     finally:
         for listener in sockets:
             listener.close()

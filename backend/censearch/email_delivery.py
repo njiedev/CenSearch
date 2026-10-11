@@ -61,7 +61,6 @@ def email_status(settings):
         "configured": settings.email_configured,
         "ready": ready,
         "provider": "resend",
-        "demo_test_recipient": settings.demo_clock and settings.demo_resend,
     }
 
 

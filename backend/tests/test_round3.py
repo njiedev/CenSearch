@@ -20,6 +20,8 @@ from test_round2 import CONTACT, RECIPIENT, workflow_case as workflow_case
         ({"copy_relation": "derived"}, "copyright_notice"),
         ({"copy_relation": "uncertain"}, "hold_for_review"),
         ({"original_id": None}, "hold_for_review"),
+        ({"match_type": "facecheck", "score": 88, "original_id": None}, "privacy_request"),
+        ({"match_type": "facecheck", "score": 87.99, "original_id": None}, "hold_for_review"),
         (
             {"photo_relation": "different_photo", "match_type": "face", "face_band": "possible"},
             "privacy_request",

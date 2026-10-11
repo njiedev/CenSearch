@@ -51,8 +51,7 @@ export default function FollowUp({ caseId }: { caseId: number }) {
       ) : <p>No removal check yet.</p>}
       {latestDelivery && <p>Latest delivery: {latestDelivery.rung} · {readable(latestDelivery.status)}</p>}
       {latestDelivery?.response?.provider_id && (
-        <p className="break-all">Resend email ID: {latestDelivery.response.provider_id}
-          {latestDelivery.response.simulated_delivery && ' · Test recipient; delivery is simulated.'}</p>
+        <p className="break-all">Resend email ID: {latestDelivery.response.provider_id}</p>
       )}
       {latestDelivery?.status === 'awaiting_response' && (
         <p>Follow-up due: {date(latestDelivery.deadline)}. A reasoned refusal requires your review.</p>

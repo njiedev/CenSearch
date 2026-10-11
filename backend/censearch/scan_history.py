@@ -25,7 +25,7 @@ def history(session, person_id):
             if request.get("person_id") != person_id:
                 continue
             if request.get("mode") == "face_search":
-                label = "FaceCheck · score above 90"
+                label = "FaceCheck · scores 88+"
             elif request.get("mode") == "supplied_urls":
                 label = f"{len(request.get('supplied_urls', []))} supplied URLs"
             else:

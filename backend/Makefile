@@ -2,20 +2,19 @@ PHOTOS ?= seed
 API_PORT ?= 8490
 BASE_PORT ?= 9111
 
-.PHONY: setup test api mock seed demo demo-three e2e e2e-round2 e2e-round3 e2e-app ui
+.PHONY: setup test api mock seed e2e e2e-round2 e2e-round3 e2e-app
 
 setup:
 	uv sync --frozen
 	uv run python scripts/setup_models.py $(if $(MODEL_SOURCE),--source "$(MODEL_SOURCE)",)
 	uv run playwright install chromium
-	cd demo-ui && npm ci && npm run build
 	cd ../frontend && npm ci && npm run build
 
 test:
 	uv run pytest
 
 api:
-	uv run uvicorn censearch.api:app --host 127.0.0.1 --port 8190
+	uv run uvicorn censearch.api:app --host 127.0.0.1 --port 8190 --reload --reload-dir censearch
 
 seed:
 	uv run python -m mockweb.seed --photos "$(PHOTOS)" --output "$(MOCK_ROOT)"
@@ -23,23 +22,14 @@ seed:
 mock:
 	uv run python -m mockweb.run --root "$(MOCK_ROOT)"
 
-demo:
-	uv run python scripts/demo.py --photos "$(PHOTOS)" --api-port $(API_PORT) --base-port $(BASE_PORT) $(if $(MODEL),--model,) $(if $(NO_BROWSER),--no-browser,)
-
-demo-three:
-	uv run python scripts/demo.py --three --model --photos "$(PHOTOS)" --api-port $(API_PORT) --base-port $(BASE_PORT) $(if $(NO_BROWSER),--no-browser,) $(if $(RESEND),--resend-test,)
-
 e2e:
-	uv run python scripts/e2e.py --photos "$(PHOTOS)" --api-port $(API_PORT) --base-port $(BASE_PORT) --browser
-
-ui:
-	cd demo-ui && npm run dev
+	uv run python scripts/e2e.py --photos "$(PHOTOS)" --api-port $(API_PORT) --base-port $(BASE_PORT)
 
 e2e-round2:
-	uv run python scripts/e2e_round2.py --photos "$(PHOTOS)" --api-port $(API_PORT) --base-port $(BASE_PORT) --browser
+	uv run python scripts/e2e_round2.py --photos "$(PHOTOS)" --api-port $(API_PORT) --base-port $(BASE_PORT)
 
 e2e-round3:
-	uv run python scripts/e2e_round3.py --photos "$(PHOTOS)" --api-port $(API_PORT) --base-port $(BASE_PORT) --browser
+	uv run python scripts/e2e_round3.py --photos "$(PHOTOS)" --api-port $(API_PORT) --base-port $(BASE_PORT)
 
 e2e-app:
 	uv run python scripts/e2e_app.py --photos "$(PHOTOS)" --api-port $(API_PORT) --base-port $(BASE_PORT)

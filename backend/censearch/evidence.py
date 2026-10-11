@@ -69,7 +69,7 @@ async def capture_page(storage, person_id, case_id, page_url, image_record, capt
     import asyncio
     import json
     import uuid
-    from playwright.async_api import async_playwright
+    from playwright.async_api import TimeoutError as PlaywrightTimeout, async_playwright
     from censearch.agent.web import ReadOnlyWeb, UA
 
     web = ReadOnlyWeb(limit=60, settings=storage.settings)
@@ -103,9 +103,14 @@ async def capture_page(storage, person_id, case_id, page_url, image_record, capt
                 await context.route("**/*", intercept)
                 await context.route_web_socket("**/*", lambda socket: socket.close())
                 page = await context.new_page()
-                response = await page.goto(page_url, wait_until="networkidle", timeout=15000)
+                response = await page.goto(page_url, wait_until="domcontentloaded", timeout=15000)
                 if response is None or response.status != 200:
                     raise ValueError("Cannot capture a successful evidence page")
+                try:
+                    await page.wait_for_load_state("networkidle", timeout=8000)
+                except PlaywrightTimeout:
+                    # Pages with ads or trackers never go idle; capture what has loaded.
+                    pass
                 page_headers = await response.all_headers()
                 screenshot = await page.screenshot(full_page=True)
                 final_url = page.url

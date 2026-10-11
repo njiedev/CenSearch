@@ -9,8 +9,6 @@ import { useState, type FormEvent } from 'react'
 import { api, isSample } from './api'
 import { ErrorBox } from './ui'
 import type { Run, SearchRequest } from './types'
-import { usePoll } from './hooks'
-import DeleteFaceCache from './DeleteFaceCache'
 
 const invalidText = (value: string) => /[^\s@]+@[^\s@]+\.[^\s@]+|data:|base64|:\/\//i.test(value)
 export default function NewScan({ personId, onStart }: { personId: string; onStart: (run: Run) => void }) {
@@ -22,10 +20,6 @@ export default function NewScan({ personId, onStart }: { personId: string; onSta
   const [consent, setConsent] = useState(false)
   const [faceSearch, setFaceSearch] = useState(!isSample())
   const [faceConsent, setFaceConsent] = useState(false)
-  const cache = usePoll(() => api.faceCache(personId), [personId])
-  const [sourceChoice, setSourceChoice] = useState<'live' | 'cache' | null>(null)
-  const source = sourceChoice ?? (cache.value?.available ? 'cache' : 'live')
-  const usingCache = faceSearch && source === 'cache'
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -74,10 +68,9 @@ export default function NewScan({ personId, onStart }: { personId: string; onSta
         found.urls = 'Each line must be an http:// or https:// page URL, without a username or password.'
       }
     }
-    if (!usingCache && !consent) found.consent = 'Allow public page fetching to start this scan.'
-    if (faceSearch && !usingCache && !faceConsent)
-      found.faceConsent = 'Allow the photo upload and 3-credit search to continue.'
-    if (usingCache && !cache.value?.available) found.cache = 'No saved scan is available. Choose a new search explicitly.'
+    if (!consent) found.consent = 'Allow public page fetching to start this scan.'
+    if (faceSearch && !faceConsent)
+      found.faceConsent = 'Authorize sending your enrolled photo to FaceCheck to start a face search.'
     if (faceSearch) {
       for (const key of ['name', 'handles', 'context', 'urls']) delete found[key]
     }
@@ -96,9 +89,8 @@ export default function NewScan({ personId, onStart }: { personId: string; onSta
         context: faceSearch ? '' : context.trim(),
         supplied_urls: faceSearch ? [] : supplied,
         mode,
-        allow_public_fetch: !usingCache,
-        facecheck_consent: faceSearch && !usingCache && faceConsent,
-        facecheck_source: usingCache ? 'cache' : 'live',
+        allow_public_fetch: true,
+        facecheck_consent: faceSearch && faceConsent,
       }))
     } catch (failure) {
       setError((failure as Error).message)
@@ -111,7 +103,7 @@ export default function NewScan({ personId, onStart }: { personId: string; onSta
     <section className="app-form-view">
       <h1>New scan</h1>
       <p>{faceSearch
-        ? 'Search by your enrolled face photo. Only FaceCheck scores above 90 appear; 90 is excluded.'
+        ? 'Search by your enrolled face photo. FaceCheck results with scores of 88 or higher appear here.'
         : 'Find public pages using your name, handles, or specific links. Your face photos stay out of the text search query.'}</p>
       <form className="scan-form" onSubmit={submit} noValidate>
         <RadioGroup className="col-span-full flex flex-wrap gap-6" value={faceSearch ? 'face' : 'text'} aria-label="Search method"
@@ -123,34 +115,15 @@ export default function NewScan({ personId, onStart }: { personId: string; onSta
           <Card className="scan-input-group col-span-full">
             <CardHeader><CardTitle>Search by face</CardTitle></CardHeader>
             <CardContent className="grid gap-4">
-              {!cache.value && !cache.error && <p role="status">Checking saved results…</p>}
-              {cache.error && <ErrorBox error={cache.error} retry={cache.retry} />}
-              {cache.value?.available && <>
-                <p>Saved live search · {new Date(cache.value.saved_at!).toLocaleString()} · {cache.value.count} candidates above 90.</p>
-                <RadioGroup value={source} aria-label="FaceCheck result source"
-                  onValueChange={(value) => { setSourceChoice(value as 'live' | 'cache'); clear('cache') }}>
-                  <Label className="check-row"><RadioGroupItem value="cache" />Use saved scan · no credits</Label>
-                  <Label className="check-row"><RadioGroupItem value="live" />Run new search · 3 credits</Label>
-                </RadioGroup>
-                <DeleteFaceCache personId={personId} onDeleted={() => {
-                  setSourceChoice('live'); setFaceConsent(false); cache.retry()
-                }} />
-              </>}
-              {usingCache ? <p>Opens the saved scan immediately. No photo upload, new search, or page crawl.
-                Results describe the web when that scan ran.</p> : <>
-                <p>Your first enrolled face photo will be sent to FaceCheck with its metadata removed.
-                  A live search costs 3 credits. Photos are never sent to the language model.</p>
-                <p>Page text helps explain qualifying results and find removal contacts. It cannot change
-                  the score or admit results at 90 or below.</p>
-                <Label className="check-row">
-                  <Checkbox checked={faceConsent}
-                    onCheckedChange={(checked) => { setFaceConsent(checked === true); clear('faceConsent') }}
-                    aria-describedby="error-faceConsent" aria-invalid={!!errors.faceConsent} />
-                  I authorize sending this enrolled photo to FaceCheck and spending 3 credits on this scan.
-                </Label>
-                {fieldError('faceConsent')}
-              </>}
-              {fieldError('cache')}
+              <p>Your first enrolled face photo will be sent to FaceCheck with its metadata removed.
+                A search costs 3 credits. Photos are never sent to the language model.</p>
+              <Label className="check-row">
+                <Checkbox checked={faceConsent}
+                  onCheckedChange={(checked) => { setFaceConsent(checked === true); clear('faceConsent') }}
+                  aria-describedby="error-faceConsent" aria-invalid={!!errors.faceConsent} />
+                I authorize sending this enrolled photo to FaceCheck and spending 3 credits on this scan.
+              </Label>
+              {fieldError('faceConsent')}
             </CardContent>
           </Card>
         ) : <>
@@ -193,14 +166,14 @@ export default function NewScan({ personId, onStart }: { personId: string; onSta
           </Card>
         </>}
         <div className="scan-form-footer">
-          {!usingCache && <Label className="check-row">
+          <Label className="check-row">
             <Checkbox checked={consent} onCheckedChange={(checked) => { setConsent(checked === true); clear('consent') }} />
             <span>I allow this scan to read public pages while logged out.</span>
-          </Label>}
+          </Label>
           {fieldError('consent')}
           {error && <ErrorBox error={error} retry={() => void submit()} />}
-          <Button type="submit" variant="default" disabled={busy || (faceSearch && !cache.value && !cache.error)}>
-            {busy ? 'Opening scan…' : usingCache ? 'Open saved scan' : 'Start scan'}
+          <Button type="submit" variant="default" disabled={busy}>
+            {busy ? 'Starting scan…' : 'Start scan'}
           </Button>
         </div>
       </form>

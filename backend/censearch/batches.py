@@ -408,7 +408,7 @@ class Batches:
         elif delivery["status"] == "failed":
             self.update(
                 item_id, "failed",
-                "Email provider rejected the request. Check the sending account.",
+                "Delivery was rejected before acceptance. Check the request and delivery setup.",
                 delivery_id=delivery["id"],
             )
         else:
@@ -417,8 +417,6 @@ class Batches:
                 "sent",
                 "Email accepted by the sending service; awaiting the site's response."
                 if delivery["response"].get("transport") == "resend"
-                else "Demo email accepted by Resend. Test delivery is simulated; the website is unchanged."
-                if delivery["response"].get("transport") == "resend_demo"
                 else f"Sent; recipient response: {delivery['status'].replace('_', ' ')}",
                 delivery_id=delivery["id"],
             )

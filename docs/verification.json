@@ -17,15 +17,6 @@
       "exit_code": 0
     },
     {
-      "command": "npm --prefix backend/demo-ui run build",
-      "exit_code": 0
-    },
-    {
-      "command": "uv run ruff check censearch mockweb scripts/e2e_app.py scripts/verify_three.py tests/test_profile.py tests/test_resend_demo.py",
-      "cwd": "backend",
-      "exit_code": 0
-    },
-    {
       "command": "backend/.venv/bin/python frontend/tests/profile_browser.py",
       "exit_code": 0,
       "coverage": [
@@ -54,11 +45,6 @@
       "command": "CENSEARCH_TEST_URL=http://127.0.0.1:5188 backend/.venv/bin/python frontend/tests/email_browser.py",
       "exit_code": 0,
       "scope": "Intercepted API; configured/missing email setup, single authorized send-mode POST, outcomes and exact notices. No email sent."
-    },
-    {
-      "command": "CENSEARCH_TEST_URL=http://127.0.0.1:5188 backend/.venv/bin/python frontend/tests/face_search_browser.py",
-      "exit_code": 0,
-      "scope": "Intercepted API and synthetic images; consent, strict score cutoff, thumbnails, review, blocked/empty/error states, resume, cache reuse/deletion and responsive layout."
     },
     {
       "command": "bash backend/deploy/package.sh /tmp/censearch-review.tar.gz",
@@ -110,17 +96,7 @@
     "notes": "Read-only SSH health request; hosted build predates current local email/profile changes."
   },
   "saved_evidence_not_rerun": {
-    "deployment_validation": "Earlier local report recorded live Strands DNS tool use, FaceCheck authentication without a search, and Object Storage synthetic text write/read/delete.",
-    "resend_test": {
-      "provider_id": "01a129f0-5d38-7ce8-b080-e0732f5ea39e",
-      "recipient": "delivered+censearch-demo@resend.dev",
-      "provider_last_event": "delivered",
-      "simulated_delivery": true,
-      "accepted_api_submission": true,
-      "real_inbox_delivery_verified": false,
-      "real_takedown_verified": false,
-      "photos_uploaded": false
-    }
+    "deployment_validation": "Earlier local report recorded live Strands DNS tool use, FaceCheck authentication without a search, and Object Storage synthetic text write/read/delete."
   },
   "not_verified": [
     "Hosted app owner-face search acceptance",

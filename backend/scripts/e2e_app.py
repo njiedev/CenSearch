@@ -54,7 +54,7 @@ def main():
             api = Recorder(base)
             stack.callback(api.client.close)
             wait_ready(api, server)
-            for path in ['/', '/signup.html', '/app/', '/console/', '/contact/', '/legal/privacy-policy/']:
+            for path in ['/', '/signup.html', '/app/', '/contact/', '/legal/privacy-policy/']:
                 response = api.client.get(path)
                 assert response.status_code == 200, (path, response.status_code)
             report['production_routes'] = 'passed'

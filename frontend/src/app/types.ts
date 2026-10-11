@@ -16,7 +16,6 @@ export type Scan = {
 export type Run = {
   id: number
   person_id?: string
-  cache_hit?: boolean
   status: string
   started_at: string
   finished_at: string | null
@@ -28,7 +27,8 @@ export type Run = {
     status: string
     id_search?: string
     progress?: number | null
-    score_above: number
+    min_score?: number
+    score_above?: number
     testing_mode: boolean
     retrieved_at?: string
     items: { url: string; score: number; label: string }[]
@@ -43,9 +43,7 @@ export type SearchRequest = {
   mode: 'name_search' | 'supplied_urls' | 'combined' | 'face_search'
   allow_public_fetch: boolean
   facecheck_consent?: boolean
-  facecheck_source?: 'live' | 'cache'
 }
-export type FaceCache = { available: boolean; count: number; run_id?: number; saved_at?: string }
 export type BatchRequest = {
   case_ids: number[]
   contact: Contact
@@ -71,7 +69,7 @@ export type Workflow = {
   lookup: { recipients?: (WorkflowNotice['recipient'] & { rung: string })[] } | null
   notices: WorkflowNotice[]
   deliveries: { notice_id: number; rung: string; status: string; deadline: string;
-    response?: { provider_id?: string; transport?: string; simulated_delivery?: boolean } }[]
+    response?: { provider_id?: string; transport?: string } }[]
   checks: { outcome: string; checked_at: string; source_removed: boolean }[]
 }
 

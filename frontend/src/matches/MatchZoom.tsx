@@ -70,9 +70,9 @@ export default function MatchZoom({ item, origin, onClose, onWhitelist, whitelis
 
             <section className="mx-zoom-section">
               {item.match_type === 'facecheck' && <p className="mx-callout">
-                FaceCheck candidate · Score {item.provider_score}. This provider thumbnail has not been
-                locally verified on the source page. The score does not establish identity, ownership,
-                or misuse. The agent reviews page text; it does not see this image.
+                Found by FaceCheck · Score {item.provider_score}. The agent reviews the page
+                context to recommend an action. A face match alone does not establish photo ownership
+                or misuse.
               </p>}
               {onWhitelist && <Button variant="outline"  disabled={whitelistBusy} onClick={() => onWhitelist(item)}>{item.whitelisted ? 'Remove from whitelist' : 'Add site to whitelist'}</Button>}
               {whitelistError && <p role="alert" className="field-error">{whitelistError}</p>}

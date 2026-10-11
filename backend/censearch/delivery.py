@@ -65,12 +65,10 @@ def send(recipient, payload, allow_external=False):
                 if code != 250:
                     raise smtplib.SMTPResponseException(code, response)
                 code, response = client.data(message.as_bytes())
+                if code != 250:
+                    raise smtplib.SMTPDataError(code, response)
             text = response.decode(errors="replace")
             result = json.loads(text[text.index("{") :]) if "{" in text else {}
-            if result.get("transport") == "resend_demo":
-                return {"status": "awaiting_response", "transport": "resend_demo", "code": code,
-                        "provider_id": result.get("provider_id"), "recipient": result.get("recipient"),
-                        "simulated_delivery": True, "reply": result}
             return {"status": outcome(result), "transport": "smtp", "code": code, "reply": result}
         if channel != "http_form" or parsed.scheme not in ("http", "https"):
             raise ValueError("Recipient requires manual delivery")
@@ -95,6 +93,11 @@ def send(recipient, payload, allow_external=False):
             result = json.loads(error.smtp_error.decode())
         except ValueError:
             result = {"reason": error.smtp_error.decode(errors="replace")[:500]}
-        return {"status": "reasoned_refusal", "transport": "smtp", "reply": result, "code": error.smtp_code}
+        refused = isinstance(result, dict) and outcome(result) == "reasoned_refusal"
+        return {
+            "status": "reasoned_refusal" if refused else "failed",
+            "transport": "smtp", "reply": result, "code": error.smtp_code,
+            "may_have_been_received": False,
+        }
     except (httpx.HTTPError, OSError, smtplib.SMTPException) as error:
         return {"status": "uncertain", "error": type(error).__name__, "may_have_been_received": True}

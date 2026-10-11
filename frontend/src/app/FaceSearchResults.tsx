@@ -15,7 +15,7 @@ export default function FaceSearchResults({ run, onResumed, onDeleted }: {
     ? { ...run.facecheck, status: 'cache_deleted', items: [], id_search: undefined }
     : run.facecheck
   if (!face) return null
-  const items = face.items.filter((item) => item.score > 90 && item.score <= 100)
+  const items = face.items.filter((item) => item.score >= 88 && item.score <= 100)
   const canResume = face.id_search && face.status !== 'completed' &&
     !['running', 'queued'].includes(run.status)
   async function resume() {
@@ -34,12 +34,12 @@ export default function FaceSearchResults({ run, onResumed, onDeleted }: {
   return (
     <section className="face-search-results" aria-label="FaceCheck results">
       <h2>FaceCheck candidates · {items.length}</h2>
-      {face.status === 'cache_deleted' ? <p role="status">Saved FaceCheck results deleted. Cases already reviewed and locally verified cases are retained.</p>
+      {face.status === 'cache_deleted' ? <p role="status">Saved FaceCheck results deleted. Reviewed cases and other scan results are retained.</p>
         : face.retrieved_at && <p>Saved live FaceCheck search · {new Date(face.retrieved_at).toLocaleString()}.
           Results have not been refreshed.</p>}
-      <p>Scores above 90 only. These are possible matches, not verified identities.
-        Select FaceCheck candidates or locally verified images below to review with the agent.</p>
-      {face.status === 'completed' && items.length === 0 && <p>No results scored above 90.</p>}
+      <p>Scores 88 or higher only. These are possible matches, not verified identities.
+        Select results below to review with the agent.</p>
+      {face.status === 'completed' && items.length === 0 && <p>No results scored 88 or higher.</p>}
       {items.length > 0 && (
         <ul>
           {items.map((item, index) => (

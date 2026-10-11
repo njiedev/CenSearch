@@ -471,7 +471,7 @@ button.mx-nav-item:hover {
   overflow: hidden;
   font-size: 12px;
   line-height: 1.4;
-  color: var(--muted);
+  color: var(--muted-foreground, #a1a1aa);
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
 }

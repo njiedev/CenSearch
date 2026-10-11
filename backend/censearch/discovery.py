@@ -16,7 +16,7 @@ SUPPLIED_LABEL = "Check supplied public URLs"
 MATCH_LABEL = "Possible match · review needed"
 REAL_LABEL = "Real source"
 MOCK_LABEL = "Simulated delivery · loopback mock administrator"
-FACE_LABEL = "FaceCheck · score above 90"
+FACE_LABEL = "FaceCheck · scores 88+"
 MISSING_KEY = "Search provider not configured. Set SERPAPI_API_KEY in backend/.env, or use Check supplied public URLs."
 EMAIL = re.compile(r"[^\s@]+@[^\s@]+\.[^\s@]+")
 
@@ -119,7 +119,6 @@ class PublicSearchRequest(BaseModel):
     mode: Literal["name_search", "supplied_urls", "combined", "face_search"] = "supplied_urls"
     allow_public_fetch: bool = False
     facecheck_consent: bool = False
-    facecheck_source: Literal["live", "cache"] = "live"
 
     @model_validator(mode="after")
     def validate_inputs(self):
@@ -129,7 +128,7 @@ class PublicSearchRequest(BaseModel):
         if any(len(handle) > 100 for handle in self.handles):
             raise ValueError("Handles must be at most 100 characters")
         if self.mode == "face_search":
-            if self.facecheck_source == "live" and not self.facecheck_consent:
+            if not self.facecheck_consent:
                 raise ValueError("Consent to sending your enrolled photo to FaceCheck is required")
             if self.full_name or self.handles or self.context or self.supplied_urls:
                 raise ValueError("Face search cannot include name queries or supplied URLs")

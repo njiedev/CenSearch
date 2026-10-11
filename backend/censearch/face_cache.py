@@ -1,47 +1,11 @@
-"""Reuse completed FaceCheck scans for the same identity and enrollment photo."""
+"""Delete stored FaceCheck results; cases already used in a review are retained."""
 
 from copy import deepcopy
 from sqlalchemy import select
 
-from censearch.db import Case, CrawlRun, Reference, Scan, now
+from censearch.db import Case, CrawlRun, Scan, now
 from censearch.case_records import BatchItem, CaseEvent, Attestation, Notice
-from censearch.facecheck import MIN_SCORE_EXCLUSIVE
-
-
-def cached_run(session, person_id):
-    photo = session.scalar(
-        select(Reference).where(Reference.person_id == person_id).order_by(Reference.id)
-    )
-    if photo is None:
-        return None
-    for run in session.scalars(select(CrawlRun).order_by(CrawlRun.id.desc())):
-        request = run.config.get("request", {})
-        face = run.config.get("facecheck", {})
-        if (
-            run.config.get("public_search")
-            and request.get("person_id") == person_id
-            and request.get("mode") == "face_search"
-            and run.status.startswith("completed")
-            and face.get("status") == "completed"
-            and face.get("testing_mode") is False
-            and face.get("photo_sha256") == photo.sha256
-            and face.get("score_above") == MIN_SCORE_EXCLUSIVE
-        ):
-            return run
-    return None
-
-
-def cache_summary(session, person_id):
-    run = cached_run(session, person_id)
-    if run is None:
-        return {"available": False, "count": 0}
-    face = run.config["facecheck"]
-    return {
-        "available": True,
-        "run_id": run.id,
-        "count": len(face["items"]),
-        "saved_at": face.get("retrieved_at") or run.finished_at,
-    }
+from censearch.facecheck import MIN_SCORE
 
 
 def delete_cache(session, person_id, directory=None):
@@ -59,7 +23,7 @@ def delete_cache(session, person_id, directory=None):
         config["facecheck"] = {
             "status": "cache_deleted",
             "items": [],
-            "score_above": MIN_SCORE_EXCLUSIVE,
+            "min_score": MIN_SCORE,
             "testing_mode": False,
             "deleted_at": now(),
         }
