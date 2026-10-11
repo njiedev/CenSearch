@@ -1,4 +1,5 @@
 import Logo from './Logo'
+import { readSession } from './app/session'
 
 export default function Nav() {
   return (
@@ -12,7 +13,7 @@ export default function Nav() {
           <a href="#features">Features</a>
           <a href="#faq">FAQ</a>
         </div>
-        <a className="landing-button" href="/signup.html">Sign up</a>
+        {readSession() ? <a className="landing-button" href="/app/">Open app</a> : <a className="landing-button" href="/signup.html">Sign up</a>}
       </nav>
     </header>
   )

@@ -5,6 +5,7 @@ import { hostname } from './types'
 
 
 type Props = {
+  embedded?: boolean
   cases: Case[]
   selected: number[]
   batch: Batch | null
@@ -25,7 +26,7 @@ function MatchCard({ item, checked, locked, onToggle, onOpen }: {
 }) {
   const action = actionOf(item)
   return (
-    <article className={`mx-card${checked ? ' is-selected' : ''}`}>
+    <article className={`mx-card${checked ? ' is-selected' : ''}${item.whitelisted ? ' is-whitelisted' : ''}`}>
       <button
         type="button"
         className="mx-card-open"
@@ -38,7 +39,7 @@ function MatchCard({ item, checked, locked, onToggle, onOpen }: {
           {action.possible && <span className="mx-possible">Possible: </span>}
           {action.label}
         </span>
-        <StatusPill status={statusOf(item)} />
+        {item.whitelisted ? <span className="mx-status tone-neutral">– Whitelisted</span> : <StatusPill status={statusOf(item)} />}
       </button>
       {/* Overlaid on the image corners, outside the open button. */}
       <label className="mx-check" title={`Select match ${item.id}`}>
@@ -73,7 +74,7 @@ export default function MatchGrid(props: Props) {
 
   return (
     <section className="mx-view" aria-labelledby="mx-matches-title">
-      <header className="mx-header">
+      {!props.embedded && <header className="mx-header">
         <div>
           <h1 id="mx-matches-title">
             Matches <span className="mx-count">({showData ? cases.length : 0})</span>
@@ -101,7 +102,7 @@ export default function MatchGrid(props: Props) {
             Auto review / send
           </button>
         </div>
-      </header>
+      </header>}
 
       {batch && showData && (
         <div className="mx-banner" role="status">
@@ -143,7 +144,7 @@ export default function MatchGrid(props: Props) {
               key={item.id}
               item={item}
               checked={selected.includes(item.id)}
-              locked={running}
+              locked={Boolean(running || item.whitelisted)}
               onToggle={() => props.onToggle(item.id)}
               onOpen={(origin) => props.onOpen(item.id, origin)}
             />

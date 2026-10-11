@@ -12,6 +12,7 @@ const STATUS: Record<ItemStatus | 'new', { label: string; icon: string; tone: To
   researching: { label: 'Finding recipient', icon: '◕', tone: 'progress' },
   drafting: { label: 'Drafting', icon: '✎', tone: 'progress' },
   sending: { label: 'Sending', icon: '➜', tone: 'progress' },
+  ready_to_send: { label: 'Ready to send', icon: '□', tone: 'neutral' },
   sent: { label: 'Sent', icon: '✓', tone: 'done' },
   drafted_not_sent: { label: 'Drafted, send it yourself', icon: '✉', tone: 'info' },
   left_alone: { label: 'Left alone', icon: '–', tone: 'neutral' },

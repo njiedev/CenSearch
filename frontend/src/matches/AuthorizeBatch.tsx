@@ -12,20 +12,24 @@ const FIELDS: { key: keyof Contact; label: string; type?: string; wide?: boolean
 ]
 
 type Props = {
+  warning?: string
+  personName?: string
+  preparing?: boolean
+  busy?: boolean
   cases: Case[]
   onRun: (contact: Contact, acceptedBy: string) => void
   onCancel: () => void
 }
 
-export default function AuthorizeBatch({ cases, onRun, onCancel }: Props) {
+export default function AuthorizeBatch({ cases, onRun, onCancel, warning = WARNING, personName = PERSON.name, preparing = false, busy = false }: Props) {
   const [contact, setContact] = useState<Contact>({
-    name: PERSON.name,
+    name: personName,
     email: '',
     address: '',
     phone: '',
-    signature: PERSON.name,
+    signature: personName,
   })
-  const [acceptedBy, setAcceptedBy] = useState(PERSON.name)
+  const [acceptedBy, setAcceptedBy] = useState(personName)
   const [accepted, setAccepted] = useState(false)
 
   if (cases.length === 0) {
@@ -56,11 +60,12 @@ export default function AuthorizeBatch({ cases, onRun, onCancel }: Props) {
     <section className="mx-view" aria-labelledby="mx-auth-title">
       <header className="mx-header">
         <div>
-          <h1 id="mx-auth-title">Authorize auto review / send</h1>
+          <h1 id="mx-auth-title">{preparing ? 'Authorize agent review' : 'Authorize auto review / send'}</h1>
           <p className="mx-sub">Check the matches, read the warning, and confirm you take responsibility.</p>
         </div>
       </header>
 
+      {preparing && <p className="mx-callout">You will review every notice before confirming which requests to send.</p>}
       <form className="mx-auth" onSubmit={submit}>
         <div className="mx-panel">
           <h2>
@@ -84,7 +89,7 @@ export default function AuthorizeBatch({ cases, onRun, onCancel }: Props) {
 
         <div className="mx-panel mx-warning">
           <h2>Legal responsibility</h2>
-          <p>{WARNING}</p>
+          <p>{warning}</p>
         </div>
 
         <div className="mx-panel">
@@ -97,6 +102,7 @@ export default function AuthorizeBatch({ cases, onRun, onCancel }: Props) {
                 <input
                   type={field.type ?? 'text'}
                   required
+                  maxLength={field.key === 'address' ? 1000 : field.key === 'phone' ? 100 : 300}
                   value={contact[field.key]}
                   onChange={(event) => setContact({ ...contact, [field.key]: event.target.value })}
                 />
@@ -104,7 +110,7 @@ export default function AuthorizeBatch({ cases, onRun, onCancel }: Props) {
             ))}
             <label className="mx-field wide">
               <span>Who accepts responsibility</span>
-              <input required value={acceptedBy} onChange={(event) => setAcceptedBy(event.target.value)} />
+              <input required maxLength={300} value={acceptedBy} onChange={(event) => setAcceptedBy(event.target.value)} />
             </label>
           </div>
         </div>
@@ -118,8 +124,8 @@ export default function AuthorizeBatch({ cases, onRun, onCancel }: Props) {
           <button type="button" className="mx-btn ghost" onClick={onCancel}>
             Back to matches
           </button>
-          <button type="submit" className="mx-btn primary" disabled={!ready}>
-            Run batch
+          <button type="submit" className="mx-btn primary" disabled={!ready || busy}>
+            {busy ? 'Preparing…' : preparing ? 'Prepare requests' : 'Run batch'}
           </button>
           {!ready && <span className="mx-muted">Fill in every field and tick the box to continue.</span>}
         </div>

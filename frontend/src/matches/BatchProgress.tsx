@@ -47,7 +47,7 @@ export default function BatchProgress({ batch, cases, onOpen, onBack }: Props) {
     )
   }
 
-  const percent = Math.round((batch.completed / batch.total) * 100)
+  const percent = batch.total ? Math.round((batch.completed / batch.total) * 100) : 0
   const done = batch.status === 'completed'
 
   return (
@@ -86,6 +86,9 @@ export default function BatchProgress({ batch, cases, onOpen, onBack }: Props) {
         {batch.items.map((item) => {
           const match = cases.find((row) => row.id === item.case_id)
           const finished = TERMINAL.includes(item.status)
+          const reached = batch.mode
+            ? item.status === 'ready_to_send' ? 'drafting' : item.status === 'sent' ? 'sending' : item.status
+            : reachedStep(item.case_id, item.status)
           return (
             <li key={item.case_id} className="mx-item">
               {match && <img src={match.matched_image_url} alt="" />}
@@ -98,7 +101,7 @@ export default function BatchProgress({ batch, cases, onOpen, onBack }: Props) {
                 <ol className="mx-steps" aria-label="Steps">
                   {STEPS.map((step) => {
                     const state = stepState(
-                      { status: item.status, reached: reachedStep(item.case_id, item.status) },
+                      { status: item.status, reached },
                       step.status,
                     )
                     return (

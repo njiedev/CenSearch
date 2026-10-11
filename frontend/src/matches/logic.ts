@@ -73,3 +73,9 @@ export function withBatch(row: Case, batch: Batch | null, contact: Contact | nul
   }
   return updated
 }
+
+export function prepareSampleItem(caseId: number, step: number): ItemStatus {
+  const path = pathFor(caseId).filter((status) => status !== 'sending')
+    .map((status): ItemStatus => status === 'sent' ? 'ready_to_send' : status)
+  return path[Math.min(step, path.length - 1)]
+}

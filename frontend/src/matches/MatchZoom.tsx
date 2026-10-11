@@ -5,6 +5,8 @@ import type { Case } from './types'
 import { hostname, isManual } from './types'
 
 const CHANNELS = {
+  smtp: 'Email to test site',
+  http_form: 'Form on test site',
   email: 'Email',
   web_form: 'Web form',
   manual_email: 'Email, sent by you',
@@ -15,13 +17,16 @@ type Props = {
   item: Case | undefined
   // The element the zoom grows out of, usually the clicked card.
   origin: HTMLElement | null
+  onWhitelist?: (item: Case) => void
+  whitelistBusy?: boolean
+  whitelistError?: string
   onClose: () => void
 }
 
 // The match, zoomed in over a blurred page: image on the left, everything we
 // know about it on the right. A native <dialog> gives focus trapping, Esc to
 // close and a ::backdrop to blur.
-export default function MatchZoom({ item, origin, onClose }: Props) {
+export default function MatchZoom({ item, origin, onClose, onWhitelist, whitelistBusy, whitelistError }: Props) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
   const [copied, setCopied] = useState(false)
@@ -75,7 +80,7 @@ export default function MatchZoom({ item, origin, onClose }: Props) {
 
   const action = item ? actionOf(item) : null
   const notice = item?.drafted_request ?? null
-  const sent = notice && item ? item.deliveries.some((row) => row.notice_id === notice.id) : false
+  const sent = notice && item ? item.batch_outcome?.status === 'sent' : false
 
   return (
     <dialog
@@ -113,6 +118,8 @@ export default function MatchZoom({ item, origin, onClose }: Props) {
             </div>
 
             <section className="mx-zoom-section">
+              {onWhitelist && <button className="mx-btn ghost" disabled={whitelistBusy} onClick={() => onWhitelist(item)}>{item.whitelisted ? 'Remove from whitelist' : 'Add site to whitelist'}</button>}
+              {whitelistError && <p role="alert" className="field-error">{whitelistError}</p>}
               <h3>{action.possible ? 'Suggested action' : 'Action taken'}</h3>
               <p className="mx-action-lg">
                 {action.possible && <span className="mx-possible">Possible: </span>}

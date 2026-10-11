@@ -191,3 +191,8 @@ export function noticeBody(route: Route, pageUrl: string, imageUrl: string, cont
 export function finalDecision(route: Route, reason: string) {
   return action(route, reason, false)
 }
+
+// App-only sample scan; the standalone matches demo retains its original rows.
+export function sampleCases(startedAt: string): Case[] {
+  return CASES.map((row) => ({ ...structuredClone(row), created_at: startedAt, whitelisted: false }))
+}

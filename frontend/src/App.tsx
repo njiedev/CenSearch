@@ -21,9 +21,14 @@ export default function App() {
             <p className="hero-sub">
               We search the web for your face and send deletion requests wherever they're needed.
             </p>
-            <a className="landing-button" href="/signup.html">
-              Start here
-            </a>
+            <div className="hero-actions">
+              <a className="landing-button" href="/signup.html">
+                Start here
+              </a>
+              <a className="landing-link" href="/app/?sample=1">
+                Try the demo
+              </a>
+            </div>
           </div>
         </section>
         <Mission />

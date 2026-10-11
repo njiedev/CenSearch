@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import Logo from './Logo'
+import { saveSession } from './app/session'
 
 // Sign-up is enrollment: POST /api/people (see backend/handoff/openapi.json).
 // The person attests to consent and ownership by ticking the exact statements
@@ -130,7 +131,8 @@ export default function SignUp() {
       const response = await fetch('/api/people', { method: 'POST', body: data })
       if (response.ok) {
         const body = await response.json()
-        setOutcome({ state: 'enrolled', name: body.person.name, photos: body.photos })
+        saveSession({ id: body.person.id, name: body.person.name })
+        window.location.assign('/app/')
       } else {
         setOutcome({ state: 'failed', ...(await readFailure(response)) })
       }
@@ -165,6 +167,9 @@ export default function SignUp() {
         <button type="button" className="su-secondary" onClick={reset}>
           Enroll someone else
         </button>
+        <a className="su-demo" href="/app/?sample=1">
+          See the demo with sample matches
+        </a>
       </div>
     )
   }
@@ -303,6 +308,9 @@ export default function SignUp() {
       </button>
 
       <p className="su-privacy">Your photos are never sent to an AI model.</p>
+      <a className="su-demo" href="/app/?sample=1">
+        Skip sign-up and try the demo with sample matches
+      </a>
     </form>
   )
 }

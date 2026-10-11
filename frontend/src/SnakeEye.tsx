@@ -15,20 +15,22 @@ const MAX_Y = 2
 type Props = {
   className?: string
   track?: boolean
+  lookAt?: { x: number; y: number } | null
 }
 
-export default function SnakeEye({ className, track = false }: Props) {
+export default function SnakeEye({ className, track = false, lookAt = null }: Props) {
   const pupilRef = useRef<HTMLImageElement>(null)
 
   useEffect(() => {
-    if (!track) {
+    if (!track && !lookAt) {
+      if (pupilRef.current) pupilRef.current.style.transform = 'none'
       return
     }
     const pupil = pupilRef.current!
     const eye = pupil.parentElement!.parentElement!
     let frame = 0
-    let pointerX = 0
-    let pointerY = 0
+    let pointerX = lookAt?.x ?? 0
+    let pointerY = lookAt?.y ?? 0
 
     function update() {
       frame = 0
@@ -51,12 +53,13 @@ export default function SnakeEye({ className, track = false }: Props) {
       }
     }
 
-    window.addEventListener('pointermove', onMove)
+    if (lookAt) frame = requestAnimationFrame(update)
+    else window.addEventListener('pointermove', onMove)
     return () => {
       window.removeEventListener('pointermove', onMove)
       cancelAnimationFrame(frame)
     }
-  }, [track])
+  }, [track, lookAt])
 
   return (
     <span className={`pixel-eye ${className ?? ''}`} aria-hidden="true">

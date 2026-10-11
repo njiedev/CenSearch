@@ -11,7 +11,7 @@ export type Route =
 
 export type Stage = 'queued' | 'reviewing' | 'capturing' | 'researching' | 'drafting' | 'sending'
 export type Outcome = 'sent' | 'drafted_not_sent' | 'left_alone' | 'held_for_review' | 'failed'
-export type ItemStatus = Stage | Outcome
+export type ItemStatus = Stage | Outcome | 'ready_to_send'
 
 export type Action = {
   route: Route
@@ -24,8 +24,10 @@ export type Action = {
 
 export type Recipient = {
   address: string
-  channel: 'email' | 'web_form' | 'manual_email' | 'manual_web'
+  channel: 'email' | 'web_form' | 'manual_email' | 'manual_web' | 'smtp' | 'http_form'
   endpoint: string
+  evidence?: unknown
+  id?: string
 }
 
 export type Notice = {
@@ -36,6 +38,10 @@ export type Notice = {
 
 export type Case = {
   id: number
+  created_at?: string
+  whitelisted?: boolean
+  score?: number
+  recipients?: Recipient[]
   page_url: string
   matched_image_url: string
   band: 'match' | 'possible'
@@ -48,11 +54,13 @@ export type Case = {
 
 export type ViewState = 'data' | 'loading' | 'empty' | 'error'
 
-export type BatchItem = { case_id: number; status: ItemStatus; reason: string }
+export type BatchItem = { case_id: number; status: ItemStatus; reason: string; decision?: Action; recipient?: Recipient }
 
 export type Batch = {
-  id: number
-  status: 'queued' | 'running' | 'completed'
+  id: number | string
+  mode?: 'send' | 'prepare'
+  phase?: 'preparing' | 'awaiting_review' | 'sending' | 'done'
+  status: 'queued' | 'running' | 'completed' | 'interrupted'
   total: number
   completed: number
   items: BatchItem[]

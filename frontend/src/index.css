@@ -1535,3 +1535,43 @@ body {
   .wall { row-gap: 32px; }
   .mission-statement { font-size: 44px; }
 }
+
+/* The hero's two ways in: sign up, or walk through the demo on sample data. */
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 24px;
+}
+
+.landing-link,
+.su-demo {
+  color: #d4d4d8;
+  font: 500 14px/1.4 var(--sans);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color 150ms ease;
+}
+
+.landing-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+}
+
+.su-demo {
+  justify-self: center;
+  text-align: center;
+}
+
+.landing-link:hover,
+.su-demo:hover {
+  color: #fff;
+}
+
+.landing-link:focus-visible,
+.su-demo:focus-visible {
+  outline: 2px solid var(--accent-light);
+  outline-offset: 4px;
+}

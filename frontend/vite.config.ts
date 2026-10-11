@@ -12,6 +12,7 @@ export default defineConfig({
         main: resolve(import.meta.dirname, 'index.html'),
         signup: resolve(import.meta.dirname, 'signup.html'),
         matches: resolve(import.meta.dirname, 'matches.html'),
+        app: resolve(import.meta.dirname, 'app/index.html'),
       },
     },
   },
