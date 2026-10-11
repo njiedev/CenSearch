@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import Corners from './Corners'
 import SnakeEye from './SnakeEye'
 
 const HEADING = 'About Us'
@@ -111,10 +112,7 @@ export default function Viewfinder() {
 
   return (
     <div className="viewfinder" ref={ref}>
-      <span className="vf-corner vf-tl" aria-hidden="true" />
-      <span className="vf-corner vf-tr" aria-hidden="true" />
-      <span className="vf-corner vf-bl" aria-hidden="true" />
-      <span className="vf-corner vf-br" aria-hidden="true" />
+      <Corners />
 
       <div className="vf-hud vf-top" aria-hidden="true">
         <span className="vf-rec">

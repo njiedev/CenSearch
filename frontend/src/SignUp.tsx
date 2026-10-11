@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import Corners from './Corners'
 
 // Sign-up is enrollment: POST /api/people (see backend/handoff/openapi.json).
 // The person attests to consent and ownership by ticking the exact statements
 // below; those statements are what the backend stores.
-const CONSENT =
-  'I consent to CenSearch storing these photos of my face and matching them against images it finds on the web.'
-const OWNERSHIP = 'I took these original photos or own the rights to them.'
-const OFFLINE = "Couldn't reach the CenSearch server. Check that the backend is running, then try again."
+const CONSENT = 'I agree to let CenSearch store these photos and search the web for my face.'
+const OWNERSHIP = 'I took these photos or own the rights to them.'
+const OFFLINE = "Can't reach the CenSearch server. Make sure the backend is running, then try again."
 
 type PhotoResult = {
   kind: 'reference' | 'original'
@@ -97,10 +97,10 @@ export default function SignUp() {
       found.name = 'Enter your name.'
     }
     if (references.length === 0) {
-      found.references = 'Add at least one clear photo of your face.'
+      found.references = 'Add at least one photo of your face.'
     }
     if (!consent) {
-      found.consent = 'We can only search for your face with your consent.'
+      found.consent = 'We need your consent to search for your face.'
     }
     if (originals.length > 0 && !ownership) {
       found.ownership = 'Confirm you own these photos, or remove them.'
@@ -154,10 +154,11 @@ export default function SignUp() {
   if (outcome.state === 'enrolled') {
     return (
       <div className="su-panel" role="status">
+        <Corners />
         <h2 className="su-title" id="signup-title">
           You're enrolled, {outcome.name}.
         </h2>
-        <p className="su-lede">Here's how your photos did. We'll search the web using the accepted ones.</p>
+        <p className="su-lede">We'll search the web using the photos marked accepted.</p>
         <PhotoList photos={outcome.photos} />
         <button type="button" className="su-secondary" onClick={reset}>
           Enroll someone else
@@ -168,16 +169,16 @@ export default function SignUp() {
 
   return (
     <form className="su-panel" onSubmit={submit} noValidate>
+      <Corners />
       <h2 className="su-title" id="signup-title">
         Sign up
       </h2>
       <p className="su-lede">
-        Add a few photos of your face. We'll look for where they appear online and help you get them taken
-        down.
+        Add photos of your face. We'll find where they show up online and help get them taken down.
       </p>
 
       <div className="su-field">
-        <label htmlFor="su-name">Your name</label>
+        <label htmlFor="su-name">Name</label>
         <input
           id="su-name"
           type="text"
@@ -197,7 +198,7 @@ export default function SignUp() {
       <div className="su-field">
         <label htmlFor="su-references">Photos of your face</label>
         <p className="su-hint" id="su-references-hint">
-          Clear photos with only you in them. Different angles help.
+          Clear photos with just you in them.
         </p>
         <label className="su-drop">
           <input
@@ -211,7 +212,7 @@ export default function SignUp() {
           />
           <span>
             {references.length > 0
-              ? `${references.length} photo${references.length === 1 ? '' : 's'} selected. Choose again to replace.`
+              ? `${references.length} photo${references.length === 1 ? '' : 's'} selected`
               : 'Choose photos'}
           </span>
         </label>
@@ -224,9 +225,9 @@ export default function SignUp() {
       </div>
 
       <div className="su-field">
-        <label htmlFor="su-originals">Photos you own (optional)</label>
+        <label htmlFor="su-originals">Photos you took (optional)</label>
         <p className="su-hint" id="su-originals-hint">
-          Originals you took or hold the rights to. They let us spot exact copies, even without your face.
+          These help us find exact copies.
         </p>
         <label className="su-drop">
           <input
@@ -239,7 +240,7 @@ export default function SignUp() {
           />
           <span>
             {originals.length > 0
-              ? `${originals.length} photo${originals.length === 1 ? '' : 's'} selected. Choose again to replace.`
+              ? `${originals.length} photo${originals.length === 1 ? '' : 's'} selected`
               : 'Choose photos'}
           </span>
         </label>
@@ -285,7 +286,7 @@ export default function SignUp() {
       )}
 
       <p className="su-privacy">
-        Face matching runs on our own server. Your photos are never sent to an AI model.
+        Your photos are never sent to an AI model.
       </p>
 
       {outcome.state === 'failed' && (

@@ -52,7 +52,9 @@ contact.
     clock, a running timecode, and a large pixel-art snake eye whose slit pupil follows the cursor in whole
     art-pixel steps.
   - Its copy types itself out in a monospace font.
-  - "Sign up" enrolls your face: name, face photos, optional owned originals,
+  - "Sign up" sits in the same viewfinder frame and shares one blur layer with
+    "About", so there's no seam between them. It enrolls your face: name, face
+    photos, optional owned originals,
     and explicit consent and ownership statements. It posts to the real
     backend enrollment endpoint and shows which photos were accepted.
 - **Restraint:** motion is ambient and sparse. It should make the site feel
