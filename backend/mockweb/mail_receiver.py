@@ -8,7 +8,20 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 
+class UncertainDelivery(Exception):
+    """Close SMTP without acknowledgment when an upstream receipt is unknown."""
+
+
 class Handler(socketserver.StreamRequestHandler):
+    def deliver(self, recipient, payload):
+        request = Request(
+            self.server.routes[recipient], payload,
+            headers={"Content-Type": "application/json", "X-Mock-Mail": self.server.token,
+                     "X-Mock-Recipient": recipient},
+        )
+        with urlopen(request, timeout=5) as response:
+            return response.read().decode()
+
     def reply(self, code, message):
         self.wfile.write(f"{code} {message}\r\n".encode())
         self.wfile.flush()
@@ -49,15 +62,10 @@ class Handler(socketserver.StreamRequestHandler):
                     part = next(
                         part for part in message.walk() if part.get_content_type() == "application/json"
                     )
-                    request = Request(
-                        self.server.routes[recipient],
-                        part.get_payload(decode=True),
-                        headers={"Content-Type": "application/json", "X-Mock-Mail": self.server.token,
-                                 "X-Mock-Recipient": recipient},
-                    )
-                    with urlopen(request, timeout=5) as response:
-                        result = response.read().decode()
+                    result = self.deliver(recipient, part.get_payload(decode=True))
                     self.reply(250, "Notice accepted " + result)
+                except UncertainDelivery:
+                    return
                 except HTTPError as error:
                     self.reply(550, error.read().decode())
                 except Exception:

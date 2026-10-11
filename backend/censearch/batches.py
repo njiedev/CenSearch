@@ -8,8 +8,7 @@ from censearch.agent.tools import fetch_page
 from censearch.agent.web import lookup_session
 from censearch.case_records import Attestation, Batch, BatchItem, Delivery, Notice
 from censearch.db import Case, Original, record
-from censearch.delivery import destination
-from censearch.discovery import draft_only
+from censearch.email_delivery import EMAIL_CHANNELS
 from censearch.whitelist import is_whitelisted
 from censearch.workflow import site_origin
 from censearch.workflow_api import ApprovalRequest, DraftRequest, PrepareRequest
@@ -170,7 +169,6 @@ class Batches:
                     "An existing notice or delivery requires review; batch will not resend it"
                 )
             data = record(case)
-            real_source = draft_only(case)
             original = session.get(Original, case.original_id) if case.original_id else None
             if original and original.person_id != case.person_id:
                 raise ValueError("Original does not belong to this enrolled person")
@@ -272,7 +270,28 @@ class Batches:
         candidates = [row for row in lookup["recipients"] if row["rung"] == "site"]
         if not candidates:
             raise ValueError("Recipient lookup found no site recipient")
-        recipient = min(candidates, key=lambda row: row.get("rank", 9999))
+        email_candidates = [row for row in candidates if row["channel"] in EMAIL_CHANNELS]
+        recipient = min(
+            email_candidates if workflow.settings.email_enabled and email_candidates else candidates,
+            key=lambda row: row.get("rank", 9999),
+        )
+        if (
+            recipient["channel"] in EMAIL_CHANNELS
+            and workflow.settings.email_enabled
+            and batch["mode"] == "send"
+            and (
+                decision["source"] != "agent"
+                or decision.get("model_status") != "completed"
+                or fetch_error
+            )
+        ):
+            with self.store.session.begin() as session:
+                session.get(Case, case_id).state = "held_for_review"
+            self.update(
+                item_id, "held_for_review",
+                "Automatic email needs a completed agent review and page context.",
+            )
+            return
         if self.leave_whitelisted(item):
             return
         self.update(item_id, "drafting", "Preparing the fixed notice", recipient=recipient)
@@ -287,13 +306,9 @@ class Batches:
         notice = await workflow.draft(case_id, DraftRequest(recipient_id=recipient["id"]))
         self.update(item_id, "drafting", "Checking delivery eligibility", notice_id=notice["id"])
         try:
-            if real_source:
-                raise ValueError("Real source · draft only; the person sends this draft themselves")
-            # This batch always stops at a draft for real sites, even if a developer enables
-            # the legacy external-delivery flag. The existing gate also runs again at send.
-            if recipient["channel"] not in ("smtp", "http_form"):
-                raise ValueError("Manual channel; the person sends this draft themselves")
-            destination(recipient["endpoint"], allow_external=False)
+            with self.store.session() as session:
+                case = session.get(Case, case_id)
+                workflow.delivery_eligible(session, case, recipient, batch["contact"])
         except ValueError as error:
             self.update(item_id, "drafted_not_sent", str(error))
             return
@@ -369,12 +384,9 @@ class Batches:
             return
         workflow = self.workflow
         case_id, item_id = item["case_id"], item["id"]
-        # Recheck eligibility after review, independent of the legacy external flag.
         with self.store.session() as session:
             case = session.get(Case, case_id)
-            if draft_only(case):
-                raise ValueError("Real source · draft only; the person sends this draft themselves")
-        destination(notice["recipient"]["endpoint"], allow_external=False)
+            workflow.delivery_eligible(session, case, notice["recipient"], notice["payload"]["contact"])
         await workflow.approve_notice(
             case_id,
             ApprovalRequest(
@@ -384,7 +396,7 @@ class Batches:
             ),
             authorization=authorization,
         )
-        self.update(item_id, "sending", "Sending through the loopback delivery gate")
+        self.update(item_id, "sending", "Sending the authorized request")
         delivery = await workflow.send(case_id)
         if delivery["status"] == "uncertain":
             self.update(
@@ -393,11 +405,21 @@ class Batches:
                 "Delivery uncertain; may have been received. Inspect before retrying.",
                 delivery_id=delivery["id"],
             )
+        elif delivery["status"] == "failed":
+            self.update(
+                item_id, "failed",
+                "Email provider rejected the request. Check the sending account.",
+                delivery_id=delivery["id"],
+            )
         else:
             self.update(
                 item_id,
                 "sent",
-                f"Sent; recipient response: {delivery['status'].replace('_', ' ')}",
+                "Email accepted by the sending service; awaiting the site's response."
+                if delivery["response"].get("transport") == "resend"
+                else "Demo email accepted by Resend. Test delivery is simulated; the website is unchanged."
+                if delivery["response"].get("transport") == "resend_demo"
+                else f"Sent; recipient response: {delivery['status'].replace('_', ' ')}",
                 delivery_id=delivery["id"],
             )
 
@@ -409,6 +431,8 @@ def case_summary(session, case):
     return record(case) | {
         "whitelisted": is_whitelisted(session, case),
         "matched_image_url": f"/api/cases/{case.id}/image",
+        "provider_score": case.score if case.match_type == "facecheck" else None,
+        "thumbnail_available": bool(case.evidence.get("image", {}).get("path")),
         "possible_action": possible_action(record(case)),
         "batch_outcome": record(latest) if latest else None,
     }

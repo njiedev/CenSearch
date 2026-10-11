@@ -13,6 +13,7 @@ from censearch.batches import case_summary
 from censearch.crawl import BudgetExceeded, Crawler, ScanCancelled, USER_AGENT, extract, origin
 from censearch.db import Case, CrawlRun, Scan, now, record
 from censearch.discovery import (
+    FACE_LABEL,
     MATCH_LABEL,
     MOCK_LABEL,
     NAME_LABEL,
@@ -26,6 +27,8 @@ from censearch.discovery import (
 )
 from censearch.evidence import EvidenceStore
 from censearch.matching import Matcher
+from censearch.face_discovery import discover_faces
+from censearch.facecheck import FaceCheckError, MIN_SCORE_EXCLUSIVE
 
 COUNTS = (
     "queries_run",
@@ -42,7 +45,8 @@ def local_settings(settings):
 
 
 class PublicCrawler(Crawler):
-    def __init__(self, settings, store, matcher, run_id, request, fixture=False, cancel_event=None):
+    def __init__(self, settings, store, matcher, run_id, request, fixture=False, cancel_event=None,
+                 facecheck_state=None):
         scoped = local_settings(settings).model_copy(
             update={
                 "allow_public_crawl": request.allow_public_fetch and not fixture,
@@ -69,6 +73,8 @@ class PublicCrawler(Crawler):
             "request": request.model_dump(),
         }
         super().__init__(scoped, store, matcher, run_id, config, cancel_event)
+        if facecheck_state:
+            self.config["facecheck"] = deepcopy(facecheck_state)
         self.request = request
         self.fixture = fixture
         self.pages = []
@@ -134,6 +140,16 @@ class PublicCrawler(Crawler):
         status = "completed"
         self.progress("running")
         try:
+            if self.request.mode == "face_search":
+                # This coroutine runs in the API's dedicated worker thread. Keep the sync
+                # provider call here so cancellation cannot leave an orphan upload thread.
+                discover_faces(self)
+                self.check_cancel()
+                if self.config["facecheck"]["status"] == "pending":
+                    status = "completed_with_limits"
+                    return
+                # Public GET verification has its own bounded allowance after discovery.
+                self.deadline = time.monotonic() + self.settings.discovery_timeout
             async with asyncio.timeout(self.settings.discovery_timeout):
                 if self.fixture and self.request.mode != "supplied_urls":
                     raise ValueError("Fixture runs must use supplied loopback URLs")
@@ -144,7 +160,7 @@ class PublicCrawler(Crawler):
                     trust_env=False,
                 ) as client:
                     self.client = client
-                    if self.request.mode != "supplied_urls":
+                    if self.request.mode in ("name_search", "combined"):
                         self.search_session = SearchSession(
                             self.settings, client, self.progress, self.check_cancel
                         )
@@ -184,7 +200,7 @@ class PublicCrawler(Crawler):
                                 ):
                                     break
                         self.candidates = dedupe(self.candidates + self.search_session.candidates)
-                    else:
+                    elif self.request.mode == "supplied_urls":
                         self.agent_state.update(
                             source="supplied_urls", model_status="not_requested", queries=[]
                         )
@@ -212,6 +228,12 @@ class PublicCrawler(Crawler):
             status = "completed_with_limits"
         except ScanCancelled:
             status = "cancelled"
+        except FaceCheckError as error:
+            self.errors.append({"error": "FaceCheckError", "message": str(error)})
+            self.config.setdefault("facecheck", {
+                "items": [], "score_above": MIN_SCORE_EXCLUSIVE, "testing_mode": False,
+            })["status"] = "error"
+            status = "failed"
         except asyncio.CancelledError:
             status = "interrupted"
             raise
@@ -273,7 +295,9 @@ class PublicCrawler(Crawler):
                     "methods": methods,
                     "simulated": simulated,
                     "draft_only": not simulated,
-                    "label": NAME_LABEL if "name_search" in methods else SUPPLIED_LABEL,
+                    "label": FACE_LABEL if "face_search" in methods else (
+                        NAME_LABEL if "name_search" in methods else SUPPLIED_LABEL
+                    ),
                     "source_label": MOCK_LABEL if simulated else REAL_LABEL,
                     "match_label": MATCH_LABEL,
                     "page_fetched_at": page["fetched_at"],
@@ -335,5 +359,7 @@ def public_view(store, run_id):
             | run.config.get("discovery", {})
             | {
                 "results": [case_summary(session, case) for case in cases],
+                "facecheck": run.config.get("facecheck"),
+                "person_id": run.config.get("request", {}).get("person_id"),
             }
         )

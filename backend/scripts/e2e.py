@@ -100,7 +100,7 @@ def browser_flow(base, person, output):
             page = context.new_page()
             errors = []
             page.on("pageerror", lambda error: errors.append(str(error)))
-            page.goto(base, wait_until="networkidle")
+            page.goto(base + "/console/", wait_until="networkidle")
             expect(page.get_by_test_id("health-summary")).to_contain_text("Face models: loaded")
             page.get_by_role("button", name="Enroll", exact=True).click()
             page.get_by_label("Name", exact=True).fill("Browser fixture")

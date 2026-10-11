@@ -5,8 +5,9 @@ import uuid
 import cv2
 from sqlalchemy import select
 from censearch.case_records import Batch, BatchItem
-from censearch.db import Person, Reference, Original, record
+from censearch.db import Case, Person, Reference, Original, record
 from censearch.face import active_references
+from censearch.face_cache import delete_cache
 from censearch.imaging import decode
 
 
@@ -32,40 +33,7 @@ class Enrollment:
             raise ValueError("An ownership statement is required when adding original photos")
         if development_fixture and self.evidence.client is not None:
             raise ValueError("Development fixtures require local storage; disable Object Storage")
-        results = []
-        accepted = []
-        for kind, uploads in (("reference", references), ("original", originals)):
-            for index, (filename, payload) in enumerate(uploads):
-                result = {
-                    "kind": kind,
-                    "index": index,
-                    "filename": Path(filename).name,
-                    "accepted": False,
-                    "reason": None,
-                }
-                try:
-                    image = decode(payload)
-                    face = None
-                    if kind == "reference":
-                        faces, skips = self.face.extract(image)
-                        if len(faces) != 1:
-                            raise ValueError(
-                                f"Exactly one quality-passing face required; found {len(faces)}; "
-                                f"skipped: {', '.join(skips) or 'none'}"
-                            )
-                        face = faces[0]
-                        result["quality"] = {
-                            "detector_score": face.detector_score,
-                            "blur": face.blur,
-                            "box": face.box,
-                        }
-                    result["accepted"] = True
-                    accepted.append((kind, index, result["filename"], payload, image, face))
-                except ValueError as error:
-                    result["reason"] = str(error)
-                results.append(result)
-        if any(not result["accepted"] for result in results):
-            raise EnrollmentError("No person saved. Remove or replace rejected photos and retry.", results)
+        results, accepted = self.validate_photos(references, originals)
         person_id = str(uuid.uuid4())
         try:
             with self.store.session.begin() as session:
@@ -116,6 +84,112 @@ class Enrollment:
             raise
         return {"person": self.get(person_id), "photos": results}
 
+    def validate_photos(self, references, originals):
+        results = []
+        accepted = []
+        for kind, uploads in (("reference", references), ("original", originals)):
+            for index, (filename, payload) in enumerate(uploads):
+                result = {
+                    "kind": kind,
+                    "index": index,
+                    "filename": Path(filename).name,
+                    "accepted": False,
+                    "reason": None,
+                }
+                try:
+                    image = decode(payload)
+                    face = None
+                    if kind == "reference":
+                        faces, skips = self.face.extract(image)
+                        if len(faces) != 1:
+                            raise ValueError(
+                                f"Exactly one quality-passing face required; found {len(faces)}; "
+                                f"skipped: {', '.join(skips) or 'none'}"
+                            )
+                        face = faces[0]
+                        result["quality"] = {
+                            "detector_score": face.detector_score,
+                            "blur": face.blur,
+                            "box": face.box,
+                        }
+                    result["accepted"] = True
+                    accepted.append((kind, index, result["filename"], payload, image, face))
+                except ValueError as error:
+                    result["reason"] = str(error)
+                results.append(result)
+        if any(not result["accepted"] for result in results):
+            raise EnrollmentError("No photos saved. Remove or replace rejected photos and retry.", results)
+        return results, accepted
+
+    def add_photos(self, person_id, references, originals, ownership):
+        person = self.get(person_id)
+        if not references and not originals:
+            raise ValueError("Choose at least one photo")
+        if originals and not ownership.strip():
+            raise ValueError("Confirm ownership before adding original photos")
+        if person["development_fixture"] and self.evidence.client is not None:
+            raise ValueError("Development fixtures require local storage; disable Object Storage")
+        results, accepted = self.validate_photos(references, originals)
+        pending = []
+        try:
+            with self.store.session.begin() as session:
+                for kind, index, filename, payload, image, face in accepted:
+                    token = uuid.uuid4().hex
+                    if kind == "reference":
+                        ok, encoded = cv2.imencode(".jpg", image)
+                        if not ok:
+                            raise ValueError("Face image encoding failed")
+                        saved = self.evidence.put(person_id, f"references/{token}.jpg", encoded.tobytes())
+                        pending.append(saved)
+                        session.add(Reference(
+                            person_id=person_id, filename=filename, path=saved["path"],
+                            sha256=saved["sha256"], embedding=face.embedding.tobytes(),
+                            quality={"detector_score": face.detector_score, "blur": face.blur, "box": face.box},
+                        ))
+                    else:
+                        saved = self.evidence.put(person_id, f"originals/{token}.image", payload)
+                        pending.append(saved)
+                        session.add(Original(
+                            person_id=person_id, filename=filename, path=saved["path"],
+                            sha256=saved["sha256"], ownership_statement=ownership.strip(),
+                        ))
+        except Exception:
+            self.evidence.remove_files(pending)
+            raise
+        return {"person": self.get(person_id), "photos": results}
+
+    def photo(self, person_id, kind, photo_id):
+        model = {"reference": Reference, "original": Original}.get(kind)
+        if model is None:
+            raise LookupError("Photo not found")
+        with self.store.session() as session:
+            row = session.get(model, photo_id)
+            if row is None or row.person_id != person_id:
+                raise LookupError("Photo not found")
+            return record(row)
+
+    def delete_photo(self, person_id, kind, photo_id):
+        photo = self.photo(person_id, kind, photo_id)
+        model = Reference if kind == "reference" else Original
+        with self.store.session.begin() as session:
+            if kind == "reference":
+                ids = list(session.scalars(select(Reference.id).where(Reference.person_id == person_id)))
+                if len(ids) <= 1:
+                    raise ValueError("Keep at least one face photo. Add a replacement before removing this photo.")
+            affected_batches = []
+            if kind == "original":
+                affected_batches = list(session.scalars(
+                    select(BatchItem.batch_id).join(Case).where(Case.original_id == photo_id)
+                ))
+            self.evidence.remove_files([{"path": photo["path"], "object_key": photo["path"]}])
+            session.delete(session.get(model, photo_id))
+            session.flush()
+            for batch in session.scalars(select(Batch).where(
+                Batch.id.in_(affected_batches), ~Batch.id.in_(select(BatchItem.batch_id))
+            )):
+                session.delete(batch)
+        return self.get(person_id)
+
     def get(self, person_id):
         with self.store.session() as session:
             person = session.get(Person, person_id)
@@ -145,6 +219,7 @@ class Enrollment:
                 raise LookupError("Person not found")
             # Remove files before reporting DB deletion; remote failures remain visible.
             self.evidence.delete_person(person_id)
+            delete_cache(session, person_id)
             session.delete(person)
             session.flush()
             for batch in session.scalars(select(Batch).where(~Batch.id.in_(select(BatchItem.batch_id)))):

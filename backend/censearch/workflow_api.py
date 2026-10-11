@@ -102,7 +102,8 @@ def install(app):
     @router.get("/batches/warning")
     async def batch_warning() -> dict:
         from censearch.batches import WARNING
-        return {"warning": WARNING}
+        from censearch.email_delivery import email_status
+        return {"warning": WARNING, "email_delivery": email_status(app.state.settings)}
 
     @router.post("/batches", status_code=202, response_model=BatchResponse)
     async def create_batch(request: BatchRequest) -> dict:

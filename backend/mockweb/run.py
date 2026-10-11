@@ -67,7 +67,7 @@ def stop(process):
 
 
 @contextmanager
-def running(root, base_port=8811, logs=None, extended=False):
+def running(root, base_port=8811, logs=None, extended=False, mail_command=None, mail_env=None):
     count = 9 if extended else 8
     available(range(base_port, base_port + count))
     commands = []
@@ -113,6 +113,8 @@ def running(root, base_port=8811, logs=None, extended=False):
             str(base_port + 4),
         ]
     )
+    if mail_command is not None:
+        commands[7] = mail_command
     if extended:
         commands.append(
             [
@@ -136,7 +138,10 @@ def running(root, base_port=8811, logs=None, extended=False):
             stream = (logs / f"mock-{index}.log").open("w") if logs else subprocess.DEVNULL
             if logs:
                 streams.append(stream)
-            children.append(subprocess.Popen(command, cwd=ROOT, stdout=stream, stderr=subprocess.STDOUT))
+            children.append(subprocess.Popen(
+                command, cwd=ROOT, stdout=stream, stderr=subprocess.STDOUT,
+                env=mail_env if index == 7 else None,
+            ))
         deadline = time.monotonic() + 15
         for port in range(base_port, base_port + count):
             while True:

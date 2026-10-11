@@ -63,7 +63,7 @@ def browser_case(base, cid, output, recorder):
                 )
 
             page.on("response", capture)
-            page.goto(base, wait_until="networkidle")
+            page.goto(base + "/console/", wait_until="networkidle")
             page.get_by_role("button", name="Decide", exact=True).click()
             expect(page.get_by_label("Choose workflow case")).to_have_value(str(cid))
             expect(page.get_by_test_id("page-description")).to_contain_text("Model not configured")
@@ -138,7 +138,7 @@ def browser_refusal(base, case_id, output):
         browser = playwright.chromium.launch()
         try:
             page = browser.new_page(viewport={"width": 1280, "height": 900})
-            page.goto(base, wait_until="networkidle")
+            page.goto(base + "/console/", wait_until="networkidle")
             page.get_by_role("button", name="Verify", exact=True).click()
             page.get_by_label("Choose workflow case").select_option(str(case_id))
             expect(page.get_by_test_id("refusal-decision")).to_be_visible()

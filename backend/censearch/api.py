@@ -11,22 +11,23 @@ import cv2
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse
-from fastapi.staticfiles import StaticFiles
 from PIL import Image
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy import delete, select, text
 from censearch.agent.probe import Probe
 from censearch.agent.web import loopback
+from censearch.email_delivery import email_status
 from censearch.batches import Batches, case_summary
-from censearch.config import ROOT, Settings
+from censearch.config import Settings
 from censearch.copy_detect import VERSION
 from censearch.crawl import Crawler, validate_url
-from censearch.db import Case, CrawlRun, Person, Scan, Store, WhitelistDomain, now, record
+from censearch.db import Case, CrawlRun, Person, Reference, Scan, Store, WhitelistDomain, now, record
 from censearch.discovery import PublicSearchRequest
 from censearch.public_crawl import PublicCrawler, public_view
 from censearch.enroll import Enrollment, EnrollmentError
 from censearch.evidence import EvidenceStore
 from censearch.face import FaceConfig, OpenCVFaceEngine
+from censearch.face_cache import cached_run, cache_summary, delete_cache
 from censearch.matching import Matcher
 from censearch.workflow import Workflow
 from censearch.workflow_api import install
@@ -223,6 +224,7 @@ def create_app(settings=None):
                 "remote_verified": app.state.evidence.remote_verified,
             },
             "external_delivery_enabled": settings.allow_external_delivery,
+            "email_delivery": email_status(settings),
             "public_crawl_enabled": settings.allow_public_crawl,
             "respect_robots": settings.respect_robots,
             "busy": app.state.busy,
@@ -290,6 +292,63 @@ def create_app(settings=None):
             return app.state.enrollment.get(person_id)
         except LookupError as error:
             raise HTTPException(404, str(error)) from error
+
+    @app.post("/api/people/{person_id}/photos", status_code=201, response_model=EnrollmentResponse)
+    async def add_photos(
+        person_id: str,
+        ownership: str = Form(""),
+        references: list[UploadFile] = File(default=[]),
+        originals: list[UploadFile] = File(default=[]),
+    ):
+        ready()
+        idle()
+        app.state.busy = True
+        try:
+            return await asyncio.to_thread(
+                app.state.enrollment.add_photos, person_id,
+                await uploads(references), await uploads(originals), ownership,
+            )
+        except LookupError as error:
+            raise HTTPException(404, str(error)) from error
+        except EnrollmentError as error:
+            failures = "; ".join(
+                f"{photo['filename']}: {photo['reason']}" for photo in error.photos if not photo["accepted"]
+            )
+            raise HTTPException(422, f"No photos saved. {failures}") from error
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from error
+        finally:
+            app.state.busy = False
+
+    @app.get("/api/people/{person_id}/photos/{kind}/{photo_id}")
+    def profile_photo(person_id: str, kind: str, photo_id: int):
+        ready()
+        try:
+            photo = app.state.enrollment.photo(person_id, kind, photo_id)
+        except LookupError as error:
+            raise HTTPException(404, str(error)) from error
+        path = settings.data_dir / photo["path"]
+        if not path.is_file():
+            raise HTTPException(404, "Photo file is missing")
+        with Image.open(path) as picture:
+            media_type = Image.MIME.get(picture.format, "application/octet-stream")
+        return FileResponse(path, media_type=media_type, headers={
+            "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff",
+        })
+
+    @app.delete("/api/people/{person_id}/photos/{kind}/{photo_id}", response_model=PersonResponse)
+    async def delete_photo(person_id: str, kind: str, photo_id: int):
+        ready()
+        idle()
+        app.state.busy = True
+        try:
+            return await asyncio.to_thread(app.state.enrollment.delete_photo, person_id, kind, photo_id)
+        except LookupError as error:
+            raise HTTPException(404, str(error)) from error
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from error
+        finally:
+            app.state.busy = False
 
     @app.get("/api/people/{person_id}/whitelist", response_model=WhitelistResponse)
     def get_whitelist(person_id: str):
@@ -370,6 +429,25 @@ def create_app(settings=None):
 
     @app.post("/api/public-searches", status_code=202)
     async def start_public_search(request: PublicSearchRequest) -> dict:
+        if request.mode == "face_search" and request.facecheck_source == "cache":
+            with app.state.store.session.begin() as session:
+                person = session.get(Person, request.person_id)
+                if person is None:
+                    raise HTTPException(404, "Enrolled person not found")
+                if person.development_fixture:
+                    raise HTTPException(422, "Local fixtures cannot use FaceCheck")
+                saved = cached_run(session, person.id)
+                if saved is None:
+                    raise HTTPException(404, "No saved FaceCheck scan for this photo. Choose a new search explicitly.")
+                saved_id = saved.id
+                from copy import deepcopy
+                from censearch.face_review import materialize
+                config = deepcopy(saved.config)
+                config["facecheck"]["items"] = materialize(
+                    session, saved, config["facecheck"]["items"], settings
+                )
+                saved.config = config
+            return public_view(app.state.store, saved_id) | {"cache_hit": True}
         ready()
         idle()
         with app.state.store.session.begin() as session:
@@ -379,6 +457,11 @@ def create_app(settings=None):
             real_urls = any(not loopback(urlsplit(url).hostname) for url in request.supplied_urls)
             if person.development_fixture and (request.mode != "supplied_urls" or real_urls):
                 raise HTTPException(422, "Local fixtures can only check supplied loopback URLs")
+            if request.mode == "face_search":
+                if not settings.facecheck_api_token.get_secret_value():
+                    raise HTTPException(503, "FaceCheck is not configured on this server")
+                if session.scalar(select(Reference.id).where(Reference.person_id == person.id)) is None:
+                    raise HTTPException(422, "Enroll a face photo before starting a face search")
             if (real_urls or request.mode != "supplied_urls") and not request.allow_public_fetch:
                 raise HTTPException(422, "Enable public fetching explicitly for this run")
             row = CrawlRun(
@@ -388,13 +471,34 @@ def create_app(settings=None):
             session.add(row)
             session.flush()
             run_id, fixture = row.id, person.development_fixture
+        launch_public_search(run_id, request, fixture)
+        return public_view(app.state.store, run_id)
+
+    @app.get("/api/people/{person_id}/face-search-cache")
+    def face_search_cache(person_id: str):
+        with app.state.store.session() as session:
+            if session.get(Person, person_id) is None:
+                raise HTTPException(404, "Enrolled person not found")
+            return cache_summary(session, person_id)
+
+    @app.delete("/api/people/{person_id}/face-search-cache")
+    async def delete_face_search_cache(person_id: str):
+        idle()
+        with app.state.store.session.begin() as session:
+            if session.get(Person, person_id) is None:
+                raise HTTPException(404, "Enrolled person not found")
+            count = delete_cache(session, person_id, settings.data_dir)
+        return {"deleted": count}
+
+    def launch_public_search(run_id, request, fixture, facecheck_state=None):
         app.state.busy = True
         cancel_event = app.state.scan_cancels[run_id] = Event()
 
         async def worker():
             try:
                 crawler = PublicCrawler(
-                    settings, app.state.store, app.state.matcher, run_id, request, fixture, cancel_event
+                    settings, app.state.store, app.state.matcher, run_id, request, fixture,
+                    cancel_event, facecheck_state
                 )
                 await asyncio.to_thread(lambda: asyncio.run(crawler.run()))
             finally:
@@ -404,6 +508,26 @@ def create_app(settings=None):
         task = asyncio.create_task(worker())
         app.state.tasks.add(task)
         task.add_done_callback(app.state.tasks.discard)
+
+    @app.post("/api/public-searches/{run_id}/resume", status_code=202)
+    async def resume_face_search(run_id: int):
+        ready()
+        idle()
+        with app.state.store.session.begin() as session:
+            run = session.get(CrawlRun, run_id)
+            if run is None or not run.config.get("public_search"):
+                raise HTTPException(404, "Public search run not found")
+            request = PublicSearchRequest(**run.config["request"])
+            state = run.config.get("facecheck", {})
+            if request.mode != "face_search" or not state.get("id_search"):
+                raise HTTPException(422, "This run has no FaceCheck search to resume")
+            if state.get("status") == "completed" or run.status in ("running", "queued"):
+                raise HTTPException(409, "This FaceCheck search is complete or already running")
+            person = session.get(Person, request.person_id)
+            if person is None or person.development_fixture:
+                raise HTTPException(422, "An enrolled non-fixture identity is required")
+            run.status, run.finished_at = "queued", None
+        launch_public_search(run_id, request, False, state)
         return public_view(app.state.store, run_id)
 
     @app.get("/api/public-searches")
@@ -495,7 +619,10 @@ def create_app(settings=None):
     )
     def case_image(case_id: int):
         item = get_case(case_id)
-        path = settings.data_dir / item["evidence"]["image"]["path"]
+        relative = item["evidence"].get("image", {}).get("path")
+        if not relative:
+            raise HTTPException(404, "No thumbnail was supplied for this candidate")
+        path = settings.data_dir / relative
         if not path.is_file():
             raise HTTPException(404, "Evidence file is missing")
         with Image.open(path) as image:
@@ -512,24 +639,9 @@ def create_app(settings=None):
 
     install(app)
 
-    console = ROOT / "demo-ui/dist"
-    if console.exists():
-        app.mount("/assets", StaticFiles(directory=console / "assets"), name="assets")
+    from censearch.frontend import install_frontend
 
-    @app.get("/", include_in_schema=False)
-    def index():
-        path = console / "index.html"
-        if not path.exists():
-            return JSONResponse(
-                status_code=503,
-                content={
-                    "error": {
-                        "code": "console_not_built",
-                        "message": "Build the console with: cd demo-ui && npm ci && npm run build",
-                    }
-                },
-            )
-        return FileResponse(path, headers={"Cache-Control": "no-store"})
+    install_frontend(app, settings)
 
     return app
 

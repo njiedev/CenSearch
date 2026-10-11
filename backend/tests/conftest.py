@@ -1,4 +1,4 @@
-"""Local-only fixtures. No dataset download and no writes to the prototype."""
+"""Local-only fixtures. Tests never download face datasets."""
 
 import json
 import os
@@ -38,6 +38,9 @@ def settings(tmp_path, monkeypatch):
         LIKENESS_DATA_DIR=tmp_path,
         LIKENESS_MODELS_DIR=ROOT / "models",
         allow_public_crawl=False,
+        CENSEARCH_EMAIL_ENABLED=False,
+        CENSEARCH_EMAIL_FROM="",
+        resend_api_key="",
     )
 
 

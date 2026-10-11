@@ -1,4 +1,4 @@
-"""YuNet/SFace with the prototype's calibrated native-tile and rotation pipeline."""
+"""YuNet/SFace with a calibrated native-tile and rotation pipeline."""
 
 from dataclasses import asdict, dataclass
 import hashlib

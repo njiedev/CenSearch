@@ -285,14 +285,25 @@ def test_fixture_redirect_guard_and_local_storage(client, enrolled, settings):
     assert crawler.matcher.evidence.client is None
 
 
-def test_real_source_send_refused_even_with_loopback_recipient_and_external_flag(workflow_case):
+def test_real_source_send_refused_even_with_loopback_recipient_and_external_flag(workflow_case, monkeypatch):
+    from test_round3 import await_batch, isolated_workflow, payload
+
     client, case_id = workflow_case
+    sent = isolated_workflow(client, monkeypatch)
     client.app.state.settings.allow_external_delivery = True
     with client.app.state.store.session.begin() as session:
         case = session.get(Case, case_id)
         case.evidence = case.evidence | {"context": {"discovery": {"draft_only": True}}}
+    response = client.post("/api/batches", json=payload([case_id]) | {"mode": "prepare"})
+    batch = await_batch(client, response.json()["id"])
+    assert batch["items"][0]["status"] == "drafted_not_sent"
+    notice = client.get(f"/api/cases/{case_id}/workflow").json()["notices"][0]
+    assert client.post(f"/api/cases/{case_id}/approve", json={
+        "notice_id": notice["id"], "sha256": notice["sha256"], "approved_by": "Test operator",
+    }).status_code == 200
     with pytest.raises(ValueError, match="Real source · draft only"):
         asyncio.run(client.app.state.workflow.send(case_id))
+    assert not sent
 
 
 def test_strands_trace_persisted_in_public_run(client, settings, monkeypatch):

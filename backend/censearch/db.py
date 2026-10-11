@@ -140,7 +140,12 @@ class Store:
 
     def version(self, session):
         ids = list(session.scalars(select(Person.id).order_by(Person.id)))
-        return hashlib.sha256(json.dumps(ids).encode()).hexdigest()
+        photos = [
+            (model.__tablename__, row.id, row.person_id, row.sha256)
+            for model in (Reference, Original)
+            for row in session.scalars(select(model).order_by(model.id))
+        ]
+        return hashlib.sha256(json.dumps([ids, photos]).encode()).hexdigest()
 
 
 def record(row):

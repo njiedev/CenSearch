@@ -15,11 +15,13 @@ from censearch.agent.web import lookup_session
 from censearch.case_records import Attestation, CaseEvent, CaseWorkflow, Delivery, DraftApproval, Notice
 from censearch.db import Case, Original, Person, record
 from censearch.delivery import destination, send
+from censearch.email_delivery import EMAIL_CHANNELS, check_email, mailbox, send_email
 from censearch.discovery import draft_only, provenance
 from censearch.evidence import capture_page
 from censearch.notices import digest, render
 from censearch.routing import EXTRA_QUESTIONS, QUESTIONS, decide
 from censearch.verify import Clock, check
+from censearch.whitelist import is_whitelisted
 
 
 class Workflow:
@@ -29,6 +31,8 @@ class Workflow:
         self.storage = storage
         self.clock = Clock(settings.demo_clock)
         self.lock = asyncio.Lock()
+        self.email_lock = asyncio.Lock()
+        self.next_email_at = 0.0
         self.live_call_verified = False
         self.calibration = json.loads(settings.calibration_path.read_text())
 
@@ -239,6 +243,8 @@ class Workflow:
     async def draft(self, case_id, request):
         with self.store.session.begin() as session:
             case, state = self.context(session, case_id)
+            if is_whitelisted(session, case):
+                raise ValueError("Site is on your whitelist")
             approval = session.scalar(
                 select(DraftApproval)
                 .where(
@@ -350,12 +356,32 @@ class Workflow:
             )
             return record(notice)
 
+    def delivery_eligible(self, session, case, recipient, contact):
+        if is_whitelisted(session, case):
+            raise ValueError("Site is on your whitelist")
+        if recipient["channel"] in EMAIL_CHANNELS:
+            person = session.get(Person, case.person_id)
+            if person is None or person.development_fixture:
+                raise ValueError("Development fixtures cannot send real email")
+            if (
+                case.match_type not in ("face", "copy", "both")
+                or case.band != "match"
+                or case.evidence.get("locally_verified") is False
+            ):
+                raise ValueError("Local image verification is required before sending email")
+            check_email(recipient, self.settings)
+            mailbox(contact["email"])
+            return
+        if draft_only(case):
+            raise ValueError("Real source · draft only; this recipient requires manual submission")
+        if recipient["channel"] not in ("smtp", "http_form"):
+            raise ValueError("This recipient requires manual submission")
+        destination(recipient["endpoint"], allow_external=False)
+
     async def send(self, case_id):
         try:
             with self.store.session.begin() as session:
                 case, state = self.context(session, case_id)
-                if draft_only(case):
-                    raise ValueError("Real source · draft only; the person sends this draft themselves")
                 notice = self.latest(session, Notice, case_id)
                 if (
                     notice is None
@@ -369,9 +395,7 @@ class Workflow:
                 previous = self.latest(session, Delivery, case_id)
                 if previous and (previous.notice_id == notice.id or previous.rung == notice.rung):
                     raise ValueError("Duplicate send refused")
-                destination(notice.recipient["endpoint"], self.settings.allow_external_delivery)
-                if notice.recipient["channel"] not in ("smtp", "http_form"):
-                    raise ValueError("The person sends this real-site draft themselves")
+                self.delivery_eligible(session, case, notice.recipient, notice.payload["contact"])
                 delivery = Delivery(
                     case_id=case_id,
                     notice_id=notice.id,
@@ -387,11 +411,21 @@ class Workflow:
                 session.flush()
                 identifier = delivery.id
                 payload, recipient = notice.payload, notice.recipient
+                notice_sha256 = notice.sha256
                 self.event(session, case_id, "delivery_started", delivery_id=identifier, rung=notice.rung)
         except IntegrityError as error:
             raise ValueError("Duplicate send refused") from error
         # Claim persisted before I/O. An interrupted attempt cannot be blindly retried.
-        result = await asyncio.to_thread(send, recipient, payload, self.settings.allow_external_delivery)
+        if recipient["channel"] in EMAIL_CHANNELS:
+            async with self.email_lock:
+                loop = asyncio.get_running_loop()
+                await asyncio.sleep(max(0, self.next_email_at - loop.time()))
+                result = await asyncio.to_thread(
+                    send_email, recipient, payload, self.settings, notice_sha256
+                )
+                self.next_email_at = loop.time() + 0.6
+        else:
+            result = await asyncio.to_thread(send, recipient, payload, False)
         with self.store.session.begin() as session:
             case, _ = self.context(session, case_id)
             delivery = session.get(Delivery, identifier)

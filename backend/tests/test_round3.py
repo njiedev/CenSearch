@@ -207,7 +207,7 @@ def test_batch_isolation_draft_gate_progress_and_attestation(workflow_case, monk
     ]
     assert "Simulated recipient lookup failure" in result["items"][0]["reason"]
     assert "External delivery disabled" in result["items"][2]["reason"]
-    assert "Manual channel" in result["items"][3]["reason"]
+    assert "manual submission" in result["items"][3]["reason"]
     assert len(sent) == 1
     view = client.get(f"/api/cases/{cid}/workflow").json()
     assert view["notices"][0]["payload"]["body"] == sent[0]["body"]

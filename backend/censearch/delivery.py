@@ -67,6 +67,10 @@ def send(recipient, payload, allow_external=False):
                 code, response = client.data(message.as_bytes())
             text = response.decode(errors="replace")
             result = json.loads(text[text.index("{") :]) if "{" in text else {}
+            if result.get("transport") == "resend_demo":
+                return {"status": "awaiting_response", "transport": "resend_demo", "code": code,
+                        "provider_id": result.get("provider_id"), "recipient": result.get("recipient"),
+                        "simulated_delivery": True, "reply": result}
             return {"status": outcome(result), "transport": "smtp", "code": code, "reply": result}
         if channel != "http_form" or parsed.scheme not in ("http", "https"):
             raise ValueError("Recipient requires manual delivery")

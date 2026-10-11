@@ -39,7 +39,7 @@ def browser_batch(base, cases, contact):
             page = browser.new_page(viewport={"width": 1280, "height": 900})
             errors = []
             page.on("pageerror", lambda error: errors.append(str(error)))
-            page.goto(base, wait_until="networkidle")
+            page.goto(base + "/console/", wait_until="networkidle")
             cards = page.get_by_test_id("match-card")
             expect(cards).to_have_count(len(cases))
             expect(page.get_by_test_id("match-total")).to_have_text(f"({len(cases)})")

@@ -33,6 +33,10 @@ class Handler(SimpleHTTPRequestHandler):
             self.send_error(404)
             return
         if path == "/policy":
+            if (Path(self.directory) / "policy.html").is_file():
+                self.path = "/policy.html"
+                super().do_GET()
+                return
             if self.server.site == "pixboard":
                 body = (
                     "<h1>DMCA and privacy agent</h1>"
@@ -50,6 +54,10 @@ class Handler(SimpleHTTPRequestHandler):
             return
         if path == "/receipts":
             self.respond(200, self.server.receipts)
+            return
+        if path == "/image-status":
+            target = parse_qs(urlsplit(self.path).query).get("path", [""])[0]
+            self.respond(200, {"removed": target in self.server.removed})
             return
         if path == "/search-results" and self.server.site == "search":
             self.respond(200, {"delisted": self.server.delisted})

@@ -1,14 +1,15 @@
-PHOTOS ?= /Users/mnjie/Desktop/projects/hackathon testing bs/likeness-guard/seed
+PHOTOS ?= seed
 API_PORT ?= 8490
 BASE_PORT ?= 9111
 
-.PHONY: setup test api mock seed demo e2e e2e-round2 e2e-round3 ui
+.PHONY: setup test api mock seed demo demo-three e2e e2e-round2 e2e-round3 e2e-app ui
 
 setup:
 	uv sync --frozen
 	uv run python scripts/setup_models.py $(if $(MODEL_SOURCE),--source "$(MODEL_SOURCE)",)
 	uv run playwright install chromium
 	cd demo-ui && npm ci && npm run build
+	cd ../frontend && npm ci && npm run build
 
 test:
 	uv run pytest
@@ -25,6 +26,9 @@ mock:
 demo:
 	uv run python scripts/demo.py --photos "$(PHOTOS)" --api-port $(API_PORT) --base-port $(BASE_PORT) $(if $(MODEL),--model,) $(if $(NO_BROWSER),--no-browser,)
 
+demo-three:
+	uv run python scripts/demo.py --three --model --photos "$(PHOTOS)" --api-port $(API_PORT) --base-port $(BASE_PORT) $(if $(NO_BROWSER),--no-browser,) $(if $(RESEND),--resend-test,)
+
 e2e:
 	uv run python scripts/e2e.py --photos "$(PHOTOS)" --api-port $(API_PORT) --base-port $(BASE_PORT) --browser
 
@@ -36,3 +40,6 @@ e2e-round2:
 
 e2e-round3:
 	uv run python scripts/e2e_round3.py --photos "$(PHOTOS)" --api-port $(API_PORT) --base-port $(BASE_PORT) --browser
+
+e2e-app:
+	uv run python scripts/e2e_app.py --photos "$(PHOTOS)" --api-port $(API_PORT) --base-port $(BASE_PORT)

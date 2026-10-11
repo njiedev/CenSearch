@@ -14,8 +14,9 @@ from censearch.db import now
 NAME_LABEL = "Public web · name/handle search"
 SUPPLIED_LABEL = "Check supplied public URLs"
 MATCH_LABEL = "Possible match · review needed"
-REAL_LABEL = "Real source · draft only"
+REAL_LABEL = "Real source"
 MOCK_LABEL = "Simulated delivery · loopback mock administrator"
+FACE_LABEL = "FaceCheck · score above 90"
 MISSING_KEY = "Search provider not configured. Set SERPAPI_API_KEY in backend/.env, or use Check supplied public URLs."
 EMAIL = re.compile(r"[^\s@]+@[^\s@]+\.[^\s@]+")
 
@@ -70,7 +71,8 @@ class Candidate:
     provider: str
     rank: int
     retrieved_at: str
-    discovery_method: Literal["name_search", "supplied_url"]
+    discovery_method: Literal["name_search", "supplied_url", "face_search"]
+    provider_score: float | None = None
 
     def record(self):
         return asdict(self)
@@ -92,6 +94,7 @@ def dedupe(candidates):
                 candidate.rank,
                 candidate.retrieved_at,
                 candidate.discovery_method,
+                candidate.provider_score,
             ),
         )
     return list(result.values())
@@ -113,8 +116,10 @@ class PublicSearchRequest(BaseModel):
     handles: list[str] = Field(default_factory=list, max_length=10)
     context: str = Field(default="", max_length=300)
     supplied_urls: list[str] = Field(default_factory=list, max_length=25)
-    mode: Literal["name_search", "supplied_urls", "combined"] = "supplied_urls"
+    mode: Literal["name_search", "supplied_urls", "combined", "face_search"] = "supplied_urls"
     allow_public_fetch: bool = False
+    facecheck_consent: bool = False
+    facecheck_source: Literal["live", "cache"] = "live"
 
     @model_validator(mode="after")
     def validate_inputs(self):
@@ -123,7 +128,12 @@ class PublicSearchRequest(BaseModel):
         self.handles = [text_input(handle) for handle in self.handles if handle.strip()]
         if any(len(handle) > 100 for handle in self.handles):
             raise ValueError("Handles must be at most 100 characters")
-        if self.mode != "supplied_urls" and not (self.full_name or self.handles):
+        if self.mode == "face_search":
+            if self.facecheck_source == "live" and not self.facecheck_consent:
+                raise ValueError("Consent to sending your enrolled photo to FaceCheck is required")
+            if self.full_name or self.handles or self.context or self.supplied_urls:
+                raise ValueError("Face search cannot include name queries or supplied URLs")
+        if self.mode in ("name_search", "combined") and not (self.full_name or self.handles):
             raise ValueError("Provide a full name or handle for name search")
         if self.mode == "supplied_urls" and not self.supplied_urls:
             raise ValueError("Provide at least one page URL")

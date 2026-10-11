@@ -104,10 +104,10 @@ class CaseResponse(BaseModel):
     original_id: int | None
     page_url: str
     image_url: str
-    match_type: Literal["face", "copy", "both"]
+    match_type: Literal["face", "copy", "both", "facecheck"]
     band: Literal["match", "possible"]
     score: float = Field(description="Similarity, not a confidence percentage; see evidence.score_basis")
-    face_band: Literal["match", "possible", "no_match"]
+    face_band: Literal["match", "possible", "no_match", "not_checked"]
     face_score: float | None
     copy_relation: Literal["exact", "derived", "uncertain", "none"]
     photo_relation: Literal["same_photo", "different_photo", "uncertain"]
@@ -121,6 +121,8 @@ class CaseResponse(BaseModel):
     deliveries: list[dict[str, Any]]
     verification_checks: list[dict[str, Any]]
     matched_image_url: str
+    provider_score: float | None = None
+    thumbnail_available: bool = True
     possible_action: dict[str, Any]
     batch_outcome: BatchItemResponse | None
     whitelisted: bool
@@ -163,6 +165,7 @@ class HealthResponse(BaseModel):
     model: ModelHealth
     object_storage: StorageHealth
     external_delivery_enabled: bool
+    email_delivery: dict[str, Any]
     public_crawl_enabled: bool
     respect_robots: bool
     busy: bool

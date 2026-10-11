@@ -18,7 +18,7 @@ def normalize_domain(entry):
         except ValueError:
             pass
         parsed = urlsplit(value if "://" in value else "//" + value)
-        if parsed.username or parsed.password or not parsed.hostname:
+        if parsed.scheme not in ("", "http", "https") or parsed.username or parsed.password or not parsed.hostname:
             raise ValueError()
         parsed.port  # Validate a supplied port before discarding it.
         host = parsed.hostname.removeprefix("www.").removesuffix(".")

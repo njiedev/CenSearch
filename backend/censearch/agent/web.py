@@ -198,7 +198,7 @@ class LookupSession:
         endpoint = relay if relay and local and address.endswith(".test") else "mailto:" + address
         return self.add(
             rung,
-            "smtp" if endpoint.startswith("smtp:") else "manual_email",
+            "smtp" if endpoint.startswith("smtp:") else "email",
             address,
             endpoint,
             source,
