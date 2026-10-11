@@ -487,15 +487,18 @@ button.mx-nav-item:hover {
 /* Checkbox and band sit on the image's top corners. */
 .mx-check {
   position: absolute;
-  top: 8px;
-  left: 8px;
-  display: grid;
-  place-items: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 9px 0 9px 0;
-  background: rgb(0 0 0 / 0.55);
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
   cursor: pointer;
+}
+
+.mx-check:has(:disabled) {
+  cursor: not-allowed;
 }
 
 .mx-check input,
@@ -1011,4 +1014,14 @@ button.mx-nav-item:hover {
   .mx-selection li {
     grid-template-columns: 36px minmax(0, 1fr);
   }
+}
+
+.mx-thumbnail-missing {
+  display: grid;
+  place-items: center;
+  min-height: 160px;
+  width: 100%;
+  padding: 16px;
+  color: var(--muted-foreground);
+  background: var(--muted);
 }

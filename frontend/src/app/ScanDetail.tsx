@@ -1,11 +1,20 @@
+import FollowUp from './FollowUp'
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
+import { NativeSelectOption } from "@/components/ui/native-select"
+import { NativeSelect } from "@/components/ui/native-select"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
 import { useState } from 'react'
 import MatchGrid from '../matches/MatchGrid'
 import MatchZoom from '../matches/MatchZoom'
 import { statusOf } from '../matches/logic'
 import { hostname } from '../matches/types'
 import type { Case, Scan } from './types'
-import { Empty } from './ui'
-import { date, duration } from './hooks'
+import { Empty, ErrorBox } from './ui'
+import { date, duration, usePoll } from './hooks'
+import { api, isSample } from './api'
 
 type Filters = {
   from: string
@@ -56,6 +65,10 @@ export default function ScanDetail({
   resume?: () => void
 }) {
   const [filters, setFilters] = useState<Filters>(clean)
+  const detail = usePoll(
+    () => scan.kind === 'public_search' && !isSample() ? api.run(scan.run_id) : Promise.resolve(null),
+    [scan.run_id, scan.kind],
+  )
   const [selected, setSelected] = useState<number[]>([])
   const [opened, setOpened] = useState<{ id: number; origin: HTMLElement } | null>(null)
   function update<K extends keyof Filters>(key: K, value: Filters[K]) {
@@ -111,39 +124,19 @@ export default function ScanDetail({
             already handled
           </span>
         </div>
-        {resume && <button onClick={resume}>Resume batch</button>}
+        {resume && <Button variant="outline" onClick={resume}>Resume batch</Button>}
       </header>
-      <div className="filters">
-        <label>
-          Search pages
-          <input
-            type="search"
-            value={filters.search}
-            onChange={(event) => update('search', event.target.value)}
-          />
-        </label>
-        <label>
-          From
-          <input type="date" value={filters.from} onChange={(event) => update('from', event.target.value)} />
-        </label>
-        <label>
-          To
-          <input
-            type="date"
-            value={filters.to}
-            min={filters.from}
-            onChange={(event) => update('to', event.target.value)}
-          />
-        </label>
-        <details className="site-filter">
-          <summary>Sites ({filters.sites.length || 'all'})</summary>
-          <div>
+      {detail.error && <ErrorBox error={detail.error} retry={detail.retry} />}
+      <div className="scan-toolbar" aria-label="Filter matches">
+        <Popover>
+          <PopoverTrigger asChild><Button variant="ghost" size="sm">Sites ({filters.sites.length || 'all'})</Button></PopoverTrigger>
+          <PopoverContent className="grid max-h-80 gap-3 overflow-y-auto">
             {hosts.map((host) => (
-              <label className="check-row" key={host}>
-                <input
-                  type="checkbox"
+              <Label className="check-row" key={host}>
+                <Checkbox
+
                   checked={filters.sites.includes(host)}
-                  onChange={() =>
+                  onCheckedChange={() =>
                     update(
                       'sites',
                       filters.sites.includes(host)
@@ -153,46 +146,71 @@ export default function ScanDetail({
                   }
                 />
                 {host}
-              </label>
+              </Label>
             ))}
-          </div>
-        </details>
-        <label>
-          Status
-          <select value={filters.status} onChange={(event) => update('status', event.target.value)}>
-            <option value="">All statuses</option>
-            {statuses.map(([value, label]) => (
-              <option value={value} key={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label>
-          Match strength
-          <select value={filters.strength} onChange={(event) => update('strength', event.target.value)}>
-            <option value="">All strengths</option>
-            <option value="match">Match</option>
-            <option value="possible">Possible</option>
-          </select>
-        </label>
-        <label>
-          Sort
-          <select value={filters.sort} onChange={(event) => update('sort', event.target.value)}>
-            <option value="newest">Newest</option>
-            <option value="strongest">Strongest</option>
-            <option value="site">Site</option>
-          </select>
-        </label>
+          </PopoverContent>
+        </Popover>
+        <NativeSelect aria-label="Status" value={filters.status} onChange={(event) => update('status', event.target.value)}>
+          <NativeSelectOption value="">All statuses</NativeSelectOption>
+          {statuses.map(([value, label]) => (
+            <NativeSelectOption value={value} key={value}>
+              {label}
+            </NativeSelectOption>
+          ))}
+        </NativeSelect>
+        <NativeSelect aria-label="Match strength" value={filters.strength} onChange={(event) => update('strength', event.target.value)}>
+          <NativeSelectOption value="">All strengths</NativeSelectOption>
+          <NativeSelectOption value="match">Match</NativeSelectOption>
+          <NativeSelectOption value="possible">Possible</NativeSelectOption>
+        </NativeSelect>
+        <NativeSelect aria-label="Sort" value={filters.sort} onChange={(event) => update('sort', event.target.value)}>
+          <NativeSelectOption value="newest">Newest</NativeSelectOption>
+          <NativeSelectOption value="strongest">Strongest</NativeSelectOption>
+          <NativeSelectOption value="site">Site</NativeSelectOption>
+        </NativeSelect>
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="ghost" size="sm">
+              More filters{(filters.search || filters.from || filters.to || filters.white) ? ' · active' : ''}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent align="end" className="scan-more-filters">
+            <Label>
+              Search pages
+              <Input type="search" value={filters.search}
+                onChange={(event) => update('search', event.target.value)} />
+            </Label>
+            <div className="scan-date-filters">
+              <Label>
+                From
+                <Input type="date" value={filters.from}
+                  onChange={(event) => update('from', event.target.value)} />
+              </Label>
+              <Label>
+                To
+                <Input type="date" value={filters.to} min={filters.from}
+                  onChange={(event) => update('to', event.target.value)} />
+              </Label>
+            </div>
+            <Label className="check-row">
+              <Checkbox checked={filters.white}
+                onCheckedChange={(checked) => update('white', checked === true)} />
+              Show whitelisted ({whitelisted})
+            </Label>
+          </PopoverContent>
+        </Popover>
+        <span className="filter-summary" role="status">
+          {visible.length} of {cases.length}
+        </span>
       </div>
       <div className="chips">
         {active.map(([key, value]) => (
-          <button key={key} onClick={() => update(key as keyof Filters, '')}>
+          <Button variant="outline" key={key} onClick={() => update(key as keyof Filters, '')}>
             {key}: {String(value)} ×
-          </button>
+          </Button>
         ))}
         {filters.sites.map((site) => (
-          <button
+          <Button variant="outline"
             key={site}
             onClick={() =>
               update(
@@ -202,28 +220,17 @@ export default function ScanDetail({
             }
           >
             {site} ×
-          </button>
+          </Button>
         ))}
         {(active.length > 0 || filters.sites.length > 0) && (
-          <button onClick={() => setFilters(clean)}>Clear filters</button>
+          <Button variant="outline" onClick={() => setFilters(clean)}>Clear filters</Button>
         )}
-      </div>
-      <div className="filter-summary">
-        <span>
-          {visible.length} of {cases.length}
-        </span>
-        <label className="check-row">
-          <input
-            type="checkbox"
-            checked={filters.white}
-            onChange={(event) => update('white', event.target.checked)}
-          />
-          Show whitelisted ({whitelisted})
-        </label>
       </div>
       {!cases.length ? (
         <Empty title="No matches found" action="Start a new scan" onAction={onNew}>
-          Try different handles or add specific public page URLs.
+          {detail.value?.facecheck
+            ? 'No review candidates are saved for this scan. Older saved scans can be reopened from New scan to add their candidates.'
+            : 'Try different handles or add specific public page URLs.'}
         </Empty>
       ) : !visible.length ? (
         <Empty
@@ -235,7 +242,7 @@ export default function ScanDetail({
         </Empty>
       ) : (
         <>
-          <button
+          <Button variant="outline"
             onClick={() =>
               setSelected(
                 all
@@ -245,7 +252,7 @@ export default function ScanDetail({
             }
           >
             {all ? 'Clear visible selection' : 'Select all visible'}
-          </button>
+          </Button>
           <MatchGrid
             embedded
             cases={visible}
@@ -268,9 +275,9 @@ export default function ScanDetail({
       )}
       <footer className="sticky-actions">
         <span>{safeSelected.length} selected</span>
-        <button className="primary" disabled={!safeSelected.length} onClick={() => onReview(safeSelected)}>
+        <Button variant="default" disabled={!safeSelected.length} onClick={() => onReview(safeSelected)}>
           Review with agent
-        </button>
+        </Button>
         {!safeSelected.length && <small>Select matches to review.</small>}
       </footer>
       <MatchZoom
@@ -280,6 +287,7 @@ export default function ScanDetail({
         onWhitelist={onWhitelist}
         whitelistBusy={whitelistBusy}
         whitelistError={whitelistError}
+        followUp={opened && !isSample() ? <FollowUp key={opened.id} caseId={opened.id} /> : undefined}
       />
     </section>
   )

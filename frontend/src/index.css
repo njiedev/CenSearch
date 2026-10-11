@@ -181,17 +181,37 @@ body {
 }
 
 .landing :is(a, summary):focus-visible {
-  outline: 2px solid var(--accent-light);
+  outline: 2px solid #fff;
   outline-offset: 4px;
 }
 
 .site-header {
   position: fixed;
-  inset: 0 0 auto;
+  top: 0;
+  left: 50%;
+  width: 100%;
+  transform: translateX(-50%);
   z-index: 20;
-  height: 60px;
-  background: rgb(0 0 0 / 0.88);
-  backdrop-filter: blur(16px);
+  height: 64px;
+  border: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  transition:
+    top 240ms ease,
+    width 240ms ease,
+    background 240ms ease,
+    border-color 240ms ease,
+    border-radius 240ms ease,
+    backdrop-filter 240ms ease;
+}
+
+.site-header.is-scrolled {
+  top: 8px;
+  width: min(760px, calc(100% - 32px));
+  border-color: rgb(255 255 255 / 0.12);
+  border-radius: 12px;
+  background: rgb(8 8 10 / 0.6);
+  backdrop-filter: blur(12px);
 }
 
 .site-nav {
@@ -214,11 +234,11 @@ body {
 }
 
 .brand-link:hover {
-  color: var(--accent-light);
+  color: #d4d4d8;
 }
 
 .brand-link:active {
-  color: #a78bfa;
+  color: #a1a1aa;
 }
 
 .nav-links {
@@ -240,14 +260,14 @@ body {
 
 .nav-links a:hover,
 .footer-links a:hover {
-  background: rgb(196 181 253 / 0.08);
+  background: rgb(255 255 255 / 0.08);
   color: #fff;
 }
 
 .nav-links a:active,
 .footer-links a:active {
-  background: rgb(196 181 253 / 0.12);
-  color: var(--accent-light);
+  background: rgb(255 255 255 / 0.12);
+  color: #fff;
 }
 
 .landing-button {
@@ -280,36 +300,100 @@ body {
 }
 
 .landing-button:active::before {
-  background: #c4b5fd;
+  background: #d4d4d8;
 }
 
 .site-nav > .landing-button {
   justify-self: end;
 }
 
+/* The hero's two ways in: sign up, or walk through the demo on sample data. */
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px 24px;
+}
+
+.landing-link,
+.su-demo {
+  color: #d4d4d8;
+  font: 500 14px/1.4 var(--sans);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color 150ms ease;
+}
+
+.landing-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+}
+
+.su-demo {
+  justify-self: center;
+  text-align: center;
+}
+
+.landing-link:hover,
+.su-demo:hover {
+  color: #fff;
+}
+
+.landing-link:focus-visible,
+.su-demo:focus-visible {
+  outline: 2px solid var(--accent-light);
+  outline-offset: 4px;
+}
+
 .landing .backdrop {
-  mask-image: linear-gradient(to bottom, #000, #000 65%, transparent);
-  opacity: 0.65;
+  position: absolute;
+  height: max(640px, 100svh);
+}
+
+.hero-backdrop {
+  /* Fade the whole backdrop so photos, highlights and dust dissolve together. */
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 224px), transparent 100%);
+}
+
+.hero-backdrop .grid {
+  gap: 12px;
+  grid-auto-rows: calc((100vw - (var(--columns) - 1) * 12px) / var(--columns));
+}
+
+.hero-backdrop .cell {
+  border-radius: 4px;
+}
+
+.hero-backdrop .cell img {
+  border-radius: inherit;
+  filter: grayscale(1) brightness(var(--dim)) blur(1px);
+}
+
+.hero-backdrop .cell.hit img {
+  filter: grayscale(1) brightness(0.8);
 }
 
 .hero {
   position: relative;
-  min-height: max(720px, 100svh);
-  padding: clamp(144px, 21svh, 192px) 24px 96px;
-  background: radial-gradient(ellipse 50% 35% at 50% 28%, rgb(0 0 0 / 0.9), transparent), linear-gradient(to bottom, transparent 65%, #000 100%);
+  display: grid;
+  align-items: center;
+  min-height: max(640px, 100svh);
+  padding: 32px 24px 32px;
 }
 
 .hero-copy {
   position: relative;
   display: grid;
   justify-items: center;
-  gap: 24px;
+  gap: 32px;
   text-align: center;
 }
 
 .hero-headline {
   margin: 0;
-  font: 500 clamp(2rem, 4.4vw, 3.5rem) / 1.08 var(--sans);
+  font: 500 clamp(2rem, 4.8vw, 4rem) / 1.06 var(--sans);
   letter-spacing: -0.04em;
   color: #fafafa;
 }
@@ -365,7 +449,17 @@ body {
   fill: currentColor;
 }
 
+@media (min-width: 600px) and (max-width: 959px) {
+  .hero-sub {
+    max-width: 32ch;
+  }
+}
+
 @media (max-width: 599px) {
+  .site-header.is-scrolled {
+    width: calc(100% - 16px);
+  }
+
   .site-nav {
     grid-template-columns: 1fr auto;
     padding-inline: 16px;
@@ -382,6 +476,10 @@ body {
   .hero-sub {
     max-width: 32ch;
     font-size: 16px;
+  }
+
+  .hero-copy {
+    gap: 24px;
   }
 }
 
@@ -985,19 +1083,18 @@ body {
 .mission {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
   align-items: center;
   gap: 64px;
-  min-height: calc(100svh - 60px);
-  padding: 72px max(32px, calc((100% - 1200px) / 2));
+  padding: 80px max(32px, calc((100% - 1280px) / 2));
   background: #000;
   isolation: isolate;
 }
 
 .wall {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 40px 32px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px 24px;
   text-align: center;
   align-items: start;
   margin: 0;
@@ -1023,7 +1120,9 @@ body {
 }
 
 .wall-link {
+  position: relative;
   display: grid;
+  min-height: 48px;
   gap: 8px;
   color: #a1a1aa;
   text-decoration: none;
@@ -1039,7 +1138,7 @@ body {
 }
 
 .wall-link:focus-visible {
-  outline: 2px solid var(--accent-light);
+  outline: 2px solid #fff;
   outline-offset: 6px;
 }
 
@@ -1056,18 +1155,9 @@ body {
 }
 
 .wall-headline {
-  font: 400 clamp(0.95rem, 1.05vw, 1rem) / 1.25 var(--sans);
+  font: 400 16px / 1.25 var(--sans);
   letter-spacing: -0.01em;
   text-wrap: balance;
-}
-
-.wall-item.large .wall-headline {
-  font-size: clamp(1.1rem, 1.25vw, 1.125rem);
-  line-height: 1.15;
-}
-
-.wall-item.small .wall-headline {
-  font-size: clamp(0.85rem, 0.95vw, 0.95rem);
 }
 
 .wall-source {
@@ -1082,10 +1172,9 @@ body {
 }
 
 .mission-copy {
-  order: -1;
   display: grid;
-  justify-items: center;
-  text-align: center;
+  justify-items: start;
+  text-align: left;
   gap: 24px;
   opacity: 0;
   transform: translateY(-24px);
@@ -1104,6 +1193,7 @@ body {
   font: 500 clamp(2rem, 3.6vw, 3.25rem) / 1.12 var(--sans);
   letter-spacing: -0.03em;
   color: #fafafa;
+  text-wrap: balance;
 }
 
 .mission-sub {
@@ -1124,7 +1214,7 @@ body {
   }
 }
 
-/* Narrow screens: the statement first, then a shorter stack of headlines. */
+/* Keep every headline, with complete rows at each column count. */
 @media (max-width: 899px) {
   .mission {
     grid-template-columns: minmax(0, 1fr);
@@ -1133,6 +1223,8 @@ body {
 
   .mission-copy {
     order: -1;
+    justify-items: center;
+    text-align: center;
   }
 
   .wall {
@@ -1142,19 +1234,11 @@ body {
   .wall-item {
     left: 0;
   }
-
-  .wall-item:nth-child(n + 9) {
-    display: none;
-  }
 }
 
 @media (max-width: 599px) {
   .wall {
     grid-template-columns: minmax(0, 1fr);
-  }
-
-  .wall-item:nth-child(n + 6) {
-    display: none;
   }
 }
 
@@ -1227,8 +1311,10 @@ body {
 
 .demo-note {
   max-width: 96ch;
-  margin-top: 32px;
+  margin: 32px auto 0;
   font-size: 14px;
+  text-align: center;
+  opacity: 0.6;
 }
 
 .faq > h2,
@@ -1277,48 +1363,44 @@ body {
   display: grid;
   place-items: center;
   width: 64px;
-  border-left: 1px solid var(--line);
-  border-radius: 12px;
   color: #a1a1aa;
 }
 
+/* A down arrow that spins to point up when the answer opens. */
 .faq-toggle > span {
   position: relative;
   width: 12px;
   height: 12px;
+  transition: transform 320ms cubic-bezier(0.34, 1.4, 0.64, 1);
 }
 
-.faq-toggle > span::before,
-.faq-toggle > span::after {
+.faq-toggle > span::before {
   content: '';
   position: absolute;
-  top: 5px;
-  left: 0;
-  width: 12px;
-  height: 2px;
-  background: currentColor;
+  top: -1px;
+  left: 2px;
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
 }
 
-.faq-toggle > span::after {
-  transform: rotate(90deg);
-  transition: transform 180ms ease;
-}
-
-.faq-item[open] .faq-toggle > span::after {
-  transform: rotate(0);
+.faq-item[open] .faq-toggle > span {
+  transform: rotate(180deg);
 }
 
 .faq-item summary:hover {
-  background: rgb(196 181 253 / 0.08);
+  background: rgb(255 255 255 / 0.08);
 }
 
 .faq-item summary:active {
-  background: rgb(196 181 253 / 0.12);
+  background: rgb(255 255 255 / 0.12);
 }
 
 .faq-item summary:hover .faq-toggle,
 .faq-item summary:focus-visible .faq-toggle {
-  color: var(--accent-light);
+  color: #fff;
 }
 
 .faq-item p {
@@ -1331,8 +1413,7 @@ body {
   position: relative;
   isolation: isolate;
   min-height: 640px;
-  padding-top: 80px;
-  overflow: hidden;
+  padding: 64px 0 320px;
   background: #000;
 }
 
@@ -1340,8 +1421,9 @@ body {
   position: relative;
   z-index: 1;
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr;
-  gap: 64px;
+  grid-template-columns: 2fr 1fr 1fr 1fr;
+  gap: 48px;
+  max-width: 1200px;
   padding: 0 32px;
   box-sizing: content-box;
 }
@@ -1371,29 +1453,37 @@ body {
   font-size: 14px;
 }
 
+.footer-scene {
+  --centre-shade: radial-gradient(ellipse 48% 64% at 50% 32%, #000 48%, rgb(0 0 0 / 0.96) 64%, transparent 100%);
+  position: absolute;
+  inset: -200px 0 0;
+  overflow: hidden;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, transparent, #000 200px);
+}
+
 .ascii-art {
   position: absolute;
   inset: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
-  mask-image: linear-gradient(to bottom, rgb(0 0 0 / 0.65), #000 24%, #000 92%, transparent);
 }
 
-.site-footer::after {
+.footer-scene::after {
   content: '';
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background: radial-gradient(ellipse 38% 36% at 29% 27%, rgb(0 0 0 / 0.92), transparent 100%),
-    radial-gradient(ellipse 38% 42% at 58% 24%, rgb(0 0 0 / 0.96), transparent 100%);
+  /* Leave the architecture at the edges and the street at the bottom.
+     The upper centre stays dark across the entire width of the link groups. */
+  /* The extra scrim caps even overlapping glyphs behind text below #333333.
+     It ends in the reserved street space, below the last link on every layout. */
+  background: var(--centre-shade),
+    linear-gradient(to bottom, rgb(0 0 0 / 0.7) calc(100% - 300px), transparent calc(100% - 200px));
 }
 
 /* Expand the target without adding height to the headline's grid slot. */
-.wall-link {
-  position: relative;
-}
-
 .wall-link::after {
   content: '';
   position: absolute;
@@ -1403,8 +1493,8 @@ body {
 }
 
 .wall-link:active {
-  color: var(--accent-light);
-  background: rgb(196 181 253 / 0.12);
+  color: #fff;
+  background: rgb(255 255 255 / 0.12);
 }
 
 @media (max-width: 959px) {
@@ -1414,6 +1504,11 @@ body {
 
   .footer-content {
     gap: 32px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .footer-about {
+    grid-column: 1 / -1;
   }
 }
 
@@ -1450,10 +1545,6 @@ body {
   .faq-item p {
     margin-right: 48px;
     padding: 0 16px 24px;
-  }
-
-  .site-footer {
-    padding-top: 80px;
   }
 
   .footer-content {
@@ -1513,7 +1604,6 @@ body {
 @keyframes quiet-glow { to { border-color: #777; box-shadow: 0 0 24px rgb(255 255 255 / 0.035); } }
 @media (max-width: 959px) { .how-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); row-gap: 40px; } }
 @media (max-width: 599px) {
-  .site-nav { padding-inline: 16px; }
   .mission { padding: 64px 24px; gap: 48px; }
   .wall { gap: 32px; }
   .how-grid { grid-template-columns: minmax(0, 1fr); }
@@ -1522,56 +1612,341 @@ body {
   .faq-question { padding: 12px; font-size: 14px; }
   .faq-list { margin-top: 24px; }
   .faq-item p { padding-inline: 12px; font-size: 13px; }
-  .site-footer { min-height: 680px; padding-top: 64px; }
-  .site-footer::after { background: radial-gradient(ellipse 90% 65% at 45% 32%, rgb(0 0 0 / 0.9), transparent); }
+  .site-footer { min-height: 800px; }
+  .footer-scene { --centre-shade: radial-gradient(ellipse 96% 64% at 50% 32%, #000 56%, rgb(0 0 0 / 0.96) 72%, transparent 100%); }
 }
 @media (prefers-reduced-motion: reduce) {
   .hero-copy, .scan-line, .orbit-center { animation: none; }
   .how-card:hover .step-preview { transform: none; }
 }
 
-@media (min-width: 900px) and (max-height: 860px) {
-  .mission { padding-block: 40px; gap: 40px; }
-  .wall { row-gap: 32px; }
-  .mission-statement { font-size: 44px; }
+/* ---- Contact and legal documents ---- */
+
+.document-page {
+  background: #000;
 }
 
-/* The hero's two ways in: sign up, or walk through the demo on sample data. */
-.hero-actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 8px 24px;
+.document-main,
+.contact-main {
+  position: relative;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding: 160px 32px 200px;
 }
 
-.landing-link,
-.su-demo {
-  color: #d4d4d8;
-  font: 500 14px/1.4 var(--sans);
-  text-decoration: underline;
-  text-underline-offset: 4px;
-  transition: color 150ms ease;
-}
-
-.landing-link {
-  display: inline-flex;
-  align-items: center;
-  min-height: 48px;
-}
-
-.su-demo {
-  justify-self: center;
+.document-heading {
+  margin-bottom: 80px;
   text-align: center;
 }
 
-.landing-link:hover,
-.su-demo:hover {
-  color: #fff;
+.document-heading h1 {
+  margin: 0;
+  font: 500 clamp(2.5rem, 4.4vw, 4rem) / 1.08 var(--sans);
+  letter-spacing: -0.04em;
 }
 
-.landing-link:focus-visible,
-.su-demo:focus-visible {
-  outline: 2px solid var(--accent-light);
+.document-heading p {
+  margin: 24px 0 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.document-heading .text-link {
+  margin-top: 16px;
+}
+
+.document-layout {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  align-items: start;
+  gap: 96px;
+}
+
+.document-contents {
+  position: sticky;
+  top: 104px;
+  display: grid;
+}
+
+.document-contents-compact {
+  display: none;
+}
+
+.document-contents h2 {
+  margin: 0 0 16px;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.document-contents a,
+.document-contents-compact a {
+  display: flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 8px 12px;
+  margin-left: -12px;
+  border-radius: 8px;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.document-contents a:hover,
+.document-contents-compact a:hover {
+  color: #fff;
+  background: rgb(255 255 255 / 0.06);
+}
+
+.document-contents a:active,
+.document-contents-compact a:active {
+  background: rgb(255 255 255 / 0.1);
+}
+
+.document-body {
+  min-width: 0;
+  max-width: 720px;
+  color: #b4b4bc;
+  font-size: 17px;
+  line-height: 1.75;
+  overflow-wrap: anywhere;
+}
+
+.document-body p {
+  margin: 0 0 20px;
+}
+
+.document-body .document-intro {
+  margin-bottom: 48px;
+  color: #d4d4d8;
+  font-size: 20px;
+  line-height: 1.6;
+}
+
+.document-body section + section {
+  margin-top: 48px;
+}
+
+.document-body h2 {
+  margin: 0 0 20px;
+  font-size: 28px;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  color: #fafafa;
+}
+
+.text-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  max-width: 100%;
+  color: #d4d4d8;
+  text-decoration-color: #57575f;
+  text-underline-offset: 4px;
+  overflow-wrap: anywhere;
+}
+
+.text-link:hover,
+.contact-form a:hover {
+  color: #fff;
+  text-decoration-color: currentColor;
+}
+
+.text-link:active,
+.contact-form a:active {
+  color: #a1a1aa;
+}
+
+.contact-main {
+  max-width: 704px;
+  padding-top: 112px;
+}
+
+.contact-main .document-heading {
+  margin-bottom: 32px;
+}
+
+.contact-main .document-heading h1 {
+  font-size: clamp(2.5rem, 4vw, 3.5rem);
+}
+
+.contact-main .document-heading p {
+  margin-top: 16px;
+}
+
+.contact-main .document-heading .text-link {
+  margin-top: 0;
+}
+
+.contact-form {
+  display: grid;
+  gap: 20px;
+}
+
+.contact-field {
+  display: grid;
+  gap: 8px;
+}
+
+.contact-field label {
+  font-size: 14px;
+  color: #e4e4e7;
+}
+
+.contact-field :is(input, select, textarea) {
+  width: 100%;
+  min-width: 0;
+  min-height: 48px;
+  padding: 12px 16px;
+  border: 1px solid #303034;
+  border-radius: 8px;
+  background: #050505;
+  color: #f4f4f5;
+  font: inherit;
+  transition: border-color 180ms ease, background 180ms ease;
+}
+
+.contact-field textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.contact-field :is(input, textarea)::placeholder {
+  color: #85858d;
+}
+
+.contact-field :is(input, select, textarea):hover {
+  border-color: #66666e;
+}
+
+.contact-field :is(input, select, textarea):active {
+  background: #101010;
+}
+
+.document-page :is(input, select, textarea, button):focus-visible {
+  outline: 2px solid #fff;
   outline-offset: 4px;
+}
+
+.contact-note,
+.contact-action p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.contact-note a,
+.contact-status a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  color: #d4d4d8;
+  text-underline-offset: 4px;
+}
+
+.contact-action {
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.contact-submit {
+  display: inline-flex;
+  align-items: center;
+  gap: 24px;
+  min-height: 48px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+  color: #000;
+  font: 500 14px/1 var(--sans);
+  cursor: pointer;
+  transition: background 180ms ease;
+}
+
+.contact-submit:hover {
+  background: #e4e4e7;
+}
+
+.contact-submit:active {
+  background: #d4d4d8;
+}
+
+.contact-submit:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+}
+
+.contact-status {
+  margin: 0;
+  padding: 16px;
+  border: 1px solid #303034;
+  border-radius: 8px;
+  color: #d4d4d8;
+  font-size: 14px;
+}
+
+@media (max-width: 899px) {
+  .document-layout {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+
+  .document-contents {
+    display: none;
+  }
+
+  .document-contents-compact {
+    display: block;
+    padding: 0 16px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+  }
+
+  .document-contents-compact summary {
+    align-content: center;
+    min-height: 48px;
+    cursor: pointer;
+  }
+
+  .document-contents-compact summary:hover {
+    color: #fff;
+  }
+
+  .document-contents-compact summary:active {
+    color: #fff;
+  }
+
+  .document-contents-compact nav {
+    padding-bottom: 16px;
+  }
+}
+
+@media (max-width: 599px) {
+  .document-main,
+  .contact-main {
+    padding: 128px 24px 160px;
+  }
+
+  .document-heading {
+    margin-bottom: 48px;
+  }
+
+  .document-body {
+    font-size: 16px;
+  }
+
+  .document-body h2 {
+    font-size: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .contact-field :is(input, select, textarea),
+  .contact-submit {
+    transition: none;
+  }
 }

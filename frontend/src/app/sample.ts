@@ -56,7 +56,7 @@ function marked(rows: Case[]) {
   }))
 }
 export const sample = {
-  person: () => ({ id: 'sample', name: 'Alex Rivera' }),
+  person: () => ({ id: 'sample', name: 'Alex Rivera', consent: '', created_at: '', development_fixture: false, references: [], originals: [], active_reference_count: 0 }),
   warning: () => ({ warning: WARNING }),
   scans: () =>
     state.scans.map((row) => ({
@@ -157,7 +157,7 @@ export const sample = {
     const id = `sample-${Date.now()}`
     const view: Batch = {
       id,
-      mode: 'prepare',
+      mode: request.mode,
       phase: 'preparing',
       status: 'running',
       total: request.case_ids.length,
@@ -178,8 +178,11 @@ export const sample = {
         const planId = ((item.case_id - 1) % 8) + 1
         const plan = PLANS[planId]
         item.status = prepareSampleItem(planId, step)
+        if (request.mode === 'send' && item.status === 'ready_to_send') item.status = 'sent'
         item.reason =
-          item.status === 'ready_to_send'
+          item.status === 'sent'
+            ? 'Simulated email delivery. No network request was sent.'
+            : item.status === 'ready_to_send'
             ? 'Draft ready. Nothing sent.'
             : (STAGE_REASON[item.status] ?? plan.reason)
         const row = state.cases[entry.scan].find((row) => row.id === item.case_id)!

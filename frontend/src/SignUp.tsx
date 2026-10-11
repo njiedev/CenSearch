@@ -84,6 +84,10 @@ function PhotoList({ photos }: { photos: PhotoResult[] }) {
 }
 
 export default function SignUp() {
+  const fixture = ['127.0.0.1', 'localhost', '[::1]'].includes(location.hostname) &&
+    new URLSearchParams(location.search).get('fixture') === '1'
+  const consentText = fixture ? 'Use these local test fixtures only; no actual consent claim.' : CONSENT
+  const ownershipText = fixture ? 'Hypothetical fixture ownership for local testing only.' : OWNERSHIP
   const [name, setName] = useState('')
   const [references, setReferences] = useState<File[]>([])
   const [originals, setOriginals] = useState<File[]>([])
@@ -119,11 +123,12 @@ export default function SignUp() {
 
     const data = new FormData()
     data.append('name', name.trim())
-    data.append('consent', CONSENT)
+    data.append('consent', consentText)
+    if (fixture) data.append('development_fixture', 'true')
     references.forEach((file) => data.append('references', file))
     originals.forEach((file) => data.append('originals', file))
     if (originals.length > 0) {
-      data.append('ownership', OWNERSHIP)
+      data.append('ownership', ownershipText)
     }
 
     setOutcome({ state: 'sending' })
@@ -186,6 +191,7 @@ export default function SignUp() {
         Add photos of your face. We'll find where they show up online and help get them taken down.
       </p>
 
+      {fixture && <p role="status">Local fixture enrollment · external face search is blocked.</p>}
       <div className="su-field">
         <label htmlFor="su-name">Name</label>
         <input
@@ -267,7 +273,7 @@ export default function SignUp() {
             aria-invalid={Boolean(errors.consent)}
             aria-describedby={errors.consent ? 'su-consent-error' : undefined}
           />
-          <span>{CONSENT}</span>
+          <span>{consentText}</span>
         </label>
         {errors.consent && (
           <p className="su-error" id="su-consent-error">
@@ -286,7 +292,7 @@ export default function SignUp() {
               aria-invalid={Boolean(errors.ownership)}
               aria-describedby={errors.ownership ? 'su-ownership-error' : undefined}
             />
-            <span>{OWNERSHIP}</span>
+            <span>{ownershipText}</span>
           </label>
           {errors.ownership && (
             <p className="su-error" id="su-ownership-error">

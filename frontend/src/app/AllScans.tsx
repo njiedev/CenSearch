@@ -1,3 +1,7 @@
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
 import { useState } from 'react'
 import type { Scan } from './types'
 import { Empty, ScanStatus } from './ui'
@@ -36,10 +40,10 @@ export default function AllScans({
         <h1>All scans</h1>
         <p>Your public searches and their results.</p>
       </header>
-      <label className="table-search">
+      <Label className="table-search">
         Find a scan
-        <input type="search" value={query} onChange={(event) => setQuery(event.target.value)} />
-      </label>
+        <Input type="search" value={query} onChange={(event) => setQuery(event.target.value)} />
+      </Label>
       {!scans.length ? (
         <Empty title="No scans yet" action="Start scan" onAction={newScan}>
           Start your first scan to look for public appearances.
@@ -50,28 +54,28 @@ export default function AllScans({
         </Empty>
       ) : (
         <div className="table-scroll">
-          <table>
-            <thead>
-              <tr>
-                <th>Scan</th>
-                <th aria-sort={sort === 'started' ? (descending ? 'descending' : 'ascending') : 'none'}>
-                  <button onClick={() => order('started')}>Started ↕</button>
-                </th>
-                <th>Duration</th>
-                <th>Pages</th>
-                <th>Images checked</th>
-                <th aria-sort={sort === 'matches' ? (descending ? 'descending' : 'ascending') : 'none'}>
-                  <button onClick={() => order('matches')}>Matches ↕</button>
-                </th>
-                <th>Possible</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Scan</TableHead>
+                <TableHead aria-sort={sort === 'started' ? (descending ? 'descending' : 'ascending') : 'none'}>
+                  <Button variant="ghost" onClick={() => order('started')}>Started ↕</Button>
+                </TableHead>
+                <TableHead>Duration</TableHead>
+                <TableHead>Pages</TableHead>
+                <TableHead>Images checked</TableHead>
+                <TableHead aria-sort={sort === 'matches' ? (descending ? 'descending' : 'ascending') : 'none'}>
+                  <Button variant="ghost" onClick={() => order('matches')}>Matches ↕</Button>
+                </TableHead>
+                <TableHead>Possible</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
               {rows.map((scan) => (
-                <tr key={scan.run_id} onClick={() => open(scan)}>
-                  <td>
-                    <button
+                <TableRow key={scan.run_id} onClick={() => open(scan)}>
+                  <TableCell>
+                    <Button variant="ghost"
                       className="scan-name"
                       title={scan.label}
                       onClick={(event) => {
@@ -80,21 +84,21 @@ export default function AllScans({
                       }}
                     >
                       {scan.label}
-                    </button>
-                  </td>
-                  <td>{date(scan.started_at)}</td>
-                  <td>{duration(scan.started_at, scan.finished_at)}</td>
-                  <td>{scan.pages_fetched ?? '-'}</td>
-                  <td>{scan.images_checked ?? '-'}</td>
-                  <td>{scan.match_count ?? '-'}</td>
-                  <td>{scan.possible_count ?? '-'}</td>
-                  <td>
+                    </Button>
+                  </TableCell>
+                  <TableCell>{date(scan.started_at)}</TableCell>
+                  <TableCell>{duration(scan.started_at, scan.finished_at)}</TableCell>
+                  <TableCell>{scan.pages_fetched ?? '-'}</TableCell>
+                  <TableCell>{scan.images_checked ?? '-'}</TableCell>
+                  <TableCell>{scan.match_count ?? '-'}</TableCell>
+                  <TableCell>{scan.possible_count ?? '-'}</TableCell>
+                  <TableCell>
                     <ScanStatus status={scan.status} />
-                  </td>
-                </tr>
+                  </TableCell>
+                </TableRow>
               ))}
-            </tbody>
-          </table>
+            </TableBody>
+          </Table>
         </div>
       )}
     </section>

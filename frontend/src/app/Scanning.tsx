@@ -1,60 +1,79 @@
+import { photoUrl } from '../photoUrl'
+import { Eye } from '../Logo'
+import { DustLayer } from '../dust'
+import { Button } from "@/components/ui/button"
 import { useEffect, useRef, useState } from 'react'
-import SnakeEye from '../SnakeEye'
 import { api } from './api'
 import { ErrorBox, Loading } from './ui'
 import { usePoll } from './hooks'
 import type { Run } from './types'
+import FaceSearchResults from './FaceSearchResults'
 
 function ScanAnimation() {
   const stage = useRef<HTMLDivElement>(null)
+  const canvas = useRef<HTMLCanvasElement>(null)
   const tiles = useRef<(HTMLDivElement | null)[]>([])
-  const [lookAt, setLookAt] = useState<{ x: number; y: number } | null>(null)
+  const [gaze, setGaze] = useState({ x: 60, y: 40, lid: 30 })
   useEffect(() => {
     const media = matchMedia('(prefers-reduced-motion: reduce)')
+    const dust = new DustLayer(canvas.current!, 0.7)
     let frame = 0
     let last = 0
     let elapsed = 0
-    let lastGaze = 0
-    let box = stage.current!.getBoundingClientRect()
-    const resize = new ResizeObserver(() => {
-      box = stage.current!.getBoundingClientRect()
-    })
-    resize.observe(stage.current!)
+    let lastPhase = ''
+    const dissolved = new Set<number>()
     function draw(now: number) {
       elapsed += last ? Math.min(now - last, 50) : 0
       last = now
+      const turn = Math.floor(elapsed / 2400)
+      const watching = elapsed % 2400 > 300
+      const deciding = elapsed % 2400 > 1200
+      const phase = `${turn}/${watching}/${deciding}`
+      if (phase !== lastPhase) {
+        lastPhase = phase
+        setGaze({
+          x: watching ? [43, 60, 77][turn % 3] : 60,
+          y: watching ? 30 : 40,
+          lid: deciding ? 24 : 4,
+        })
+      }
       tiles.current.forEach((tile, i) => {
         if (!tile) return
-        const t = ((elapsed - i * 1500 + 9000) % 9000) / 9000
-        const side = i % 2 ? 1 : -1
-        const x = side * Math.min(box.width * 0.4, 340) * t
-        const y = 80 - 240 * t + 90 * t * t
-        tile.style.transform = `translate(${x}px, ${y}px) rotate(${side * t * 8}deg)`
-        tile.style.opacity = String(Math.min(t * 8, (1 - t) * (i === 0 ? 8 : 5), 0.75))
-        const watching = t >= 0.2 && t < 0.367
-        tile.dataset.watching = String(watching)
-        tile.dataset.resolved = String(t >= 0.367)
-        if (watching && elapsed - lastGaze > 180)
-          setLookAt({ x: box.left + box.width / 2 + x, y: box.top + box.height / 2 + y })
+        const age = (elapsed - i * 2400 + 14400) % 14400
+        const visible = elapsed >= i * 2400 && age < 4700
+        const cycle = Math.floor(elapsed / 14400) * 6 + i
+        tile.style.opacity = visible ? String(Math.min(age / 300, (4700 - age) / 800, 1)) : '0'
+        tile.style.transform = `translateY(${visible ? Math.max(0, 12 - age / 25) : 12}px)`
+        tile.dataset.watching = String(visible && age >= 300 && age < 1200)
+        tile.dataset.resolved = String(visible && age >= 1200)
+        if (visible && age < 300) tile.querySelector('img')!.style.opacity = '1'
+        if (visible && age >= 2200 && i % 2 && !dissolved.has(cycle)) {
+          dissolved.add(cycle)
+          const img = tile.querySelector('img')!
+          void dust.disintegrate(img, () => { img.style.opacity = '0' })
+        }
       })
-      if (elapsed - lastGaze > 180) lastGaze = elapsed
       frame = requestAnimationFrame(draw)
     }
     function resume() {
       cancelAnimationFrame(frame)
+      dust.clear()
       last = 0
       if (document.hidden || media.matches) {
-        setLookAt(null)
+        setGaze({ x: 60, y: 40, lid: 30 })
         return
       }
       frame = requestAnimationFrame(draw)
     }
+    const resize = () => dust.resize()
     resume()
+    window.addEventListener('resize', resize)
     document.addEventListener('visibilitychange', resume)
     media.addEventListener('change', resume)
     return () => {
       cancelAnimationFrame(frame)
-      resize.disconnect()
+      dust.clear()
+      window.removeEventListener('resize', resize)
       document.removeEventListener('visibilitychange', resume)
       media.removeEventListener('change', resume)
     }
@@ -63,20 +82,20 @@ function ScanAnimation() {
     <div className="scan-art" ref={stage} aria-hidden="true">
       {[63, 77, 88, 49, 60, 74].map((photo, i) => (
         <div
-          className={`scan-tile ${i === 0 ? 'match' : ''}`}
-          ref={(node) => {
-            tiles.current[i] = node
-          }}
+          className={`scan-tile ${i % 2 ? 'dismiss' : 'match'} scan-slot-${i % 3}`}
+          ref={(node) => { tiles.current[i] = node }}
           key={photo}
         >
-          <img src={`/photos/${photo}.jpg`} alt="" />
-          <span>{i === 0 ? '✓ Match' : '– No match'}</span>
+          <img src={photoUrl(photo)} alt="" />
+          <span>{i % 2 ? '×' : '✓'}</span>
         </div>
       ))}
-      <SnakeEye className="scan-eye" lookAt={lookAt} />
+      <canvas className="scan-dust" ref={canvas} />
+      <div className="scan-eye"><Eye gaze={gaze} /></div>
     </div>
   )
 }
+
 export default function Scanning({
   id,
   onDone,
@@ -146,36 +165,48 @@ export default function Scanning({
   )
   return (
     <section className="scan-view">
-      {!stopped && <ScanAnimation />}
+      {!stopped && !finished && <ScanAnimation />}
       <div className="scan-status" aria-live="polite" aria-atomic="true">
         <h1>
           {stopped
             ? `Scan ${run.status}`
-            : run.metrics.analysed
-              ? 'Checking images…'
+            : run.facecheck && ['uploading', 'submitting', 'searching'].includes(run.facecheck.status)
+              ? 'Searching FaceCheck'
+              : run.metrics.analysed
+              ? 'Checking images'
               : pagesFetched
-                ? 'Reading public pages…'
-                : 'Searching for pages…'}
+                ? 'Reading public pages'
+                : 'Searching for pages'}
+          {!stopped && !finished && (
+            <span className="loading-dots" aria-hidden="true">
+              <span>.</span><span>.</span><span>.</span>
+            </span>
+          )}
         </h1>
-        <p>
-          {stopped
-            ? 'Start a new scan, or inspect any matches already found.'
-            : 'Matching runs locally. The tiles above are decorative, not search results.'}
-        </p>
-        <div className="summary">
-          <span>
-            <strong>{pagesFetched ?? '-'}</strong>pages fetched
-          </span>
-          <span>
-            <strong>{run.metrics.analysed ?? '-'}</strong>images checked
-          </span>
-          <span>
-            <strong>{run.results?.length ?? run.metrics.matches ?? '-'}</strong>matches so far
-          </span>
-          <span>
-            <strong>{elapsed}s</strong>elapsed
-          </span>
-        </div>
+        {stopped && <p>Start a new scan, or inspect any matches already found.</p>}
+        {run.facecheck && !stopped && <p>
+          {run.facecheck.status === 'completed'
+            ? `${run.facecheck.items.length} candidates above 90 · checking public pages`
+            : `FaceCheck ${run.facecheck.progress ?? 0}% · keeping scores above 90 only`}
+        </p>}
+        <details className="scan-details">
+          <summary>Scan details · {elapsed}s</summary>
+          <p className="muted">Animation only · results appear when the scan finishes.</p>
+          <div className="summary">
+            <span>
+              <strong>{pagesFetched ?? '-'}</strong>pages fetched
+            </span>
+            <span>
+              <strong>{run.metrics.analysed ?? '-'}</strong>images checked
+            </span>
+            <span>
+              <strong>{run.results?.length ?? run.metrics.matches ?? '-'}</strong>matches so far
+            </span>
+            <span>
+              <strong>{elapsed}s</strong>elapsed
+            </span>
+          </div>
+        </details>
         {run.errors?.length > 0 && (
           <p className="field-error">
             {run.errors.map((item) => item.message || item.error || 'A page could not be checked.').join(' ')}
@@ -183,18 +214,23 @@ export default function Scanning({
         )}
       </div>
       {error && <ErrorBox error={error} retry={retry} />}
+      {stopped && run.facecheck && <FaceSearchResults run={run} onResumed={() => {
+        announced.current = null
+        setFinished(false)
+        retry()
+      }} />}
       {cancelError && <ErrorBox error={cancelError} retry={() => void cancel()} />}
       {stopped ? (
         <div className="actions">
-          <button className="primary" onClick={onRetry}>
+          <Button variant="default" onClick={onRetry}>
             Start a new scan
-          </button>
-          {run.results.length > 0 && <button onClick={onResults}>Open partial results</button>}
+          </Button>
+          {run.results.length > 0 && <Button variant="outline" onClick={onResults}>Open partial results</Button>}
         </div>
       ) : (
-        <button disabled={cancelling || finished} onClick={cancel}>
+        <Button variant="outline" disabled={cancelling || finished} onClick={cancel}>
           {cancelling ? 'Cancelling…' : 'Cancel scan'}
-        </button>
+        </Button>
       )}
     </section>
   )

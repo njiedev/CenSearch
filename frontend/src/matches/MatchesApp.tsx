@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button"
 import { useEffect, useMemo, useState } from 'react'
 import { Clock } from '../Hud'
 import PhotoGrid from '../PhotoGrid'
@@ -117,7 +118,7 @@ export default function MatchesApp() {
             <ul className="mx-nav">
               {nav.map((item) => (
                 <li key={item.id}>
-                  <button
+                  <Button variant="outline"
                     type="button"
                     className="mx-nav-item"
                     aria-current={section === item.id ? 'page' : undefined}
@@ -125,7 +126,7 @@ export default function MatchesApp() {
                   >
                     <span>{item.label}</span>
                     {item.badge && <span className="mx-nav-badge">{item.badge}</span>}
-                  </button>
+                  </Button>
                 </li>
               ))}
             </ul>
@@ -146,7 +147,7 @@ export default function MatchesApp() {
             <p className="mx-nav-group">Mock controls</p>
             <div className="mx-segment" role="radiogroup" aria-label="Matches page state">
               {VIEW_STATES.map((state) => (
-                <button
+                <Button variant="outline"
                   key={state.id}
                   type="button"
                   role="radio"
@@ -154,12 +155,12 @@ export default function MatchesApp() {
                   onClick={() => setViewState(state.id)}
                 >
                   {state.label}
-                </button>
+                </Button>
               ))}
             </div>
-            <button type="button" className="mx-btn ghost small" onClick={reset}>
+            <Button variant="outline" type="button" className="mx-btn ghost small" onClick={reset}>
               Reset mock
-            </button>
+            </Button>
             <p className="mx-mock-note">Sample data, not connected to the backend.</p>
           </div>
         </aside>

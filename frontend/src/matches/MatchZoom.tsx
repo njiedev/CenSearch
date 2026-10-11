@@ -1,4 +1,6 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog'
+import { Button } from '@/components/ui/button'
 import { actionOf, statusOf } from './logic'
 import { StatusPill } from './Status'
 import type { Case } from './types'
@@ -20,56 +22,15 @@ type Props = {
   onWhitelist?: (item: Case) => void
   whitelistBusy?: boolean
   whitelistError?: string
+  followUp?: ReactNode
   onClose: () => void
 }
 
-// The match, zoomed in over a blurred page: image on the left, everything we
-// know about it on the right. A native <dialog> gives focus trapping, Esc to
-// close and a ::backdrop to blur.
-export default function MatchZoom({ item, origin, onClose, onWhitelist, whitelistBusy, whitelistError }: Props) {
-  const dialogRef = useRef<HTMLDialogElement>(null)
-  const panelRef = useRef<HTMLDivElement>(null)
+export default function MatchZoom({ item, origin, onClose, onWhitelist, whitelistBusy, whitelistError, followUp }: Props) {
   const [copied, setCopied] = useState(false)
-
-  useLayoutEffect(() => {
-    const dialog = dialogRef.current!
-    if (!item) {
-      if (dialog.open) {
-        dialog.close()
-      }
-      return
-    }
-    if (!dialog.open) {
-      dialog.showModal()
-    }
-    // Grow from the card: start at its size and spot, end at the centre.
-    const panel = panelRef.current!
-    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    if (!origin || still) {
-      return
-    }
-    const from = origin.getBoundingClientRect()
-    const to = panel.getBoundingClientRect()
-    const dx = from.left + from.width / 2 - (to.left + to.width / 2)
-    const dy = from.top + from.height / 2 - (to.top + to.height / 2)
-    const scale = Math.max(from.width / to.width, 0.2)
-    panel.animate(
-      [
-        { transform: `translate(${dx}px, ${dy}px) scale(${scale})`, opacity: 0.4 },
-        { transform: 'none', opacity: 1 },
-      ],
-      { duration: 280, easing: 'cubic-bezier(0.2, 0.7, 0.2, 1)' },
-    )
-  }, [item, origin])
-
-  // Hand focus back to the card that opened the zoom.
+  const returnFocus = useRef<HTMLElement | null>(null)
   useEffect(() => {
-    const dialog = dialogRef.current!
-    function restore() {
-      origin?.focus()
-    }
-    dialog.addEventListener('close', restore)
-    return () => dialog.removeEventListener('close', restore)
+    if (origin) returnFocus.current = origin
   }, [origin])
 
   async function copy(text: string) {
@@ -83,22 +44,15 @@ export default function MatchZoom({ item, origin, onClose, onWhitelist, whitelis
   const sent = notice && item ? item.batch_outcome?.status === 'sent' : false
 
   return (
-    <dialog
-      ref={dialogRef}
-      className="mx-zoom"
-      aria-labelledby="mx-zoom-title"
-      onClose={onClose}
-      onClick={(event) => {
-        // A click on the blurred backdrop (the dialog itself) closes it.
-        if (event.target === event.currentTarget) {
-          onClose()
-        }
-      }}
-    >
+    <Dialog open={Boolean(item)} onOpenChange={(open) => { if (!open) onClose() }}>
+      <DialogContent className="app-shell max-h-[90svh] overflow-y-auto p-0 sm:max-w-4xl" aria-describedby={undefined}
+        onCloseAutoFocus={(event) => { event.preventDefault(); returnFocus.current?.focus() }}>
       {item && action && (
-        <div className="mx-zoom-panel" ref={panelRef}>
+        <div className="mx-zoom-panel">
           <figure className="mx-zoom-image">
-            <img src={item.matched_image_url} alt={`Matched image for match ${item.id}`} />
+            {item.thumbnail_available === false
+              ? <p className="mx-thumbnail-missing">Thumbnail unavailable for this saved candidate.</p>
+              : <img src={item.matched_image_url} alt={`Candidate image for match ${item.id}`} />}
           </figure>
 
           <div className="mx-zoom-body">
@@ -107,18 +61,20 @@ export default function MatchZoom({ item, origin, onClose, onWhitelist, whitelis
                 <p className="mx-eyebrow">
                   Match {item.id} · {item.band === 'possible' ? 'Possible match' : 'Match'}
                 </p>
-                <h2 id="mx-zoom-title">{hostname(item.page_url)}</h2>
+                <DialogTitle>{hostname(item.page_url)}</DialogTitle>
                 <a className="mx-link" href={item.page_url} target="_blank" rel="noreferrer">
                   Open source page ↗
                 </a>
               </div>
-              <button type="button" className="mx-close" onClick={onClose} aria-label="Close">
-                ✕
-              </button>
             </div>
 
             <section className="mx-zoom-section">
-              {onWhitelist && <button className="mx-btn ghost" disabled={whitelistBusy} onClick={() => onWhitelist(item)}>{item.whitelisted ? 'Remove from whitelist' : 'Add site to whitelist'}</button>}
+              {item.match_type === 'facecheck' && <p className="mx-callout">
+                FaceCheck candidate · Score {item.provider_score}. This provider thumbnail has not been
+                locally verified on the source page. The score does not establish identity, ownership,
+                or misuse. The agent reviews page text; it does not see this image.
+              </p>}
+              {onWhitelist && <Button variant="outline"  disabled={whitelistBusy} onClick={() => onWhitelist(item)}>{item.whitelisted ? 'Remove from whitelist' : 'Add site to whitelist'}</Button>}
               {whitelistError && <p role="alert" className="field-error">{whitelistError}</p>}
               <h3>{action.possible ? 'Suggested action' : 'Action taken'}</h3>
               <p className="mx-action-lg">
@@ -150,8 +106,8 @@ export default function MatchZoom({ item, origin, onClose, onWhitelist, whitelis
                 </p>
                 {isManual(notice.recipient) && (
                   <p className="mx-callout">
-                    This is a real website, so we don’t send it for you. Copy the notice and send it to the recipient
-                    yourself.
+                    Check the recorded outcome for this request. If it remains unsent, you can copy the notice
+                    and submit it yourself.
                   </p>
                 )}
               </section>
@@ -161,16 +117,18 @@ export default function MatchZoom({ item, origin, onClose, onWhitelist, whitelis
               <section className="mx-zoom-section">
                 <div className="mx-section-head">
                   <h3>{sent ? 'Sent notice' : 'Drafted notice'}</h3>
-                  <button type="button" className="mx-btn ghost small" onClick={() => copy(notice.payload.body)}>
+                  <Button variant="outline" type="button" size="sm" onClick={() => copy(notice.payload.body)}>
                     {copied ? 'Copied ✓' : 'Copy notice'}
-                  </button>
+                  </Button>
                 </div>
                 <pre className="mx-notice">{notice.payload.body}</pre>
               </section>
             )}
+            {followUp}
           </div>
         </div>
       )}
-    </dialog>
+      </DialogContent>
+    </Dialog>
   )
 }

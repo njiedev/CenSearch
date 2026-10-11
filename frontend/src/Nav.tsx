@@ -1,17 +1,27 @@
+import { useEffect, useState } from 'react'
 import Logo from './Logo'
 import { readSession } from './app/session'
 
-export default function Nav() {
+export default function Nav({ onLanding = true }: { onLanding?: boolean }) {
+  const home = onLanding ? '' : '/'
+  const [scrolled, setScrolled] = useState(() => window.scrollY > 24)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 24)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   return (
-    <header className="site-header">
+    <header className={`site-header${scrolled ? ' is-scrolled' : ''}`}>
       <nav className="site-nav" aria-label="Main navigation">
-        <a className="brand-link" href="#top" aria-label="CenSearch">
-          <Logo />
+        <a className="brand-link" href={`${home}#top`} aria-label="CenSearch">
+          <Logo compact />
         </a>
         <div className="nav-links">
-          <a href="#mission">Mission</a>
-          <a href="#features">Features</a>
-          <a href="#faq">FAQ</a>
+          <a href={`${home}#mission`}>Mission</a>
+          <a href={`${home}#features`}>Features</a>
+          <a href={`${home}#faq`}>FAQ</a>
         </div>
         {readSession() ? <a className="landing-button" href="/app/">Open app</a> : <a className="landing-button" href="/signup.html">Sign up</a>}
       </nav>

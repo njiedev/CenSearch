@@ -8,7 +8,7 @@ import PhotoGrid from './PhotoGrid'
 export default function App() {
   return (
     <div className="landing">
-      <PhotoGrid />
+      <PhotoGrid framed />
       <Nav />
       <main>
         <section className="hero" id="top">

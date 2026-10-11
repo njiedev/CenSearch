@@ -1,3 +1,8 @@
+import { Card } from "@/components/ui/card"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
 import { useState, type FormEvent } from 'react'
 import { PERSON, WARNING } from './mockData'
 import type { Case, Contact } from './types'
@@ -15,13 +20,17 @@ type Props = {
   warning?: string
   personName?: string
   preparing?: boolean
+  allowReview?: boolean
+  deliveryNote?: string
   busy?: boolean
   cases: Case[]
-  onRun: (contact: Contact, acceptedBy: string) => void
+  onRun: (contact: Contact, acceptedBy: string, mode?: 'prepare' | 'send') => void
   onCancel: () => void
 }
 
-export default function AuthorizeBatch({ cases, onRun, onCancel, warning = WARNING, personName = PERSON.name, preparing = false, busy = false }: Props) {
+export default function AuthorizeBatch({ cases, onRun, onCancel, warning = WARNING, personName = PERSON.name, preparing = false, allowReview = false, deliveryNote = '', busy = false }: Props) {
+  const [reviewFirst, setReviewFirst] = useState(false)
+  const prepareOnly = preparing || reviewFirst
   const [contact, setContact] = useState<Contact>({
     name: personName,
     email: '',
@@ -38,9 +47,9 @@ export default function AuthorizeBatch({ cases, onRun, onCancel, warning = WARNI
         <div className="mx-empty">
           <h2>Nothing selected</h2>
           <p>Select one or more matches first, then come back here to authorize them.</p>
-          <button type="button" className="mx-btn primary" onClick={onCancel}>
+          <Button type="button" variant="default" onClick={onCancel}>
             Go to matches
-          </button>
+          </Button>
         </div>
       </section>
     )
@@ -52,7 +61,7 @@ export default function AuthorizeBatch({ cases, onRun, onCancel, warning = WARNI
   function submit(event: FormEvent) {
     event.preventDefault()
     if (ready) {
-      onRun(contact, acceptedBy)
+      onRun(contact, acceptedBy, prepareOnly ? 'prepare' : 'send')
     }
   }
 
@@ -60,23 +69,32 @@ export default function AuthorizeBatch({ cases, onRun, onCancel, warning = WARNI
     <section className="mx-view" aria-labelledby="mx-auth-title">
       <header className="mx-header">
         <div>
-          <h1 id="mx-auth-title">{preparing ? 'Authorize agent review' : 'Authorize auto review / send'}</h1>
+          <h1 id="mx-auth-title">{prepareOnly ? 'Authorize agent review' : 'Authorize automatic requests'}</h1>
           <p className="mx-sub">Check the matches, read the warning, and confirm you take responsibility.</p>
         </div>
       </header>
 
-      {preparing && <p className="mx-callout">You will review every notice before confirming which requests to send.</p>}
+      <p className="mx-callout">{prepareOnly
+        ? 'You will review every notice before confirming which requests to send.'
+        : 'The agent will review these matches and send eligible requests automatically. You will see each decision, recipient and exact notice afterwards. Uncertain cases stop for review.'}</p>
+      {deliveryNote && <p className="mx-callout" role="status">{deliveryNote}</p>}
       <form className="mx-auth" onSubmit={submit}>
-        <div className="mx-panel">
+        <Card className="gap-4 p-6">
           <h2>
             {cases.length} match{cases.length === 1 ? '' : 'es'} selected
           </h2>
           <ul className="mx-selection">
             {cases.map((item) => (
               <li key={item.id}>
-                <img src={item.matched_image_url} alt="" />
+                {item.thumbnail_available === false
+                  ? <span className="mx-muted" role="img" aria-label="Thumbnail unavailable">—</span>
+                  : <img src={item.matched_image_url} alt="Candidate image" />}
                 <span className="mx-mono">Match {item.id}</span>
-                <span>{hostname(item.page_url)}</span>
+                <span>{hostname(item.page_url)}
+                  {item.match_type === 'facecheck' && <span className="mx-muted block text-xs">
+                    FaceCheck · Score {item.provider_score} · Not locally verified
+                  </span>}
+                </span>
                 <span className="mx-muted">{item.possible_action.label}</span>
               </li>
             ))}
@@ -85,48 +103,53 @@ export default function AuthorizeBatch({ cases, onRun, onCancel, warning = WARNI
             The agent reviews each suggestion and may choose a different legal basis, or hold a match for you to
             review.
           </p>
-        </div>
+        </Card>
 
-        <div className="mx-panel mx-warning">
+        <Card className="gap-4 p-6 mx-warning">
           <h2>Legal responsibility</h2>
           <p>{warning}</p>
-        </div>
+        </Card>
 
-        <div className="mx-panel">
+        <Card className="gap-4 p-6">
           <h2>Your contact details</h2>
           <p className="mx-muted">These go on every request in this batch.</p>
           <div className="mx-fields">
             {FIELDS.map((field) => (
-              <label key={field.key} className={`mx-field${field.wide ? ' wide' : ''}`}>
+              <Label key={field.key} className={`mx-field${field.wide ? ' wide' : ''}`}>
                 <span>{field.label}</span>
-                <input
+                <Input
                   type={field.type ?? 'text'}
                   required
                   maxLength={field.key === 'address' ? 1000 : field.key === 'phone' ? 100 : 300}
                   value={contact[field.key]}
                   onChange={(event) => setContact({ ...contact, [field.key]: event.target.value })}
                 />
-              </label>
+              </Label>
             ))}
-            <label className="mx-field wide">
+            <Label className="mx-field wide">
               <span>Who accepts responsibility</span>
-              <input required maxLength={300} value={acceptedBy} onChange={(event) => setAcceptedBy(event.target.value)} />
-            </label>
+              <Input required maxLength={300} value={acceptedBy} onChange={(event) => setAcceptedBy(event.target.value)} />
+            </Label>
           </div>
-        </div>
+        </Card>
 
-        <label className="mx-accept">
-          <input type="checkbox" checked={accepted} onChange={(event) => setAccepted(event.target.checked)} />
+        <Label className="mx-accept">
+          <Checkbox  checked={accepted} onCheckedChange={(checked) => setAccepted(checked === true)} />
           <span>I accept the legal-responsibility warning and authorize this batch.</span>
-        </label>
+        </Label>
+
+        {allowReview && <Label className="mx-accept">
+          <Checkbox checked={reviewFirst} onCheckedChange={(checked) => setReviewFirst(checked === true)} disabled={busy} />
+          <span>Review notices before sending</span>
+        </Label>}
 
         <div className="mx-actions">
-          <button type="button" className="mx-btn ghost" onClick={onCancel}>
+          <Button type="button" variant="outline" onClick={onCancel}>
             Back to matches
-          </button>
-          <button type="submit" className="mx-btn primary" disabled={!ready || busy}>
-            {busy ? 'Preparing…' : preparing ? 'Prepare requests' : 'Run batch'}
-          </button>
+          </Button>
+          <Button type="submit" variant="default" disabled={!ready || busy}>
+            {busy ? 'Starting…' : prepareOnly ? 'Prepare requests' : allowReview ? 'Review and send automatically' : 'Run batch'}
+          </Button>
           {!ready && <span className="mx-muted">Fill in every field and tick the box to continue.</span>}
         </div>
       </form>

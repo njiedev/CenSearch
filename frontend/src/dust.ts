@@ -51,6 +51,10 @@ export class DustLayer {
   // without a gap. Resolves when the last particle has faded.
   disintegrate(img: HTMLImageElement, onStart: () => void): Promise<void> {
     const rect = img.getBoundingClientRect()
+    const canvasRect = this.canvas.getBoundingClientRect()
+    // Particles use canvas coordinates, including when the hero scrolls.
+    rect.x -= canvasRect.left
+    rect.y -= canvasRect.top
     const particles = this.sample(img, rect)
     if (particles.length === 0) {
       onStart()

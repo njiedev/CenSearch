@@ -5,7 +5,7 @@ const questions = [
   },
   {
     question: 'Do you send requests to real websites?',
-    answer: 'Not in this demo. Requests are sent only to mock sites we run ourselves. For a real site you get the drafted request and the right recipient, and you send it.',
+    answer: 'When email sending is connected, the agent can email removal requests to website contacts after you authorize a batch. Requests requiring a website form remain drafts for you to submit. Sample-mode deliveries are simulated.',
   },
   {
     question: 'Who is legally responsible for a request?',

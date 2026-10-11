@@ -1,3 +1,9 @@
+import { useId } from 'react'
+import { Card } from "@/components/ui/card"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
 import { actionOf, statusOf } from './logic'
 import { StatusPill } from './Status'
 import type { Batch, Case, ViewState } from './types'
@@ -24,30 +30,44 @@ function MatchCard({ item, checked, locked, onToggle, onOpen }: {
   onToggle: () => void
   onOpen: (origin: HTMLElement) => void
 }) {
+  const checkboxId = useId()
   const action = actionOf(item)
+  const status = statusOf(item)
+  const showAction = item.whitelisted || action.route !== 'leave_alone' || status !== 'left_alone'
   return (
-    <article className={`mx-card${checked ? ' is-selected' : ''}${item.whitelisted ? ' is-whitelisted' : ''}`}>
-      <button
+    <Card role="article" className={`mx-card gap-0 p-0${checked ? ' is-selected' : ''}${item.whitelisted ? ' is-whitelisted' : ''}`}>
+      <Button variant="outline"
         type="button"
-        className="mx-card-open"
+        className="mx-card-open grid h-auto w-full gap-1.5 whitespace-normal p-2 pb-3 text-left"
         onClick={(event) => onOpen(event.currentTarget)}
         aria-label={`Open match ${item.id}: ${hostname(item.page_url)}`}
       >
-        <img src={item.matched_image_url} alt="" />
+        {item.thumbnail_available === false
+          ? <span className="mx-thumbnail-missing">Thumbnail unavailable</span>
+          : <img src={item.matched_image_url} alt="Candidate image" />}
         <span className="mx-site">{hostname(item.page_url)}</span>
-        <span className="mx-action">
+        {item.match_type === 'facecheck' && <span className="mx-muted">
+          FaceCheck · Score {item.provider_score} · Not locally verified
+        </span>}
+        {showAction && <span className="mx-action">
           {action.possible && <span className="mx-possible">Possible: </span>}
           {action.label}
-        </span>
-        {item.whitelisted ? <span className="mx-status tone-neutral">– Whitelisted</span> : <StatusPill status={statusOf(item)} />}
-      </button>
+        </span>}
+        {item.whitelisted ? <span className="mx-status tone-neutral">– Whitelisted</span> : <StatusPill status={status} />}
+      </Button>
       {/* Overlaid on the image corners, outside the open button. */}
-      <label className="mx-check" title={`Select match ${item.id}`}>
-        <input type="checkbox" checked={checked} disabled={locked} onChange={onToggle} />
+      <Label className="mx-check" htmlFor={checkboxId} title={`Select match ${item.id}`}>
+        <Checkbox
+          id={checkboxId}
+          className="size-6 border-white/60 bg-background shadow-sm enabled:hover:border-white enabled:active:brightness-90"
+          checked={checked}
+          disabled={locked}
+          onCheckedChange={onToggle}
+        />
         <span className="visually-hidden">Select match {item.id}</span>
-      </label>
+      </Label>
       <span className={`mx-band band-${item.band}`}>{item.band === 'possible' ? 'Possible' : 'Match'}</span>
-    </article>
+    </Card>
   )
 }
 
@@ -56,10 +76,10 @@ function Skeletons() {
     <div className="mx-grid" aria-busy="true" aria-label="Loading matches">
       {Array.from({ length: 6 }, (_, i) => (
         <div key={i} className="mx-card mx-skeleton">
-          <div className="sk sk-line" />
-          <div className="sk sk-image" />
-          <div className="sk sk-line" />
-          <div className="sk sk-line short" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-32 w-full" />
+          <Skeleton className="h-4 w-full" />
+          <Skeleton className="h-4 w-2/3" />
         </div>
       ))}
     </div>
@@ -82,25 +102,25 @@ export default function MatchGrid(props: Props) {
           <p className="mx-sub">Everywhere we found your face. Click one to see the details.</p>
         </div>
         <div className="mx-toolbar">
-          <button
+          <Button
             type="button"
-            className="mx-btn ghost"
+            variant="outline"
             disabled={!showData || running}
             onClick={props.onToggleAll}
           >
             {allSelected ? 'Clear selection' : 'Select all'}
-          </button>
+          </Button>
           <span className="mx-selected" aria-live="polite">
             {selected.length} selected
           </span>
-          <button
+          <Button
             type="button"
-            className="mx-btn primary"
+            variant="default"
             disabled={!showData || selected.length === 0 || running}
             onClick={props.onAuthorize}
           >
             Auto review / send
-          </button>
+          </Button>
         </div>
       </header>}
 
@@ -109,9 +129,9 @@ export default function MatchGrid(props: Props) {
           <span>
             {running ? 'Batch running' : 'Batch finished'}: {batch.completed} of {batch.total} done.
           </span>
-          <button type="button" className="mx-link" onClick={props.onShowProgress}>
+          <Button variant="outline" type="button" className="mx-link" onClick={props.onShowProgress}>
             View progress
-          </button>
+          </Button>
         </div>
       )}
 
@@ -121,9 +141,9 @@ export default function MatchGrid(props: Props) {
         <div className="mx-alert" role="alert">
           <strong>Couldn’t load your matches.</strong>
           <span>The CenSearch server didn’t answer. Check it’s running, then try again.</span>
-          <button type="button" className="mx-btn ghost">
+          <Button type="button" variant="outline">
             Try again
-          </button>
+          </Button>
         </div>
       )}
 
@@ -131,9 +151,9 @@ export default function MatchGrid(props: Props) {
         <div className="mx-empty">
           <h2>No matches yet</h2>
           <p>Run a scan and anything we find will show up here.</p>
-          <button type="button" className="mx-btn primary">
+          <Button type="button" variant="default">
             Start a scan
-          </button>
+          </Button>
         </div>
       )}
 

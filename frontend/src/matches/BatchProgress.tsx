@@ -1,3 +1,6 @@
+import { Card } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
+import { Button } from "@/components/ui/button"
 import { reachedStep } from './logic'
 import { StatusPill } from './Status'
 import type { Batch, Case, ItemStatus } from './types'
@@ -39,9 +42,9 @@ export default function BatchProgress({ batch, cases, onOpen, onBack }: Props) {
         <div className="mx-empty">
           <h2>No batch yet</h2>
           <p>Select matches and run Auto review / send. You’ll watch each one here.</p>
-          <button type="button" className="mx-btn primary" onClick={onBack}>
+          <Button type="button" variant="default" onClick={onBack}>
             Go to matches
-          </button>
+          </Button>
         </div>
       </section>
     )
@@ -63,24 +66,15 @@ export default function BatchProgress({ batch, cases, onOpen, onBack }: Props) {
         </div>
       </header>
 
-      <div className="mx-panel">
+      <Card className="gap-4 p-6">
         <div className="mx-progress-head" aria-live="polite">
           <span>
             {batch.completed} of {batch.total} done
           </span>
           <span className="mx-mono">{percent}%</span>
         </div>
-        <div
-          className="mx-bar"
-          role="progressbar"
-          aria-valuemin={0}
-          aria-valuemax={batch.total}
-          aria-valuenow={batch.completed}
-          aria-label="Batch progress"
-        >
-          <div className="mx-bar-fill" style={{ width: `${percent}%` }} />
-        </div>
-      </div>
+        <Progress value={percent} aria-label="Batch progress" className="mt-3" />
+      </Card>
 
       <ol className="mx-items">
         {batch.items.map((item) => {
@@ -91,7 +85,9 @@ export default function BatchProgress({ batch, cases, onOpen, onBack }: Props) {
             : reachedStep(item.case_id, item.status)
           return (
             <li key={item.case_id} className="mx-item">
-              {match && <img src={match.matched_image_url} alt="" />}
+              {match && (match.thumbnail_available === false
+                ? <span className="mx-muted">Thumbnail unavailable</span>
+                : <img src={match.matched_image_url} alt="Candidate image" />)}
               <div className="mx-item-main">
                 <div className="mx-item-head">
                   <span className="mx-mono">Match {item.case_id}</span>
@@ -118,9 +114,9 @@ export default function BatchProgress({ batch, cases, onOpen, onBack }: Props) {
                 <p className="mx-reason">{item.reason}</p>
               </div>
               {finished && (
-                <button type="button" className="mx-btn ghost small" onClick={(event) => onOpen(item.case_id, event.currentTarget)}>
+                <Button variant="outline" type="button" className="mx-btn ghost small" onClick={(event) => onOpen(item.case_id, event.currentTarget)}>
                   Open
-                </button>
+                </Button>
               )}
             </li>
           )

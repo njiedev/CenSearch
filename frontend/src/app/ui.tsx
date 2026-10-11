@@ -1,10 +1,14 @@
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
+import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
+import { Button } from "@/components/ui/button"
 export function ErrorBox({ error, retry }: { error: string; retry?: () => void }) {
   return (
-    <div className="app-error" role="alert">
-      <strong>Something needs attention</strong>
-      <p>{error}</p>
-      {retry && <button onClick={retry}>Retry</button>}
-    </div>
+    <Alert variant="destructive" className="app-error my-4">
+      <AlertTitle>Something needs attention</AlertTitle>
+      <AlertDescription>{error}</AlertDescription>
+      {retry && <Button type="button" variant="outline" className="col-start-2 mt-2 w-fit" onClick={retry}>Retry</Button>}
+    </Alert>
   )
 }
 export function Empty({
@@ -22,18 +26,18 @@ export function Empty({
     <section className="app-empty">
       <h2>{title}</h2>
       <p>{children}</p>
-      <button className="primary" onClick={onAction}>
+      <Button variant="default" onClick={onAction}>
         {action}
-      </button>
+      </Button>
     </section>
   )
 }
 export function Loading() {
   return (
-    <div className="app-loading" role="status" aria-label="Loading">
-      <div />
-      <div />
-      <div />
+    <div className="app-loading grid gap-4" role="status" aria-label="Loading">
+      <Skeleton className="h-8 w-48" />
+      <Skeleton className="h-40 w-full" />
+      <Skeleton className="h-8 w-2/3" />
       <span className="visually-hidden">Loading…</span>
     </div>
   )
@@ -49,9 +53,9 @@ export function ScanStatus({ status }: { status: string }) {
           ? 'neutral'
           : 'progress'
   return (
-    <span className={`mx-status tone-${tone}`}>
+    <Badge variant="outline" className={`tone-${tone}`}>
       <span aria-hidden="true">{icon}</span>
       {status.replaceAll('_', ' ')}
-    </span>
+    </Badge>
   )
 }

@@ -1,3 +1,8 @@
+import { Card } from "@/components/ui/card"
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
+import { Checkbox } from "@/components/ui/checkbox"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
 import { useState } from 'react'
 import BatchProgress from '../matches/BatchProgress'
 import MatchZoom from '../matches/MatchZoom'
@@ -67,11 +72,13 @@ function NoticeItem({
             <p className="recipient-address">{recipient.address}</p>
             <p>Channel: {recipient.channel.replaceAll('_', ' ')}</p>
             <p>
-              {recipient.channel === 'smtp' ||
+              {recipient.channel === 'email' || recipient.channel === 'manual_email'
+                ? 'Delivery destination: website email contact'
+                : recipient.channel === 'smtp' ||
               recipient.channel === 'http_form' ||
               recipient.endpoint.includes('127.0.0.1')
                 ? 'Delivery destination: test site'
-                : 'Delivery destination: you send this yourself'}
+                : 'Delivery destination: manual submission'}
             </p>
             <h4>Evidence for this recipient</h4>
             <Evidence value={evidence} />
@@ -85,7 +92,7 @@ function NoticeItem({
         {notice ? (
           <>
             <pre className="mx-notice">{notice.payload.body}</pre>
-            <button onClick={copy}>Copy notice</button>
+            <Button variant="outline" onClick={copy}>Copy notice</Button>
             <span role="status">{copyStatus}</span>
           </>
         ) : (
@@ -168,7 +175,7 @@ export default function BatchReview({
           onClose={() => setZoom(null)}
         />
         <p className="muted">You can return to the scan while the batch continues.</p>
-        <button onClick={onBack}>Back to scan</button>
+        <Button variant="outline" onClick={onBack}>Back to scan</Button>
         {result.error && <ErrorBox error={result.error} retry={result.retry} />}
       </>
     )
@@ -208,23 +215,22 @@ export default function BatchReview({
             </h2>
             {status === 'drafted_not_sent' && (
               <p>
-                CenSearch never submits requests to real sites. Copy these drafts and send them yourself; any
-                requests you left out also remain unsent.
+                These requests were not sent. Open each request to see why and copy the notice if needed.
               </p>
             )}
             {items.map((item) => {
               const row = cases.find((candidate) => candidate.id === item.case_id)
               return (
-                <div className="review-item" key={item.case_id}>
+                <Card className="review-item gap-0 py-0" key={item.case_id}>
                   {status === 'ready_to_send' && (
-                    <label className="check-row">
-                      <input
-                        type="checkbox"
+                    <Label className="check-row">
+                      <Checkbox
+
                         checked={!excluded.includes(item.case_id) && !row?.whitelisted}
                         disabled={row?.whitelisted || sending}
-                        onChange={(event) =>
+                        onCheckedChange={(checked) =>
                           setExcluded(
-                            event.target.checked
+                            checked === true
                               ? excluded.filter((value) => value !== item.case_id)
                               : [...excluded, item.case_id],
                           )
@@ -232,21 +238,21 @@ export default function BatchReview({
                       />
                       Include request {item.case_id}
                       {row?.whitelisted && ' · Whitelisted; cannot send'}
-                    </label>
+                    </Label>
                   )}
-                  <details>
-                    <summary>
+                  <Accordion type="single" collapsible><AccordionItem value="notice" className="border-0">
+                    <AccordionTrigger className="px-4">
                       <span>{row ? hostname(row.page_url) : `Match ${item.case_id}`}</span>
                       <StatusPill status={item.status} />
                       <span>Read request ↓</span>
-                    </summary>
+                    </AccordionTrigger><AccordionContent className="px-0">
                     {row ? (
                       <NoticeItem row={row} decision={item.decision} reason={item.reason} />
                     ) : (
                       <p>Case details are unavailable. Refresh before sending.</p>
                     )}
-                  </details>
-                </div>
+                  </AccordionContent></AccordionItem></Accordion>
+                </Card>
               )
             })}
           </section>
@@ -254,20 +260,20 @@ export default function BatchReview({
       })}
       <footer className="sticky-actions review-footer">
         {done ? (
-          <button
-            className="primary"
+          <Button
+            variant="default"
             onClick={() => {
               onUpdated()
               onBack()
             }}
           >
             Back to scan
-          </button>
+          </Button>
         ) : (
           <>
-            <button onClick={onBack}>Back to scan</button>
-            <button
-              className="primary"
+            <Button variant="outline" onClick={onBack}>Back to scan</Button>
+            <Button
+              variant="default"
               disabled={
                 !ready.length ||
                 sending ||
@@ -277,7 +283,7 @@ export default function BatchReview({
               onClick={() => setConfirm(true)}
             >
               Send {ready.length} requests
-            </button>
+            </Button>
             {!ready.length && <p>No requests selected. Select a ready request to send it.</p>}
             {confirm && (
               <div className="confirmation" role="region" aria-label="Confirm sending">
@@ -293,12 +299,12 @@ export default function BatchReview({
                   ))}
                 </ul>
                 <div className="actions">
-                  <button className="primary" disabled={sending} onClick={send}>
+                  <Button variant="default" disabled={sending} onClick={send}>
                     {sending ? 'Sending…' : `Send ${ready.length} requests`}
-                  </button>
-                  <button disabled={sending} onClick={() => setConfirm(false)}>
+                  </Button>
+                  <Button variant="outline" disabled={sending} onClick={() => setConfirm(false)}>
                     Go back
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}

@@ -1,3 +1,4 @@
+import { Badge } from "@/components/ui/badge"
 import type { ItemStatus } from './types'
 
 // Every status has text and an icon, never color alone. Tones follow Carbon:
@@ -23,9 +24,9 @@ const STATUS: Record<ItemStatus | 'new', { label: string; icon: string; tone: To
 export function StatusPill({ status }: { status: ItemStatus | 'new' }) {
   const info = STATUS[status]
   return (
-    <span className={`mx-status tone-${info.tone}`}>
+    <Badge variant="outline" className={`mx-status tone-${info.tone}`}>
       <span aria-hidden="true">{info.icon}</span>
       {info.label}
-    </span>
+    </Badge>
   )
 }

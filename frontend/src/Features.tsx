@@ -33,7 +33,7 @@ export default function Features() {
             </article>
           ))}
         </div>
-        <p className="demo-note">Illustrative workflow. In this demo, requests go only to our mock sites. For real sites, you get a draft and a named recipient to send it yourself.</p>
+        <p className="demo-note">Illustrative workflow. Automatic email requires a connected sending account and your batch authorization. Website forms require manual submission.</p>
       </div>
     </section>
   )

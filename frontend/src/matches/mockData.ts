@@ -1,8 +1,9 @@
+import { photoUrl } from '../photoUrl'
 import type { Action, Case, Contact, Outcome, Recipient, Route } from './types'
 
 // MOCK DATA. Nothing here comes from the backend. Labels, the warning and the
 // notice wording are copied from backend/censearch so the layout shows real
-// lengths. Photos are the placeholder stock images from public/photos.
+// lengths. Images are decorative samples, not discovered matches.
 
 export const LABELS: Record<Route, string> = {
   copyright_notice: 'Copyright notice (DMCA 512(c))',
@@ -55,7 +56,7 @@ export const CASES: Case[] = [
   {
     id: 1,
     page_url: 'http://pixboard.example/gallery/summer-17',
-    matched_image_url: '/photos/63.jpg',
+    matched_image_url: photoUrl(63),
     band: 'match',
     state: 'new',
     possible_action: action('copyright_notice', COPY),
@@ -63,7 +64,7 @@ export const CASES: Case[] = [
   {
     id: 2,
     page_url: 'http://friendlink.example/u/arivera_fan/photos',
-    matched_image_url: '/photos/77.jpg',
+    matched_image_url: photoUrl(77),
     band: 'match',
     state: 'new',
     possible_action: action('privacy_request', PRIVACY),
@@ -71,7 +72,7 @@ export const CASES: Case[] = [
   {
     id: 3,
     page_url: 'http://localnews.example/2026/09/street-festival-recap',
-    matched_image_url: '/photos/88.jpg',
+    matched_image_url: photoUrl(88),
     band: 'possible',
     state: 'new',
     possible_action: action('hold_for_review', UNCERTAIN),
@@ -79,7 +80,7 @@ export const CASES: Case[] = [
   {
     id: 4,
     page_url: 'http://shadygallery.example/sets/candid-412',
-    matched_image_url: '/photos/49.jpg',
+    matched_image_url: photoUrl(49),
     band: 'match',
     state: 'new',
     possible_action: action('copyright_notice', COPY),
@@ -87,7 +88,7 @@ export const CASES: Case[] = [
   {
     id: 5,
     page_url: 'https://streetstyle.example/posts/downtown-looks',
-    matched_image_url: '/photos/60.jpg',
+    matched_image_url: photoUrl(60),
     band: 'match',
     state: 'new',
     possible_action: action('privacy_request', PRIVACY),
@@ -95,7 +96,7 @@ export const CASES: Case[] = [
   {
     id: 6,
     page_url: 'http://friendlink.example/groups/campus-2025',
-    matched_image_url: '/photos/74.jpg',
+    matched_image_url: photoUrl(74),
     band: 'possible',
     state: 'new',
     possible_action: action('privacy_request', PRIVACY),
@@ -103,7 +104,7 @@ export const CASES: Case[] = [
   {
     id: 7,
     page_url: 'http://pixboard.example/boards/faces-of-the-city',
-    matched_image_url: '/photos/62.jpg',
+    matched_image_url: photoUrl(62),
     band: 'match',
     state: 'new',
     possible_action: action('privacy_request', PRIVACY),
@@ -111,7 +112,7 @@ export const CASES: Case[] = [
   {
     id: 8,
     page_url: 'http://localnews.example/2026/10/council-meeting',
-    matched_image_url: '/photos/76.jpg',
+    matched_image_url: photoUrl(76),
     band: 'possible',
     state: 'new',
     possible_action: action('hold_for_review', UNCERTAIN),

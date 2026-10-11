@@ -41,6 +41,9 @@ export type Case = {
   created_at?: string
   whitelisted?: boolean
   score?: number
+  match_type?: 'face' | 'copy' | 'both' | 'facecheck'
+  provider_score?: number | null
+  thumbnail_available?: boolean
   recipients?: Recipient[]
   page_url: string
   matched_image_url: string

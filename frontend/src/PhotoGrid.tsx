@@ -1,9 +1,11 @@
+import { photoUrl } from './photoUrl'
 import { useEffect, useRef } from 'react'
 import { DustLayer } from './dust'
 
-const PHOTO_COUNT = 160 // files in public/photos, named 01.jpg … 160.jpg
+const PHOTO_COUNT = 160 // decorative photos in public/photos
 const CELL_TARGET = 130 // preferred cell edge in CSS pixels
-const DIM = 0.45 // photo brightness; shared with CSS through --dim
+const DIM = 0.45 // signup photo brightness
+const HERO_DIM = 0.18 // uniform hero brightness, including dust
 const MAX_BUSY = 8 // cells animating at once
 const HIT_MS = 1500 // must match the `hit` keyframes in index.css
 const FADE_MS = 400
@@ -15,10 +17,6 @@ type Cell = {
   img: HTMLImageElement
   photo: number
   busy: boolean
-}
-
-function photoUrl(photo: number) {
-  return `/photos/${String(photo).padStart(2, '0')}.jpg`
 }
 
 function randomBetween(min: number, max: number) {
@@ -35,7 +33,7 @@ function pickEffect(): Effect {
 
 // Builds the grid inside `container` and keeps it animating. Returns a
 // function that stops everything and empties the container.
-function startGrid(container: HTMLDivElement, dust: DustLayer) {
+function startGrid(container: HTMLDivElement, dust: DustLayer, framed: boolean) {
   let alive = true
   const timers = new Set<number>()
 
@@ -48,16 +46,26 @@ function startGrid(container: HTMLDivElement, dust: DustLayer) {
       timers.add(id)
     })
 
-  const columns = Math.max(4, Math.ceil(window.innerWidth / CELL_TARGET))
-  const cellSize = window.innerWidth / columns
-  const rows = Math.ceil(window.innerHeight / cellSize)
+  const width = window.innerWidth
+  const height = container.parentElement!.clientHeight
+  const gap = framed ? 12 : 0
+  const busyLimit = framed ? 3 : MAX_BUSY
+  const columns = framed ? Math.max(6, Math.ceil(width / 112)) : Math.max(4, Math.ceil(width / CELL_TARGET))
+  const cellSize = (width - gap * (columns - 1)) / columns
+  const rows = Math.ceil(height / (cellSize + gap))
   container.style.setProperty('--columns', String(columns))
-  container.style.setProperty('--dim', String(DIM))
+  container.style.setProperty('--dim', String(framed ? HERO_DIM : DIM))
 
   const cells: Cell[] = []
   for (let i = 0; i < columns * rows; i++) {
+    const column = i % columns
+    const row = Math.floor(i / columns)
     const el = document.createElement('div')
     el.className = 'cell empty'
+    if (framed) {
+      el.style.gridColumn = String(column + 1)
+      el.style.gridRow = String(row + 1)
+    }
     const img = document.createElement('img')
     img.alt = ''
     img.draggable = false
@@ -135,10 +143,10 @@ function startGrid(container: HTMLDivElement, dust: DustLayer) {
     while (alive) {
       const idle = cells.filter((cell) => !cell.busy)
       const busyCount = cells.length - idle.length
-      if (idle.length > 0 && busyCount < MAX_BUSY) {
+      if (idle.length > 0 && busyCount < busyLimit) {
         void animate(idle[Math.floor(Math.random() * idle.length)])
       }
-      await sleep(randomBetween(250, 700))
+      await sleep(framed ? randomBetween(750, 1400) : randomBetween(250, 700))
     }
   }
 
@@ -160,14 +168,14 @@ function startGrid(container: HTMLDivElement, dust: DustLayer) {
   }
 }
 
-export default function PhotoGrid() {
+export default function PhotoGrid({ framed = false }: { framed?: boolean }) {
   const gridRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
     const container = gridRef.current!
-    const dust = new DustLayer(canvasRef.current!, DIM)
-    let stop = startGrid(container, dust)
+    const dust = new DustLayer(canvasRef.current!, framed ? HERO_DIM : DIM)
+    let stop = startGrid(container, dust, framed)
 
     let resizeTimer = 0
     function onResize() {
@@ -175,7 +183,7 @@ export default function PhotoGrid() {
       resizeTimer = window.setTimeout(() => {
         stop()
         dust.resize()
-        stop = startGrid(container, dust)
+        stop = startGrid(container, dust, framed)
       }, 200)
     }
     window.addEventListener('resize', onResize)
@@ -185,13 +193,13 @@ export default function PhotoGrid() {
       window.clearTimeout(resizeTimer)
       stop()
     }
-  }, [])
+  }, [framed])
 
   return (
-    <div className="backdrop" aria-hidden="true">
+    <div className={`backdrop${framed ? ' hero-backdrop' : ''}`} aria-hidden="true">
       <div className="grid" ref={gridRef} />
       <canvas className="dust" ref={canvasRef} />
-      <div className="vignette" />
+      {!framed && <div className="vignette" />}
     </div>
   )
 }

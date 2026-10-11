@@ -1,10 +1,17 @@
+import { Card } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
 import { useState } from 'react'
 import { api } from './api'
-import { signOut, type Session } from './session'
+import { signOut } from './session'
+import type { Person } from './types'
+import Profile from './Profile'
 import { ErrorBox } from './ui'
 
 function normalizeDomain(value: string) {
   try {
+    if (/[\r\n\t]/.test(value)) return ''
     const url = new URL(value.includes('://') ? value.trim() : `https://${value.trim()}`)
     const host = url.hostname
       .toLowerCase()
@@ -32,11 +39,15 @@ export default function Settings({
   domains,
   update,
   busy,
+  tab,
+  onUpdated,
 }: {
-  person: Session
+  person: Person
   domains: string[]
   update: (domains: string[]) => Promise<void>
   busy: boolean
+  tab: string
+  onUpdated: () => void
 }) {
   const [input, setInput] = useState('')
   const [error, setError] = useState('')
@@ -77,18 +88,23 @@ export default function Settings({
   return (
     <section className="app-form-view">
       <h1>Settings</h1>
-      <section className="settings-section">
+      <nav className="settings-tabs" aria-label="Settings sections">
+        <a href="#settings" aria-current={tab === 'profile' ? 'page' : undefined}>Profile</a>
+        <a href="#settings/whitelist" aria-current={tab === 'whitelist' ? 'page' : undefined}>Whitelist <span>{domains.length}</span></a>
+      </nav>
+      {tab === 'profile' && <Profile person={person} onUpdated={onUpdated} />}
+      {tab === 'whitelist' && <Card className="settings-section">
         <h2>Whitelist: sites to leave alone</h2>
-        <p>Matches on these sites are marked and the agent will never draft or send a request to them.</p>
+        <p>Matches on these sites and their subdomains stay visible, but new drafts and deliveries are blocked. Requests already sent cannot be recalled.</p>
         <form
           onSubmit={(event) => {
             event.preventDefault()
             void add()
           }}
         >
-          <label>
+          <Label>
             Site or URL
-            <input
+            <Input
               value={input}
               onChange={(event) => {
                 setInput(event.target.value)
@@ -96,39 +112,39 @@ export default function Settings({
               }}
               placeholder="example.com"
             />
-          </label>
+          </Label>
           {input && (
             <p className="muted">
               {normalized ? `Will save: ${normalized}` : 'Enter a valid domain or URL.'}
             </p>
           )}
-          <button type="submit" disabled={busy} className="primary">
+          <Button type="submit" disabled={busy} variant="default">
             {busy ? 'Saving…' : 'Add site'}
-          </button>
+          </Button>
         </form>
         {domains.length ? (
           <ul className="domain-list">
             {domains.map((domain) => (
               <li key={domain}>
                 <span>{domain}</span>
-                <button disabled={busy} onClick={() => void remove(domain)} aria-label={`Remove ${domain}`}>
+                <Button variant="outline" disabled={busy} onClick={() => void remove(domain)} aria-label={`Remove ${domain}`}>
                   Remove
-                </button>
+                </Button>
               </li>
             ))}
           </ul>
         ) : (
           <p className="muted">No sites on your whitelist yet. Add a site above to leave it alone.</p>
         )}
-      </section>
-      <section className="settings-section">
+      </Card>}
+      {tab === 'profile' && <Card className="settings-section">
         <h2>Enrollment</h2>
         <p>
           Enrolled name: <strong>{person.name}</strong>
         </p>
-        <button className="danger" onClick={() => setConfirm(true)}>
+        <Button variant="destructive" onClick={() => setConfirm(true)}>
           Delete my enrollment
-        </button>
+        </Button>
         {confirm && (
           <div className="confirmation">
             <h3>Delete your enrollment?</h3>
@@ -137,16 +153,16 @@ export default function Settings({
               cannot be undone.
             </p>
             <div className="actions">
-              <button className="danger" disabled={deleting} onClick={deleteEnrollment}>
+              <Button variant="destructive" disabled={deleting} onClick={deleteEnrollment}>
                 {deleting ? 'Deleting…' : 'Delete enrollment permanently'}
-              </button>
-              <button onClick={() => setConfirm(false)} disabled={deleting}>
+              </Button>
+              <Button variant="outline" onClick={() => setConfirm(false)} disabled={deleting}>
                 Keep enrollment
-              </button>
+              </Button>
             </div>
           </div>
         )}
-      </section>
+      </Card>}
       {error && <ErrorBox error={error} />}
     </section>
   )

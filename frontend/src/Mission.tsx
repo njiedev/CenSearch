@@ -48,7 +48,7 @@ export default function Mission() {
         {ARTICLES.map((article, i) => (
           <li
             key={article.url}
-            className={`wall-item${article.size ? ` ${article.size}` : ''}`}
+            className="wall-item"
             style={{ '--order': i, ...floats[i] } as React.CSSProperties}
           >
             <a className="wall-link" href={article.url} target="_blank" rel="noreferrer">

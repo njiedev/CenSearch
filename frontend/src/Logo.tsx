@@ -83,7 +83,7 @@ function Animate({
 }
 
 // Shared eye animation for the compact navigation and footer marks.
-function Eye() {
+export function Eye({ gaze }: { gaze?: { x: number; y: number; lid: number } }) {
   const clipId = `${useId()}-eye`
   const [still, setStill] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
 
@@ -97,18 +97,18 @@ function Eye() {
   return (
     <svg className="logo-eye" viewBox="0 0 120 72" aria-hidden="true">
       <clipPath id={clipId}>
-        <path d={visible(HALF)}>
-          {!still && <Animate attribute="d" seconds={LID_SECONDS} frames={LID} format={visible} />}
+        <path d={visible(gaze && !still ? gaze.lid : HALF)}>
+          {!still && !gaze && <Animate attribute="d" seconds={LID_SECONDS} frames={LID} format={visible} />}
         </path>
       </clipPath>
-      <circle className="logo-pupil" cx={CENTER} cy="40" r="12" clipPath={`url(#${clipId})`}>
-        {!still && <Animate attribute="cx" seconds={PUPIL_SECONDS} frames={PUPIL} format={String} />}
+      <circle className="logo-pupil" cx={gaze && !still ? gaze.x : CENTER} cy={gaze && !still ? gaze.y : 40} r="12" clipPath={`url(#${clipId})`}>
+        {!still && !gaze && <Animate attribute="cx" seconds={PUPIL_SECONDS} frames={PUPIL} format={String} />}
       </circle>
-      <path className="logo-lid-fill" d={lidFill(HALF)}>
-        {!still && <Animate attribute="d" seconds={LID_SECONDS} frames={LID} format={lidFill} />}
+      <path className="logo-lid-fill" d={lidFill(gaze && !still ? gaze.lid : HALF)}>
+        {!still && !gaze && <Animate attribute="d" seconds={LID_SECONDS} frames={LID} format={lidFill} />}
       </path>
-      <path className="logo-lid" d={lidLine(HALF)}>
-        {!still && <Animate attribute="d" seconds={LID_SECONDS} frames={LID} format={lidLine} />}
+      <path className="logo-lid" d={lidLine(gaze && !still ? gaze.lid : HALF)}>
+        {!still && !gaze && <Animate attribute="d" seconds={LID_SECONDS} frames={LID} format={lidLine} />}
       </path>
       <path className="logo-outline" d={OUTLINE} />
     </svg>

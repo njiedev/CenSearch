@@ -1,7 +1,6 @@
 import { sample } from './sample'
 import { signOut } from './session'
-import type { Session } from './session'
-import type { Batch, BatchRequest, Case, Run, Scan, SearchRequest } from './types'
+import type { Batch, BatchRequest, Case, FaceCache, Person, PhotoKind, Run, Scan, SearchRequest, Workflow, WorkflowNotice } from './types'
 
 export class ApiError extends Error {
   status: number
@@ -58,8 +57,24 @@ const json = (method: string, body?: unknown): RequestInit => ({
   ...(body === undefined ? {} : { body: JSON.stringify(body) }),
 })
 const personPath = (id: string) => `/people/${encodeURIComponent(id)}`
+function liveOnly(): never {
+  throw new ApiError(503, 'Connect the backend to check removal and follow up.')
+}
 export const api = {
-  person: async (id: string): Promise<Session> => {
+  workflow: (id: number) => request<Workflow>(`/cases/${id}/workflow`, liveOnly),
+  verify: (id: number) => request(`/cases/${id}/verify`, liveOnly, json('POST')),
+  advanceClock: () => request('/clock/advance', liveOnly, json('POST', { seconds: 172801 })),
+  recipients: (id: number) => request(`/cases/${id}/recipients`, liveOnly, json('POST')),
+  approveDraft: (id: number, revision: number, rung: string, approvedBy: string) =>
+    request(`/cases/${id}/approve-draft`, liveOnly, json('POST', { revision, rung, approved_by: approvedBy })),
+  draft: (id: number, recipientId: string, rung: string) =>
+    request<WorkflowNotice>(`/cases/${id}/draft`, liveOnly, json('POST', { recipient_id: recipientId, rung })),
+  approveNotice: (id: number, notice: WorkflowNotice, approvedBy: string) =>
+    request(`/cases/${id}/approve`, liveOnly, json('POST', {
+      notice_id: notice.id, sha256: notice.sha256, approved_by: approvedBy,
+    })),
+  sendNotice: (id: number) => request(`/cases/${id}/send`, liveOnly, json('POST')),
+  person: async (id: string): Promise<Person> => {
     try {
       return await request(personPath(id), sample.person)
     } catch (error) {
@@ -67,6 +82,13 @@ export const api = {
       throw error
     }
   },
+  photoUrl: (id: string, kind: PhotoKind, photoId: number) => `/api${personPath(id)}/photos/${kind}/${photoId}`,
+  addPhotos: (id: string, body: FormData) => request<{ person: Person; photos: unknown[] }>(
+    `${personPath(id)}/photos`, () => { throw new ApiError(503, 'Connect the backend to manage photos.') }, { method: 'POST', body },
+  ),
+  deletePhoto: (id: string, kind: PhotoKind, photoId: number) => request<Person>(
+    `${personPath(id)}/photos/${kind}/${photoId}`, () => { throw new ApiError(503, 'Connect the backend to manage photos.') }, json('DELETE'),
+  ),
   scans: (id: string) => request<Scan[]>(`${personPath(id)}/scans`, sample.scans),
   cases: (id: string, run?: number) =>
     request<Case[]>(
@@ -78,11 +100,20 @@ export const api = {
     request(`${personPath(id)}/whitelist`, () => sample.putWhitelist(domains), json('PUT', { domains })),
   deletePerson: (id: string) => request(`${personPath(id)}`, sample.deletePerson, json('DELETE')),
   startScan: (body: SearchRequest) =>
-    request<Run>('/public-searches', () => sample.start(body), json('POST', body)),
+    request<Run>('/public-searches', () => {
+      if (body.mode === 'face_search') throw new ApiError(503, 'Connect the backend to run FaceCheck. Face search is unavailable in sample mode.')
+      return sample.start(body)
+    }, json('POST', body)),
   run: (id: number) => request<Run>(`/public-searches/${id}`, () => sample.run(id)),
   cancel: (id: number) =>
     request<Run>(`/public-searches/${id}/cancel`, () => sample.cancel(id), json('POST')),
-  warning: () => request<{ warning: string }>('/batches/warning', sample.warning),
+  resumeFaceSearch: (id: number) =>
+    request<Run>(`/public-searches/${id}/resume`, () => sample.run(id), json('POST')),
+  faceCache: (id: string) =>
+    request<FaceCache>(`${personPath(id)}/face-search-cache`, () => ({ available: false, count: 0 })),
+  deleteFaceCache: (id: string) =>
+    request<{ deleted: number }>(`${personPath(id)}/face-search-cache`, () => ({ deleted: 0 }), json('DELETE')),
+  warning: () => request<{ warning: string; email_delivery?: { ready: boolean; demo_test_recipient?: boolean } }>('/batches/warning', sample.warning),
   prepare: (body: BatchRequest) => request<Batch>('/batches', () => sample.prepare(body), json('POST', body)),
   batch: (id: string) => request<Batch>(`/batches/${encodeURIComponent(id)}`, () => sample.batch(id)),
   send: (id: string, ids: number[]) =>
