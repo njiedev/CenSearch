@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
-import SnakeEye from './SnakeEye'
+import Logo from './Logo'
 
 // Sign-up is enrollment: POST /api/people (see backend/handoff/openapi.json).
 // The person attests to consent and ownership by ticking the exact statements
@@ -154,7 +154,9 @@ export default function SignUp() {
   if (outcome.state === 'enrolled') {
     return (
       <div className="su-panel" role="status">
-        <SnakeEye className="su-eye" track />
+        <span className="su-logo">
+          <Logo />
+        </span>
         <h2 className="su-title" id="signup-title">
           You're enrolled, {outcome.name}.
         </h2>
@@ -169,7 +171,9 @@ export default function SignUp() {
 
   return (
     <form className="su-panel" onSubmit={submit} noValidate>
-      <SnakeEye className="su-eye" track />
+      <span className="su-logo">
+        <Logo />
+      </span>
       <h2 className="su-title" id="signup-title">
         Sign up
       </h2>

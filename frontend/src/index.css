@@ -640,10 +640,10 @@ body {
   gap: 14px;
   width: min(560px, 100%);
   padding: 24px 40px 20px;
-  border: 1px solid rgb(196 181 253 / 0.16);
-  border-radius: 24px;
-  background: rgb(16 12 24 / 0.55);
-  box-shadow: 0 24px 80px rgb(0 0 0 / 0.5);
+  border: 1px solid #27272a;
+  border-radius: 16px;
+  background: linear-gradient(160deg, rgb(10 10 10 / 0.82), rgb(0 0 0 / 0.72));
+  box-shadow: 0 24px 80px rgb(0 0 0 / 0.6);
   font: 15px/1.5 var(--sans);
   color: #e4e4e7;
 }
@@ -652,15 +652,15 @@ body {
   margin: 0;
 }
 
-.su-eye {
+.su-logo {
   justify-self: center;
-  width: 36px;
+  color: #fafafa;
 }
 
 .su-title {
   margin: 0;
-  font: 400 clamp(1.75rem, 3vw, 2.125rem) / 1.15 var(--sans);
-  letter-spacing: -0.02em;
+  font: 500 clamp(1.75rem, 3vw, 2rem) / 1.125 var(--sans);
+  letter-spacing: -0.03em;
   text-align: center;
   color: #fff;
 }
@@ -703,15 +703,15 @@ body {
 .su-field input[type='text'] {
   min-height: 48px;
   padding: 0 16px;
-  border: 1px solid rgb(255 255 255 / 0.12);
-  border-radius: 12px;
-  background: rgb(0 0 0 / 0.35);
+  border: 1px solid #27272a;
+  border-radius: 10px;
+  background: #0a0a0a;
   color: #fff;
   font: inherit;
 }
 
 .su-field input[type='text']:hover {
-  border-color: rgb(255 255 255 / 0.24);
+  border-color: #3f3f46;
 }
 
 .su-field input:focus-visible,
@@ -735,17 +735,17 @@ body {
   place-items: center;
   min-height: 48px;
   padding: 8px 12px;
-  border: 1px dashed rgb(255 255 255 / 0.2);
-  border-radius: 12px;
-  background: rgb(0 0 0 / 0.35);
+  border: 1px dashed #3f3f46;
+  border-radius: 10px;
+  background: #0a0a0a;
   color: #d4d4d8;
   text-align: center;
   cursor: pointer;
 }
 
 .su-drop:hover {
-  border-color: var(--accent-light);
-  background: rgb(196 181 253 / 0.06);
+  border-color: #a1a1aa;
+  background: rgb(255 255 255 / 0.04);
 }
 
 .su-drop input {
@@ -784,7 +784,7 @@ body {
   width: 20px;
   height: 20px;
   margin: 1px 0 0;
-  accent-color: var(--accent);
+  accent-color: #fafafa;
   cursor: pointer;
 }
 
@@ -834,23 +834,22 @@ body {
   min-height: 48px;
   padding: 0 24px;
   border: 0;
-  border-radius: 12px;
+  border-radius: 10px;
   font: 500 15px/1 var(--sans);
   cursor: pointer;
 }
 
 .su-submit {
-  background: var(--accent);
-  color: #fff;
-  box-shadow: 0 0 24px rgb(124 58 237 / 0.35);
+  background: #fff;
+  color: #000;
 }
 
 .su-submit:hover {
-  background: var(--accent-hover);
+  background: #e4e4e7;
 }
 
 .su-submit:active {
-  background: var(--accent-dark);
+  background: #c4b5fd;
 }
 
 .su-submit:disabled {
@@ -859,13 +858,13 @@ body {
 }
 
 .su-secondary {
-  border: 1px solid rgb(196 181 253 / 0.5);
+  border: 1px solid #3f3f46;
   background: transparent;
-  color: var(--accent-light);
+  color: #fafafa;
 }
 
 .su-secondary:hover {
-  background: rgb(196 181 253 / 0.08);
+  background: rgb(255 255 255 / 0.06);
 }
 
 @media (max-width: 599px) {
@@ -889,7 +888,7 @@ body {
 }
 
 .rec-hud {
-  --vf-line: var(--accent-light);
+  --vf-line: rgb(228 228 231 / 0.7);
   --vf-inset: clamp(16px, 3vw, 32px);
   --vf-stroke: 4px;
   position: fixed;
@@ -897,6 +896,11 @@ body {
   z-index: 2;
   color: var(--vf-line);
   pointer-events: none;
+}
+
+.rec-hud .vf-rec-dot {
+  background: #ef4444;
+  box-shadow: 0 0 10px rgb(239 68 68 / 0.8);
 }
 
 .rec-hud .vf-corner {
@@ -933,7 +937,7 @@ body {
   place-items: center;
   min-height: 48px;
   padding: 0 12px;
-  color: var(--accent-light);
+  color: #a1a1aa;
   font: clamp(13px, 1.4vw, 18px) / 1 var(--pixel);
   letter-spacing: 0.08em;
   text-transform: uppercase;

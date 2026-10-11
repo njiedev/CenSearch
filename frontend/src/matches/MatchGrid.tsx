@@ -11,7 +11,7 @@ type Props = {
   viewState: ViewState
   onToggle: (id: number) => void
   onToggleAll: () => void
-  onOpen: (id: number) => void
+  onOpen: (id: number, origin: HTMLElement) => void
   onAuthorize: () => void
   onShowProgress: () => void
 }
@@ -21,29 +21,31 @@ function MatchCard({ item, checked, locked, onToggle, onOpen }: {
   checked: boolean
   locked: boolean
   onToggle: () => void
-  onOpen: () => void
+  onOpen: (origin: HTMLElement) => void
 }) {
   const action = actionOf(item)
   return (
     <article className={`mx-card${checked ? ' is-selected' : ''}`}>
-      <div className="mx-card-top">
-        <label className="mx-check">
-          <input type="checkbox" checked={checked} disabled={locked} onChange={onToggle} />
-          <span>Match {item.id}</span>
-        </label>
-        <span className={`mx-band band-${item.band}`}>{item.band === 'possible' ? 'Possible match' : 'Match'}</span>
-      </div>
-      <button type="button" className="mx-card-open" onClick={onOpen} aria-label={`Open match ${item.id}`}>
-        <img src={item.matched_image_url} alt={`Matched image ${item.id}`} />
+      <button
+        type="button"
+        className="mx-card-open"
+        onClick={(event) => onOpen(event.currentTarget)}
+        aria-label={`Open match ${item.id}: ${hostname(item.page_url)}`}
+      >
+        <img src={item.matched_image_url} alt="" />
         <span className="mx-site">{hostname(item.page_url)}</span>
         <span className="mx-action">
           {action.possible && <span className="mx-possible">Possible: </span>}
           {action.label}
         </span>
-        <span className="mx-source">Suggested by {action.source === 'agent' ? 'the agent' : 'rule fallback'}</span>
         <StatusPill status={statusOf(item)} />
-        {item.batch_outcome && <span className="mx-reason">{item.batch_outcome.reason}</span>}
       </button>
+      {/* Overlaid on the image corners, outside the open button. */}
+      <label className="mx-check" title={`Select match ${item.id}`}>
+        <input type="checkbox" checked={checked} disabled={locked} onChange={onToggle} />
+        <span className="visually-hidden">Select match {item.id}</span>
+      </label>
+      <span className={`mx-band band-${item.band}`}>{item.band === 'possible' ? 'Possible' : 'Match'}</span>
     </article>
   )
 }
@@ -76,7 +78,7 @@ export default function MatchGrid(props: Props) {
           <h1 id="mx-matches-title">
             Matches <span className="mx-count">({showData ? cases.length : 0})</span>
           </h1>
-          <p className="mx-sub">Everywhere we found your face. Open one to see the details.</p>
+          <p className="mx-sub">Everywhere we found your face. Click one to see the details.</p>
         </div>
         <div className="mx-toolbar">
           <button
@@ -143,7 +145,7 @@ export default function MatchGrid(props: Props) {
               checked={selected.includes(item.id)}
               locked={running}
               onToggle={() => props.onToggle(item.id)}
-              onOpen={() => props.onOpen(item.id)}
+              onOpen={(origin) => props.onOpen(item.id, origin)}
             />
           ))}
         </div>

@@ -28,7 +28,7 @@ function stepState(item: { status: ItemStatus; reached: ItemStatus }, step: Item
 type Props = {
   batch: Batch | null
   cases: Case[]
-  onOpen: (id: number) => void
+  onOpen: (id: number, origin: HTMLElement) => void
   onBack: () => void
 }
 
@@ -115,7 +115,7 @@ export default function BatchProgress({ batch, cases, onOpen, onBack }: Props) {
                 <p className="mx-reason">{item.reason}</p>
               </div>
               {finished && (
-                <button type="button" className="mx-btn ghost small" onClick={() => onOpen(item.case_id)}>
+                <button type="button" className="mx-btn ghost small" onClick={(event) => onOpen(item.case_id, event.currentTarget)}>
                   Open
                 </button>
               )}

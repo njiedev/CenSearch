@@ -1,17 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Clock } from '../Hud'
 import PhotoGrid from '../PhotoGrid'
-import SnakeEye from '../SnakeEye'
+import Logo from '../Logo'
 import AuthorizeBatch from './AuthorizeBatch'
 import BatchProgress from './BatchProgress'
-import MatchDetail from './MatchDetail'
 import { STAGE_REASON, pathFor, withBatch } from './logic'
 import MatchGrid from './MatchGrid'
+import MatchZoom from './MatchZoom'
 import { CASES, PLANS } from './mockData'
 import type { Batch, Contact, ViewState } from './types'
 import { TERMINAL } from './types'
 
-type Section = 'matches' | 'detail' | 'authorize' | 'progress'
+type Section = 'matches' | 'authorize' | 'progress'
 
 const TICK_MS = 700
 
@@ -25,7 +25,7 @@ const VIEW_STATES: { id: ViewState; label: string }[] = [
 export default function MatchesApp() {
   const [section, setSection] = useState<Section>('matches')
   const [selected, setSelected] = useState<number[]>([])
-  const [detailId, setDetailId] = useState<number | null>(null)
+  const [zoom, setZoom] = useState<{ id: number; origin: HTMLElement } | null>(null)
   const [batch, setBatch] = useState<Batch | null>(null)
   const [viewState, setViewState] = useState<ViewState>('data')
   const [contact, setContact] = useState<Contact | null>(null)
@@ -72,9 +72,8 @@ export default function MatchesApp() {
     setSelected((current) => (current.includes(id) ? current.filter((x) => x !== id) : [...current, id]))
   }
 
-  function open(id: number) {
-    setDetailId(id)
-    go('detail')
+  function open(id: number, origin: HTMLElement) {
+    setZoom({ id, origin })
   }
 
   function run(contact: Contact) {
@@ -94,13 +93,12 @@ export default function MatchesApp() {
     setSelected([])
     setBatch(null)
     setContact(null)
-    setDetailId(null)
+    setZoom(null)
     go('matches')
   }
 
   const nav: { id: Section; label: string; badge?: string }[] = [
     { id: 'matches', label: 'Matches', badge: String(viewState === 'data' ? cases.length : 0) },
-    { id: 'detail', label: 'Match detail', badge: detailId ? `#${detailId}` : undefined },
     { id: 'authorize', label: 'Authorize', badge: selected.length ? String(selected.length) : undefined },
     { id: 'progress', label: 'Batch progress', badge: batch ? `${batch.completed}/${batch.total}` : undefined },
   ]
@@ -111,9 +109,8 @@ export default function MatchesApp() {
       <div className="rec-blur" aria-hidden="true" />
       <div className="mx-shell">
         <aside className="mx-sidebar">
-          <a className="mx-brand" href="/">
-            <SnakeEye className="mx-brand-eye" track />
-            <span>CenSearch</span>
+          <a className="mx-brand" href="/" aria-label="CenSearch home">
+            <Logo />
           </a>
 
           <nav aria-label="Sections">
@@ -189,9 +186,6 @@ export default function MatchesApp() {
               onShowProgress={() => go('progress')}
             />
           )}
-          {section === 'detail' && (
-            <MatchDetail item={cases.find((row) => row.id === detailId)} onBack={() => go('matches')} />
-          )}
           {section === 'authorize' && (
             <AuthorizeBatch
               cases={cases.filter((row) => selected.includes(row.id))}
@@ -209,6 +203,11 @@ export default function MatchesApp() {
           )}
         </div>
       </div>
+      <MatchZoom
+        item={zoom ? cases.find((row) => row.id === zoom.id) : undefined}
+        origin={zoom?.origin ?? null}
+        onClose={() => setZoom(null)}
+      />
     </>
   )
 }
