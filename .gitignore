@@ -1,0 +1,14 @@
+# Private notes and runtime artifacts stay local.
+*.md
+!/README.md
+.local/
+__pycache__/
+*.py[cod]
+.DS_Store
+
+# Raw run reports are retained locally; published verification is in docs/.
+backend/reports/app-backend-validation.json
+backend/reports/app-integration-validation.json
+backend/reports/batch-speed-*.json
+backend/reports/three-resend-demo.json
+backend/reports/three-resend-provider.json

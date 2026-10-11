@@ -1,0 +1,132 @@
+{
+  "checked_at_utc": "2026-10-11",
+  "scope": "Local working tree validation before cleanup commits; no deployment, live face search or email submission in this run.",
+  "checks": [
+    {
+      "command": "LIKENESS_TEST_PHOTOS=<local-fixtures> uv run pytest",
+      "cwd": "backend",
+      "exit_code": 0,
+      "passed": 272,
+      "seconds": 32.63,
+      "warnings": [
+        "Starlette testclient: deprecated anyio.abc.BlockingPortal alias"
+      ]
+    },
+    {
+      "command": "npm --prefix frontend run build && npm --prefix frontend run lint",
+      "exit_code": 0
+    },
+    {
+      "command": "npm --prefix backend/demo-ui run build",
+      "exit_code": 0
+    },
+    {
+      "command": "uv run ruff check censearch mockweb scripts/e2e_app.py scripts/verify_three.py tests/test_profile.py tests/test_resend_demo.py",
+      "cwd": "backend",
+      "exit_code": 0
+    },
+    {
+      "command": "backend/.venv/bin/python frontend/tests/profile_browser.py",
+      "exit_code": 0,
+      "coverage": [
+        "Real disposable local API; synthetic face-free photos",
+        "Photo render/upload/persistence/removal/cancel/last-face protection/invalid-face rejection",
+        "Whitelist normalization/reload/invalid schemes/subdomain exclusion/lookalike inclusion/removal",
+        "360/600/840/1440 widths, keyboard, long domain, reduced motion, no page errors"
+      ]
+    },
+    {
+      "command": "backend/.venv/bin/python backend/scripts/e2e_app.py --photos <local-fixtures>",
+      "exit_code": 0,
+      "seconds": 16.71,
+      "coverage": [
+        "Built signup enrollment",
+        "Actual scan: two matches",
+        "Review with zero deliveries before confirmation",
+        "Loopback mock send and removed/still-present verification",
+        "Approved host escalation and removal",
+        "No page errors; temporary servers stopped"
+      ],
+      "external_provider_calls": false,
+      "intercepted_api_responses": false
+    },
+    {
+      "command": "CENSEARCH_TEST_URL=http://127.0.0.1:5188 backend/.venv/bin/python frontend/tests/email_browser.py",
+      "exit_code": 0,
+      "scope": "Intercepted API; configured/missing email setup, single authorized send-mode POST, outcomes and exact notices. No email sent."
+    },
+    {
+      "command": "CENSEARCH_TEST_URL=http://127.0.0.1:5188 backend/.venv/bin/python frontend/tests/face_search_browser.py",
+      "exit_code": 0,
+      "scope": "Intercepted API and synthetic images; consent, strict score cutoff, thumbnails, review, blocked/empty/error states, resume, cache reuse/deletion and responsive layout."
+    },
+    {
+      "command": "bash backend/deploy/package.sh /tmp/censearch-review.tar.gz",
+      "exit_code": 0,
+      "scope": "Archive path inspection: no credentials, enrolled/decorative photos, fixture folders, runtime data or handoff notes; intentional UI graphics retained."
+    },
+    {
+      "command": "ffprobe docs/interface-walkthrough.mp4",
+      "exit_code": 0,
+      "duration_seconds": 46.100567,
+      "scope": "Sample interface recording, placeholder app marks, fictional identity, simulated outcomes. No backend/provider demonstration."
+    },
+    {
+      "command": "CENSEARCH_TEST_URL=http://127.0.0.1:5188 backend/.venv/bin/python frontend/tests/app_browser.py",
+      "result": "All sections passed across the initial run and a targeted rerun; the initial whole-script exit was 1, the targeted rerun exit was 0. A fresh whole-script pass is not claimed.",
+      "initial_passed_sections": [
+        "automatic_email_flow",
+        "sample_flow",
+        "keyboard_flow",
+        "response_checks"
+      ],
+      "targeted_rerun_sections": [
+        "failures_and_compatibility",
+        "long_text_and_history"
+      ],
+      "targeted_rerun": "Imported these two functions from app_browser and awaited them with a fresh Playwright Chromium browser.",
+      "scope": "Sample/intercepted API; keyboard and focus, responsive layout, optional/subset sends, whitelist rollback, errors, cancellation, enrollment deletion, long labels, history and reload."
+    }
+  ],
+  "initial_failures_corrected": [
+    "The e2e script needed the optional review-before-send checkbox after automatic sending became the default.",
+    "First full e2e attempt stopped at an outdated follow-up button name after removal verification passed; corrected selector and rerun passed.",
+    "The sample browser suite asserted the old exact RGB button color after the UI theme changed; removed that brittle assertion. Interaction and accessibility checks remain.",
+    "The remaining whitelist failure check opened the old settings route and used an incomplete Person response. Updated the route and synthetic response to the actual profile contract; reran the remaining two sections successfully."
+  ],
+  "fresh_hosted_read_only_checks": {
+    "public_app_http_status": 401,
+    "database": "ok",
+    "face_models_loaded": true,
+    "model_configured": true,
+    "model": "hackathon-chat",
+    "model_live_call_verified_health_flag": true,
+    "new_model_probe_run": false,
+    "object_storage": "s3_and_local",
+    "remote_verified_health_flag": false,
+    "external_delivery_enabled": false,
+    "public_crawl_enabled": false,
+    "email_delivery_health_key_present": false,
+    "notes": "Read-only SSH health request; hosted build predates current local email/profile changes."
+  },
+  "saved_evidence_not_rerun": {
+    "deployment_validation": "Earlier local report recorded live Strands DNS tool use, FaceCheck authentication without a search, and Object Storage synthetic text write/read/delete.",
+    "resend_test": {
+      "provider_id": "01a129f0-5d38-7ce8-b080-e0732f5ea39e",
+      "recipient": "delivered+censearch-demo@resend.dev",
+      "provider_last_event": "delivered",
+      "simulated_delivery": true,
+      "accepted_api_submission": true,
+      "real_inbox_delivery_verified": false,
+      "real_takedown_verified": false,
+      "photos_uploaded": false
+    }
+  },
+  "not_verified": [
+    "Hosted app owner-face search acceptance",
+    "Production email to a controlled real recipient",
+    "Real-site removal",
+    "Continuous cloud availability"
+  ],
+  "history": "Existing commits retained; internal handoff documents removed from the current tracked tree only."
+}
