@@ -6,12 +6,11 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [react()],
   build: {
-    // Pages: the landing page, sign-up, the earlier viewfinder design and the matches mock.
+    // Pages: the landing page, sign-up and the matches mock.
     rollupOptions: {
       input: {
         main: resolve(import.meta.dirname, 'index.html'),
         signup: resolve(import.meta.dirname, 'signup.html'),
-        viewfinder: resolve(import.meta.dirname, 'viewfinder.html'),
         matches: resolve(import.meta.dirname, 'matches.html'),
       },
     },

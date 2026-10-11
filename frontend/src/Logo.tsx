@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { useEffect, useId, useState } from 'react'
 
 // The eye outline never changes. Inside it, the upper lid is a filled shape
 // whose lower edge curves from corner to corner; that curve's control point
@@ -82,34 +82,44 @@ function Animate({
   )
 }
 
-// The wordmark: CENSEARCH with the A drawn as an eye that opens by different
-// amounts, blinks, and glances left and right. Futura Bold comes from the
-// system (it ships with macOS); see the fallback stack in index.css.
-export default function Logo() {
+// Shared eye animation for the compact navigation and footer marks.
+function Eye() {
   const clipId = `${useId()}-eye`
-  const [still] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+  const [still, setStill] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+
+  useEffect(() => {
+    const media = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const update = () => setStill(media.matches)
+    media.addEventListener('change', update)
+    return () => media.removeEventListener('change', update)
+  }, [])
 
   return (
-    <h1 className="logo" aria-label="CenSearch">
-      <span aria-hidden="true">CENSE</span>
-      <svg className="logo-eye" viewBox="0 0 120 72" aria-hidden="true">
-        <clipPath id={clipId}>
-          <path d={visible(HALF)}>
-            {!still && <Animate attribute="d" seconds={LID_SECONDS} frames={LID} format={visible} />}
-          </path>
-        </clipPath>
-        <circle className="logo-pupil" cx={CENTER} cy="40" r="12" clipPath={`url(#${clipId})`}>
-          {!still && <Animate attribute="cx" seconds={PUPIL_SECONDS} frames={PUPIL} format={String} />}
-        </circle>
-        <path className="logo-lid-fill" d={lidFill(HALF)}>
-          {!still && <Animate attribute="d" seconds={LID_SECONDS} frames={LID} format={lidFill} />}
+    <svg className="logo-eye" viewBox="0 0 120 72" aria-hidden="true">
+      <clipPath id={clipId}>
+        <path d={visible(HALF)}>
+          {!still && <Animate attribute="d" seconds={LID_SECONDS} frames={LID} format={visible} />}
         </path>
-        <path className="logo-lid" d={lidLine(HALF)}>
-          {!still && <Animate attribute="d" seconds={LID_SECONDS} frames={LID} format={lidLine} />}
-        </path>
-        <path className="logo-outline" d={OUTLINE} />
-      </svg>
-      <span aria-hidden="true">RCH</span>
-    </h1>
+      </clipPath>
+      <circle className="logo-pupil" cx={CENTER} cy="40" r="12" clipPath={`url(#${clipId})`}>
+        {!still && <Animate attribute="cx" seconds={PUPIL_SECONDS} frames={PUPIL} format={String} />}
+      </circle>
+      <path className="logo-lid-fill" d={lidFill(HALF)}>
+        {!still && <Animate attribute="d" seconds={LID_SECONDS} frames={LID} format={lidFill} />}
+      </path>
+      <path className="logo-lid" d={lidLine(HALF)}>
+        {!still && <Animate attribute="d" seconds={LID_SECONDS} frames={LID} format={lidLine} />}
+      </path>
+      <path className="logo-outline" d={OUTLINE} />
+    </svg>
+  )
+}
+
+export default function Logo({ compact = false }: { compact?: boolean }) {
+  return (
+    <span className="logo" aria-label="CenSearch">
+      <Eye />
+      <span aria-hidden="true">{compact ? 'CS' : 'CenSearch'}</span>
+    </span>
   )
 }
