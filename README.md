@@ -51,7 +51,8 @@ contact.
     "Start here" button that opens the sign-up page.
   - Sign-up is its own page (`signup.html`): the blurred photo feed behind a
     full-screen camera HUD reading "Surveillance in progress", with a live
-    clock and running timecode. It enrolls your face: name, face
+    clock and running timecode. The form sits on a rounded, see-through card
+    that fits on a laptop screen without scrolling. It enrolls your face: name, face
     photos, optional owned originals,
     and explicit consent and ownership statements. It posts to the real
     backend enrollment endpoint and shows which photos were accepted.

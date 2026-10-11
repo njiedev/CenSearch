@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
+import SnakeEye from './SnakeEye'
 
 // Sign-up is enrollment: POST /api/people (see backend/handoff/openapi.json).
 // The person attests to consent and ownership by ticking the exact statements
@@ -153,6 +154,7 @@ export default function SignUp() {
   if (outcome.state === 'enrolled') {
     return (
       <div className="su-panel" role="status">
+        <SnakeEye className="su-eye" track />
         <h2 className="su-title" id="signup-title">
           You're enrolled, {outcome.name}.
         </h2>
@@ -167,6 +169,7 @@ export default function SignUp() {
 
   return (
     <form className="su-panel" onSubmit={submit} noValidate>
+      <SnakeEye className="su-eye" track />
       <h2 className="su-title" id="signup-title">
         Sign up
       </h2>
@@ -192,56 +195,58 @@ export default function SignUp() {
         )}
       </div>
 
-      <div className="su-field">
-        <label htmlFor="su-references">Photos of your face</label>
-        <p className="su-hint" id="su-references-hint">
-          Clear photos with just you in them.
-        </p>
-        <label className="su-drop">
-          <input
-            id="su-references"
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(event) => setReferences(Array.from(event.target.files ?? []))}
-            aria-invalid={Boolean(errors.references)}
-            aria-describedby={errors.references ? 'su-references-hint su-references-error' : 'su-references-hint'}
-          />
-          <span>
-            {references.length > 0
-              ? `${references.length} photo${references.length === 1 ? '' : 's'} selected`
-              : 'Choose photos'}
-          </span>
-        </label>
-        <Previews files={references} />
-        {errors.references && (
-          <p className="su-error" id="su-references-error">
-            {errors.references}
+      <div className="su-row">
+        <div className="su-field">
+          <label htmlFor="su-references">Photos of your face</label>
+          <p className="su-hint" id="su-references-hint">
+            Clear photos with just you in them.
           </p>
-        )}
-      </div>
+          <label className="su-drop">
+            <input
+              id="su-references"
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(event) => setReferences(Array.from(event.target.files ?? []))}
+              aria-invalid={Boolean(errors.references)}
+              aria-describedby={errors.references ? 'su-references-hint su-references-error' : 'su-references-hint'}
+            />
+            <span>
+              {references.length > 0
+                ? `${references.length} photo${references.length === 1 ? '' : 's'} selected`
+                : 'Choose photos'}
+            </span>
+          </label>
+          <Previews files={references} />
+          {errors.references && (
+            <p className="su-error" id="su-references-error">
+              {errors.references}
+            </p>
+          )}
+        </div>
 
-      <div className="su-field">
-        <label htmlFor="su-originals">Photos you took (optional)</label>
-        <p className="su-hint" id="su-originals-hint">
-          These help us find exact copies.
-        </p>
-        <label className="su-drop">
-          <input
-            id="su-originals"
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={(event) => setOriginals(Array.from(event.target.files ?? []))}
-            aria-describedby="su-originals-hint"
-          />
-          <span>
-            {originals.length > 0
-              ? `${originals.length} photo${originals.length === 1 ? '' : 's'} selected`
-              : 'Choose photos'}
-          </span>
-        </label>
-        <Previews files={originals} />
+        <div className="su-field">
+          <label htmlFor="su-originals">Photos you took (optional)</label>
+          <p className="su-hint" id="su-originals-hint">
+            These help us find exact copies.
+          </p>
+          <label className="su-drop">
+            <input
+              id="su-originals"
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(event) => setOriginals(Array.from(event.target.files ?? []))}
+              aria-describedby="su-originals-hint"
+            />
+            <span>
+              {originals.length > 0
+                ? `${originals.length} photo${originals.length === 1 ? '' : 's'} selected`
+                : 'Choose photos'}
+            </span>
+          </label>
+          <Previews files={originals} />
+        </div>
       </div>
 
       <div className="su-field">
@@ -282,10 +287,6 @@ export default function SignUp() {
         </div>
       )}
 
-      <p className="su-privacy">
-        Your photos are never sent to an AI model.
-      </p>
-
       {outcome.state === 'failed' && (
         <div className="su-failure" role="alert">
           <p>{outcome.message}</p>
@@ -296,6 +297,8 @@ export default function SignUp() {
       <button type="submit" className="su-submit" disabled={sending} aria-busy={sending}>
         {sending ? 'Enrolling…' : 'Enroll my face'}
       </button>
+
+      <p className="su-privacy">Your photos are never sent to an AI model.</p>
     </form>
   )
 }

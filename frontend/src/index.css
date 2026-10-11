@@ -544,24 +544,18 @@ body {
   white-space: nowrap;
 }
 
-/* ---- Sign up: the same viewfinder look as About ---- */
-
-.signup {
-  display: grid;
-  justify-items: center;
-  align-content: center;
-  min-height: 100svh;
-  /* Starts below the blur's 160px fade-in. */
-  padding: 192px 16px 120px;
-}
+/* ---- Sign up: a soft, see-through card ---- */
 
 .su-panel {
-  position: relative;
   display: grid;
-  gap: 24px;
-  width: min(720px, 100%);
-  padding: calc(var(--vf-inset) + 40px);
-  font: 16px/1.5 var(--mono);
+  gap: 14px;
+  width: min(560px, 100%);
+  padding: 24px 40px 20px;
+  border: 1px solid rgb(196 181 253 / 0.16);
+  border-radius: 24px;
+  background: rgb(16 12 24 / 0.55);
+  box-shadow: 0 24px 80px rgb(0 0 0 / 0.5);
+  font: 15px/1.5 var(--sans);
   color: #e4e4e7;
 }
 
@@ -569,41 +563,66 @@ body {
   margin: 0;
 }
 
+.su-eye {
+  justify-self: center;
+  width: 36px;
+}
+
 .su-title {
   margin: 0;
-  font-size: clamp(1.75rem, 4vw, 3rem);
-  font-weight: 400;
-  line-height: 1.2;
+  font: 400 clamp(1.75rem, 3vw, 2.125rem) / 1.15 var(--sans);
+  letter-spacing: -0.02em;
+  text-align: center;
   color: #fff;
+}
+
+.su-lede {
+  margin-top: -6px !important;
+  margin-bottom: 4px !important;
+  text-align: center;
+  color: #a1a1aa;
 }
 
 .su-field {
   display: grid;
-  gap: 8px;
+  align-content: start;
+  gap: 6px;
+}
+
+.su-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
 }
 
 .su-field > label:first-child:not(.su-check) {
-  color: #fff;
+  font-weight: 500;
+  color: #f4f4f5;
 }
 
 .su-hint,
 .su-privacy {
-  font-size: 14px;
+  font-size: 13px;
   color: #a1a1aa;
+}
+
+.su-privacy {
+  margin-top: -4px !important;
+  text-align: center;
 }
 
 .su-field input[type='text'] {
   min-height: 48px;
   padding: 0 16px;
-  border: 1px solid #3f3f46;
-  border-radius: 0;
-  background: rgb(0 0 0 / 0.4);
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 12px;
+  background: rgb(0 0 0 / 0.35);
   color: #fff;
   font: inherit;
 }
 
 .su-field input[type='text']:hover {
-  border-color: #71717a;
+  border-color: rgb(255 255 255 / 0.24);
 }
 
 .su-field input:focus-visible,
@@ -625,10 +644,11 @@ body {
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 72px;
-  padding: 16px;
-  border: 1px dashed #52525b;
-  background: rgb(0 0 0 / 0.4);
+  min-height: 48px;
+  padding: 8px 12px;
+  border: 1px dashed rgb(255 255 255 / 0.2);
+  border-radius: 12px;
+  background: rgb(0 0 0 / 0.35);
   color: #d4d4d8;
   text-align: center;
   cursor: pointer;
@@ -649,7 +669,7 @@ body {
 .su-previews {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -657,10 +677,10 @@ body {
 
 .su-previews img {
   display: block;
-  width: 64px;
-  height: 64px;
+  width: 40px;
+  height: 40px;
   object-fit: cover;
-  border: 1px solid #3f3f46;
+  border-radius: 8px;
 }
 
 .su-check {
@@ -668,20 +688,19 @@ body {
   grid-template-columns: auto 1fr;
   gap: 12px;
   align-items: start;
-  padding: 4px 0;
   cursor: pointer;
 }
 
 .su-check input {
   width: 20px;
   height: 20px;
-  margin: 2px 0 0;
+  margin: 1px 0 0;
   accent-color: var(--accent);
   cursor: pointer;
 }
 
 .su-error {
-  font-size: 14px;
+  font-size: 13px;
   color: #fca5a5;
 }
 
@@ -693,7 +712,8 @@ body {
   display: grid;
   gap: 12px;
   padding: 16px;
-  border: 1px solid #f87171;
+  border: 1px solid rgb(248 113 113 / 0.6);
+  border-radius: 12px;
   background: rgb(248 113 113 / 0.08);
   color: #fecaca;
 }
@@ -722,17 +742,18 @@ body {
 
 .su-submit,
 .su-secondary {
-  justify-self: start;
   min-height: 48px;
   padding: 0 24px;
   border: 0;
-  font: inherit;
+  border-radius: 12px;
+  font: 500 15px/1 var(--sans);
   cursor: pointer;
 }
 
 .su-submit {
   background: var(--accent);
   color: #fff;
+  box-shadow: 0 0 24px rgb(124 58 237 / 0.35);
 }
 
 .su-submit:hover {
@@ -749,13 +770,23 @@ body {
 }
 
 .su-secondary {
-  border: 1px solid var(--accent-light);
+  border: 1px solid rgb(196 181 253 / 0.5);
   background: transparent;
   color: var(--accent-light);
 }
 
 .su-secondary:hover {
   background: rgb(196 181 253 / 0.08);
+}
+
+@media (max-width: 599px) {
+  .su-panel {
+    padding: 24px 20px;
+  }
+
+  .su-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* ---- Sign-up page: a full-screen recording HUD ---- */
@@ -832,7 +863,7 @@ body {
 /* The form scrolls in its own layer and fades out before it reaches the HUD
    rows, so nothing slides underneath the readouts. */
 .rec-page {
-  --rec-clear: 120px;
+  --rec-clear: 96px;
   position: fixed;
   inset: 0;
   z-index: 1;
@@ -840,19 +871,19 @@ body {
   justify-items: center;
   align-content: safe center;
   overflow-y: auto;
-  padding: calc(var(--rec-clear) + 32px) 16px;
+  padding: calc(var(--rec-clear) + 16px) 16px;
   mask-image: linear-gradient(
     to bottom,
     transparent var(--rec-clear),
-    #000 calc(var(--rec-clear) + 32px),
-    #000 calc(100% - var(--rec-clear) - 32px),
+    #000 calc(var(--rec-clear) + 16px),
+    #000 calc(100% - var(--rec-clear) - 16px),
     transparent calc(100% - var(--rec-clear))
   );
 }
 
 @media (max-width: 599px) {
   .rec-page {
-    --rec-clear: 136px;
+    --rec-clear: 120px;
   }
 }
 
