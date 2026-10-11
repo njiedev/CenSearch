@@ -5,8 +5,13 @@ Never echo CLI output: keys-create returns a secret only once.
 """
 
 import argparse
+import configparser
 import json
+import os
 import subprocess
+import urllib.error
+import urllib.request
+from pathlib import Path
 
 READ_ENV = """import json
 from pathlib import Path
@@ -43,6 +48,36 @@ def cli(*args):
     return json.loads(command(["linode-cli", "object-storage", *args, "--json"]))
 
 
+def api_token():
+    token = os.environ.get("LINODE_CLI_TOKEN")
+    if token:
+        return token
+    config = configparser.ConfigParser()
+    config.read(Path.home() / ".config/linode-cli")
+    user = config.get("DEFAULT", "default-user", fallback=None)
+    token = config.get(user, "token", fallback=None) if user else None
+    if not token:
+        raise RuntimeError("No Linode API token found; run linode-cli configure")
+    return token
+
+
+def create_bucket(label, region):
+    # linode-cli 5.69 dropped the bucket actions, so this one call uses the REST API.
+    # Creating a bucket that this account already owns returns the existing bucket.
+    request = urllib.request.Request(
+        "https://api.linode.com/v4/object-storage/buckets",
+        data=json.dumps({"label": label, "region": region}).encode(),
+        headers={"Authorization": "Bearer " + api_token(), "Content-Type": "application/json"},
+        method="POST",
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            return json.load(response)
+    except urllib.error.HTTPError as error:
+        reasons = [item.get("reason") for item in json.load(error).get("errors", [])]
+        raise RuntimeError(f"Bucket creation failed ({error.code}): {reasons}") from None
+
+
 def single(value):
     return value[0] if isinstance(value, list) else value
 
@@ -67,8 +102,7 @@ def main():
         args.host,
     ]
     existing = json.loads(command([*ssh, "python3 -c " + shlex.quote(READ_ENV)]))
-    # buckets-create is idempotent for this account, label and region.
-    bucket = single(cli("buckets-create", "--label", args.bucket, "--region", args.region))
+    bucket = create_bucket(args.bucket, args.region)
     endpoint = bucket.get("s3_endpoint")
     if not endpoint:
         raise RuntimeError("Bucket response omitted s3_endpoint; refusing to guess it")
