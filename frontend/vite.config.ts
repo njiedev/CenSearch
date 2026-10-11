@@ -6,11 +6,12 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [react()],
   build: {
-    // Two pages: the landing page and the sign-up page.
+    // Three pages: the landing page, the sign-up page and the earlier viewfinder design.
     rollupOptions: {
       input: {
         main: resolve(import.meta.dirname, 'index.html'),
         signup: resolve(import.meta.dirname, 'signup.html'),
+        viewfinder: resolve(import.meta.dirname, 'viewfinder.html'),
       },
     },
   },

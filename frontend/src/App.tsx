@@ -1,5 +1,6 @@
 import Logo from './Logo'
 import PhotoGrid from './PhotoGrid'
+import VariantSwitch from './VariantSwitch'
 
 export default function App() {
   return (
@@ -23,6 +24,7 @@ export default function App() {
           </div>
         </section>
       </main>
+      <VariantSwitch current="hero" />
     </>
   )
 }
