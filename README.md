@@ -48,9 +48,10 @@ contact.
   - The wordmark draws the A in CENSEARCH as an eye with an eyelid. It
     opens by different amounts, blinks, and glances left and right.
   - Under the wordmark, a short headline, one line on what we do, and a
-    "Start here" button that jumps to sign-up.
-  - "Sign up" sits inside camera-viewfinder brackets over the blurred feed.
-    It enrolls your face: name, face
+    "Start here" button that opens the sign-up page.
+  - Sign-up is its own page (`signup.html`): the blurred photo feed behind a
+    full-screen camera HUD reading "Surveillance in progress", with a live
+    clock and running timecode. It enrolls your face: name, face
     photos, optional owned originals,
     and explicit consent and ownership statements. It posts to the real
     backend enrollment endpoint and shows which photos were accepted.

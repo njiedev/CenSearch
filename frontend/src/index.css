@@ -511,12 +511,14 @@ body {
   }
 
   /* The long REC label takes the first row; the clock drops below it. */
-  .vf-top {
+  .vf-top,
+  .rec-top {
     grid-template-columns: 1fr auto;
     row-gap: 12px;
   }
 
-  .vf-top time {
+  .vf-top time,
+  .rec-top time {
     grid-row: 2;
     justify-self: start;
   }
@@ -754,6 +756,104 @@ body {
 
 .su-secondary:hover {
   background: rgb(196 181 253 / 0.08);
+}
+
+/* ---- Sign-up page: a full-screen recording HUD ---- */
+
+.rec-blur {
+  position: fixed;
+  inset: 0;
+  background: rgb(0 0 0 / 0.6);
+  -webkit-backdrop-filter: blur(14px);
+  backdrop-filter: blur(14px);
+}
+
+.rec-hud {
+  --vf-line: var(--accent-light);
+  --vf-inset: clamp(16px, 3vw, 32px);
+  --vf-stroke: 4px;
+  position: fixed;
+  inset: 0;
+  z-index: 2;
+  color: var(--vf-line);
+  pointer-events: none;
+}
+
+.rec-hud .vf-corner {
+  width: clamp(48px, 9vw, 144px);
+}
+
+.rec-top,
+.rec-bottom {
+  position: absolute;
+  left: calc(var(--vf-inset) + 24px);
+  right: calc(var(--vf-inset) + 24px);
+}
+
+.rec-top {
+  top: calc(var(--vf-inset) + 24px);
+}
+
+.rec-bottom {
+  bottom: calc(var(--vf-inset) + 24px);
+}
+
+.rec-bottom span {
+  grid-column: 3;
+  justify-self: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.rec-back {
+  position: fixed;
+  bottom: calc(clamp(16px, 3vw, 32px) + 12px);
+  left: calc(clamp(16px, 3vw, 32px) + 12px);
+  z-index: 3;
+  display: inline-grid;
+  place-items: center;
+  min-height: 48px;
+  padding: 0 12px;
+  color: var(--accent-light);
+  font: clamp(13px, 1.4vw, 18px) / 1 var(--pixel);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-decoration: none;
+}
+
+.rec-back:hover {
+  color: #fff;
+}
+
+.rec-back:focus-visible {
+  outline: 2px solid var(--accent-light);
+  outline-offset: 2px;
+}
+
+/* The form scrolls in its own layer and fades out before it reaches the HUD
+   rows, so nothing slides underneath the readouts. */
+.rec-page {
+  --rec-clear: 120px;
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  display: grid;
+  justify-items: center;
+  align-content: safe center;
+  overflow-y: auto;
+  padding: calc(var(--rec-clear) + 32px) 16px;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent var(--rec-clear),
+    #000 calc(var(--rec-clear) + 32px),
+    #000 calc(100% - var(--rec-clear) - 32px),
+    transparent calc(100% - var(--rec-clear))
+  );
+}
+
+@media (max-width: 599px) {
+  .rec-page {
+    --rec-clear: 136px;
+  }
 }
 
 /* ---- Headline clippings over the grid ---- */

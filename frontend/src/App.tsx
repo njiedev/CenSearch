@@ -1,6 +1,5 @@
 import Logo from './Logo'
 import PhotoGrid from './PhotoGrid'
-import SignUp from './SignUp'
 
 export default function App() {
   return (
@@ -18,17 +17,11 @@ export default function App() {
             <p className="hero-sub">
               We search the web for your face and send deletion requests wherever they're needed.
             </p>
-            <a className="hero-cta" href="#signup">
+            <a className="hero-cta" href="/signup.html">
               Start here
             </a>
           </div>
-          <p className="scroll-hint">Scroll</p>
         </section>
-        <div className="blurred">
-          <section className="signup" id="signup" aria-labelledby="signup-title">
-            <SignUp />
-          </section>
-        </div>
       </main>
     </>
   )
