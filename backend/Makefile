@@ -23,7 +23,7 @@ mock:
 	uv run python -m mockweb.run --root "$(MOCK_ROOT)"
 
 demo:
-	uv run python scripts/demo.py --photos "$(PHOTOS)" --api-port $(API_PORT) --base-port $(BASE_PORT)
+	uv run python scripts/demo.py --photos "$(PHOTOS)" --api-port $(API_PORT) --base-port $(BASE_PORT) $(if $(MODEL),--model,)
 
 e2e:
 	uv run python scripts/e2e.py --photos "$(PHOTOS)" --api-port $(API_PORT) --base-port $(BASE_PORT) --browser

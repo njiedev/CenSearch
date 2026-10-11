@@ -27,6 +27,7 @@ def main():
     parser.add_argument("--photos", type=Path, required=True)
     parser.add_argument("--api-port", type=int, default=8490)
     parser.add_argument("--base-port", type=int, default=9111)
+    parser.add_argument("--model", action="store_true", help="use the model key from backend/.env")
     args = parser.parse_args()
     source = select_person(args.photos)
     ports = [args.api_port, *range(args.base_port, args.base_port + 8)]
@@ -53,12 +54,13 @@ def main():
         LIKENESS_SMTP_RELAY=f"smtp://127.0.0.1:{args.base_port + 7}",
         LIKENESS_RDAP_BOOTSTRAP=f"http://127.0.0.1:{args.base_port + 6}/bootstrap",
         LIKENESS_SEARCH_ENDPOINT=f"http://127.0.0.1:{args.base_port + 5}/report",
-        OPENAI_API_KEY="",
         OBJ_ENDPOINT="",
         OBJ_BUCKET="",
         OBJ_ACCESS_KEY="",
         OBJ_SECRET_KEY="",
     )
+    if not args.model:
+        environment["OPENAI_API_KEY"] = ""
     base = f"http://127.0.0.1:{args.api_port}"
     signal.signal(signal.SIGINT, interrupted)
     signal.signal(signal.SIGTERM, interrupted)
