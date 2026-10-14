@@ -142,7 +142,7 @@
   grid-row: 1;
   min-width: 144px;
 }
-.app-shell label:not(.mx-check):not(.check-row):not(.mx-accept) {
+.app-shell label:not(.mx-check):not(.check-row):not(.mx-accept):not(.mode-option) {
   display: grid;
   gap: 8px;
 }
@@ -817,9 +817,9 @@
 
 .settings-tabs { display: flex; gap: 24px; margin-top: 16px; border-bottom: 1px solid var(--line); }
 .settings-tabs a { display: flex; align-items: center; gap: 8px; min-height: 48px; border-bottom: 2px solid transparent; color: var(--muted-foreground); }
-.settings-tabs a[aria-current="page"] { color: var(--foreground); border-color: var(--brand, #a78bfa); }
+.settings-tabs a[aria-current="page"] { color: var(--foreground); border-color: var(--foreground); }
 .settings-tabs a:hover { background: #ffffff08; }
-.settings-tabs a:focus-visible { outline: 2px solid #a78bfa; outline-offset: 4px; }
+.settings-tabs a:focus-visible { outline: 2px solid var(--ring); outline-offset: 4px; }
 .settings-tabs span { font-size: 12px; border: 1px solid var(--line); padding: 0 8px; border-radius: 16px; }
 .profile-identity { display: flex; align-items: center; gap: 16px; min-width: 0; overflow-wrap: anywhere; }
 .profile-avatar { display: grid; place-items: center; flex: 0 0 56px; height: 56px; border-radius: 50%; background: #ffffff08; border: 1px solid var(--line); }

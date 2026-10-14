@@ -1,11 +1,10 @@
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar } from '@/components/ui/sidebar'
-import { Home, Plus, ListFilter, Settings as SettingsIcon, ScanLine, LogOut } from 'lucide-react'
+import { ArrowUpRight, Home, Plus, ListFilter, Settings as SettingsIcon, ScanLine, LogOut } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
-import Logo from '../Logo'
+import Logo, { Eye } from '../Logo'
 import AuthorizeBatch from '../matches/AuthorizeBatch'
 import { hostname } from '../matches/types'
 import { DEMO } from '../demo'
@@ -225,41 +224,35 @@ function Dashboard() {
     view = data.error ? <ErrorBox error={data.error} retry={data.retry} /> : <Loading />
   else if (route === 'home') {
     const cases = data.value.cases
+    const sent = cases.filter((row) => row.batch_outcome?.status === 'sent').length
+    const waiting = cases.filter((row) => ['ready_to_send', 'held_for_review'].includes(row.batch_outcome?.status ?? '')).length
     view = (
       <section className="app-home">
-        <Card className="home-overview">
-          <CardContent className="home-start">
-            <h1>What should we look for?</h1>
-            <p>Find where your face and photos appear. Decide what happens next.</p>
-            <div className="actions">
-              <Button variant="default" onClick={() => navigate('new')}>
-                <span>Start scan</span>
-              </Button>
-              <Button variant="outline" onClick={() => navigate('scans')}>View all scans</Button>
-            </div>
-          </CardContent>
-          {scans.length > 0 && (
-            <div className="summary home-summary">
-              <span><strong>{scans.length}</strong>scans run</span>
-              <span><strong>{cases.length}</strong>matches found</span>
-              <span><strong>{cases.filter((row) => row.batch_outcome?.status === 'sent').length}</strong>requests sent</span>
-              <span><strong>{cases.filter((row) => ['ready_to_send', 'held_for_review'].includes(row.batch_outcome?.status ?? '')).length}</strong>awaiting your review</span>
-            </div>
-          )}
-        </Card>
+        <header className="home-hero">
+          <span className="home-eye" aria-hidden="true"><Eye /></span>
+          <h1>What should we look for?</h1>
+          <p>Find where your face and photos appear. Decide what happens next.</p>
+        </header>
+        <NewScan key={session.id} personId={session.id} compact onStart={(run) => {
+          refresh()
+          navigate(`scan/${run.id}/running`)
+        }} />
         {scans.length > 0 && (
-          <section className="recent-scans" aria-label="Recent scans">
-            <h2>Recent scans</h2>
+          <section className="recent-scans" aria-labelledby="recent-scans-title">
+            <div className="recent-scans-head">
+              <h2 id="recent-scans-title">Recent scans</h2>
+              <p>{scans.length} {scans.length === 1 ? 'scan' : 'scans'} · {cases.length} matches · {sent} sent · {waiting} awaiting review</p>
+            </div>
             {scans.slice(0, 5).map((row) => (
-              <Button variant="outline" className="recent-scan" key={row.run_id} onClick={() => openScan(row)}>
+              <button type="button" className="recent-scan" key={row.run_id} onClick={() => openScan(row)}>
                 <span className="scan-link grid min-w-0 gap-1">
                   <span className="truncate" title={row.label}>{row.label}</span>
                   <small>{relative(row.started_at)}</small>
                 </span>
                 <ScanStatus status={row.status} />
                 <span>{row.match_count} matches</span>
-                <span aria-hidden="true">↗</span>
-              </Button>
+                <ArrowUpRight aria-hidden="true" />
+              </button>
             ))}
           </section>
         )}
@@ -343,21 +336,22 @@ function Dashboard() {
         <Button variant="outline" onClick={() => navigate('home')}>Go home</Button>
       </>
     )
+  const wide = route === 'scans' || (!!runId && !parts[2])
   return (
     <>
       <a className="skip-link" href="#app-main" onClick={(event) => { event.preventDefault(); main.current?.focus() }}>Skip to content</a>
       {sidebar()}
       <SidebarInset className="min-w-0">
-        <header className="flex min-h-16 items-center gap-3 border-b px-4 md:px-6">
+        <header className="app-topbar flex min-h-16 items-center gap-3 px-4 md:px-6">
           <SidebarTrigger aria-label="Toggle navigation" />
           <Separator orientation="vertical" className="data-[orientation=vertical]:h-4" />
           <span className="text-sm text-muted-foreground">CenSearch / {route === 'home' ? 'Home' : route === 'new' ? 'New scan' : parts[0] === 'settings' ? 'Settings' : route === 'scans' ? 'All scans' : 'Scan'}</span>
-          {DEMO && <Badge variant="outline" className="sample-label ml-auto max-w-[50%] shrink whitespace-normal text-right text-amber-200">Demo: sample person, simulated scans and sending</Badge>}
+          {DEMO && <Badge variant="outline" className="sample-label ml-auto max-w-[50%] shrink whitespace-normal text-right">Demo: sample person, simulated scans and sending</Badge>}
         </header>
         <div id="app-main" ref={main} tabIndex={-1} className="dashboard-content flex-1 p-4 md:p-6">
           {error && <ErrorBox error={error} />}
           {data.value && data.error && <ErrorBox error={data.error} retry={data.retry} />}
-          {view}
+          <div key={location.hash || 'home'} className={`view ${wide ? 'view-wide' : 'view-narrow'}`}>{view}</div>
         </div>
       </SidebarInset>
     </>

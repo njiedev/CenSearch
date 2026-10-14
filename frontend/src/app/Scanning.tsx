@@ -163,6 +163,20 @@ export default function Scanning({
     0,
     Math.floor(((run.finished_at ? Date.parse(run.finished_at) : now) - Date.parse(run.started_at)) / 1000),
   )
+  const searching = !!run.facecheck && ['uploading', 'submitting', 'searching'].includes(run.facecheck.status)
+  const stage = finished ? 3 : run.metrics.analysed ? 2 : searching ? 0 : 1
+  const steps = [
+    run.facecheck && {
+      at: 0,
+      label: 'Searching the web for your face',
+      detail: run.facecheck.status === 'completed'
+        ? `${run.facecheck.items.length} candidates scored 88 or higher`
+        : `${run.facecheck.progress ?? 0}% · keeping scores of 88 or higher`,
+    },
+    { at: 1, label: 'Reading the public pages', detail: `${pagesFetched ?? 0} pages fetched` },
+    { at: 2, label: 'Comparing faces and photos', detail: `${run.metrics.analysed ?? 0} images checked` },
+    { at: 3, label: 'Matches ready', detail: `${run.results?.length ?? run.metrics.matches ?? 0} found` },
+  ].filter((step): step is { at: number; label: string; detail: string } => !!step && step.at <= stage)
   return (
     <section className="scan-view">
       {!stopped && !finished && <ScanAnimation />}
@@ -184,11 +198,21 @@ export default function Scanning({
           )}
         </h1>
         {stopped && <p>Start a new scan, or inspect any matches already found.</p>}
-        {run.facecheck && !stopped && <p>
-          {run.facecheck.status === 'completed'
-            ? `${run.facecheck.items.length} candidates scoring 88+ · checking public pages`
-            : `FaceCheck ${run.facecheck.progress ?? 0}% · keeping scores 88 or higher only`}
-        </p>}
+        {!stopped && <ol className="scan-steps">
+          {steps.map((step) => {
+            const state = step.at < stage || finished ? 'done' : 'active'
+            return (
+              <li key={step.at} data-state={state}>
+                <span className="scan-step-mark" aria-hidden="true" />
+                <span className="scan-step-text">
+                  <span>{step.label}</span>
+                  <small>{step.detail}</small>
+                </span>
+                <span className="visually-hidden">{state === 'done' ? 'Done' : 'In progress'}</span>
+              </li>
+            )
+          })}
+        </ol>}
         <details className="scan-details">
           <summary>Scan details · {elapsed}s</summary>
           <p className="muted">Animation only · results appear when the scan finishes.</p>
