@@ -24,13 +24,14 @@ export default function App() {
               We search the web for your face and send deletion requests wherever they're needed.
             </p>
             <div className="hero-actions">
-              <a className="landing-button" href="/signup/">
-                Start here
-              </a>
-              {DEMO && (
-                <button type="button" className="landing-link" onClick={startDemo}>
+              {DEMO ? (
+                <button type="button" className="landing-button" onClick={startDemo}>
                   Try the demo
                 </button>
+              ) : (
+                <a className="landing-button" href="/signup/">
+                  Sign up
+                </a>
               )}
             </div>
           </div>

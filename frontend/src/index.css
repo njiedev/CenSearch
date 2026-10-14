@@ -304,6 +304,12 @@ body {
   background: #d4d4d8;
 }
 
+button.landing-button {
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
 .site-nav > .landing-button {
   justify-self: end;
 }
