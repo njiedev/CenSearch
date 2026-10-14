@@ -112,7 +112,7 @@ def main():
     if (photo_root / "distractors").exists():
         for index, source in enumerate(photos(photo_root / "distractors")[:4]):
             shutil.copyfile(source, fixture_folder / "distractors" / f"distractor-{index + 1}{source.suffix}")
-    (fixture_folder / "FIXTURE_ONLY").write_text("Local development fixtures. Never upload.\n")
+    (fixture_folder / "FIXTURE_ONLY").write_text("Public dataset photos. Fine to publish in the static demo; never send to FaceCheck, a vision API or the model.\n")
     seed_result = seed(fixture_folder, output / "mockweb", args.base_port)
     print("SEED", json.dumps(seed_result), flush=True)
     available([args.api_port])

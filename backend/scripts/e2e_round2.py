@@ -53,7 +53,7 @@ def main():
         folder.mkdir(parents=True)
         for index, path in enumerate(photos(source / category)[: 3 if category == "reference" else 1]):
             shutil.copyfile(path, folder / f"{category}-{index + 1}{path.suffix}")
-    (fixture / "FIXTURE_ONLY").write_text("Local development only; never upload")
+    (fixture / "FIXTURE_ONLY").write_text("Public dataset photos. Fine to publish in the static demo; never send to FaceCheck, a vision API or the model.\n")
     seed_round2(fixture, output / "mockweb", args.base_port)
     available([args.api_port])
     base = f"http://127.0.0.1:{args.api_port}"
