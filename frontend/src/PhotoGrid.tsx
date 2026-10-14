@@ -1,8 +1,9 @@
-import { DEMO_PHOTOS } from './demoPhotos'
 import { useEffect, useRef } from 'react'
 import { DustLayer } from './dust'
 
-const PHOTO_COUNT = DEMO_PHOTOS.length
+// Decorative backdrop photos in public/photos, named 01.jpg to 160.jpg.
+const PHOTOS = Array.from({ length: 160 }, (_, index) => `/photos/${String(index + 1).padStart(2, '0')}.jpg`)
+const PHOTO_COUNT = PHOTOS.length
 const CELL_TARGET = 130 // preferred cell edge in CSS pixels
 const DIM = 0.45 // signup photo brightness
 const HERO_DIM = 0.18 // uniform hero brightness, including dust
@@ -92,7 +93,7 @@ function startGrid(container: HTMLDivElement, dust: DustLayer, framed: boolean) 
 
   async function showNewPhoto(cell: Cell) {
     cell.photo = pickPhoto()
-    cell.img.src = DEMO_PHOTOS[cell.photo]
+    cell.img.src = PHOTOS[cell.photo]
     try {
       await cell.img.decode()
     } catch {
