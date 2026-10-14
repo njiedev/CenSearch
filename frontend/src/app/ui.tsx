@@ -2,6 +2,7 @@ import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert'
 import { Badge } from '@/components/ui/badge'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Button } from "@/components/ui/button"
+import { Check, CircleDashed, Minus, X } from 'lucide-react'
 export function ErrorBox({ error, retry }: { error: string; retry?: () => void }) {
   return (
     <Alert variant="destructive" className="app-error my-4">
@@ -43,7 +44,7 @@ export function Loading() {
   )
 }
 export function ScanStatus({ status }: { status: string }) {
-  const icon = status === 'completed' ? '✓' : status === 'failed' ? '✕' : status === 'cancelled' ? '–' : '◔'
+  const Icon = status === 'completed' ? Check : status === 'failed' ? X : status === 'cancelled' ? Minus : CircleDashed
   const tone =
     status === 'completed'
       ? 'done'
@@ -54,7 +55,7 @@ export function ScanStatus({ status }: { status: string }) {
           : 'progress'
   return (
     <Badge variant="outline" className={`tone-${tone}`}>
-      <span aria-hidden="true">{icon}</span>
+      <Icon aria-hidden="true" />
       {status.replaceAll('_', ' ')}
     </Badge>
   )

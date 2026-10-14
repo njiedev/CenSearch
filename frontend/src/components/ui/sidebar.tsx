@@ -261,23 +261,35 @@ function SidebarTrigger({
   ...props
 }: React.ComponentProps<typeof Button>) {
   const { toggleSidebar } = useSidebar()
+  const label = props["aria-label"] ?? "Toggle Sidebar"
+  const tooltipId = React.useId()
 
   return (
-    <Button
-      data-sidebar="trigger"
-      data-slot="sidebar-trigger"
-      variant="ghost"
-      size="icon"
-      className={cn("size-7", className)}
-      onClick={(event) => {
-        onClick?.(event)
-        toggleSidebar()
-      }}
-      {...props}
-    >
-      <PanelLeftIcon />
-      <span className="sr-only">Toggle Sidebar</span>
-    </Button>
+    <span className="group/trigger relative inline-flex">
+      <Button
+        data-sidebar="trigger"
+        data-slot="sidebar-trigger"
+        variant="ghost"
+        size="icon"
+        className={cn("size-7", className)}
+        onClick={(event) => {
+          onClick?.(event)
+          toggleSidebar()
+        }}
+        {...props}
+        aria-label={label}
+        aria-describedby={tooltipId}
+      >
+        <PanelLeftIcon />
+      </Button>
+      <span
+        id={tooltipId}
+        role="tooltip"
+        className="pointer-events-none invisible absolute top-full left-0 z-50 mt-2 rounded-md bg-foreground px-3 py-1.5 text-xs whitespace-nowrap text-background group-hover/trigger:visible group-has-[:focus-visible]/trigger:visible"
+      >
+        {label}
+      </span>
+    </span>
   )
 }
 

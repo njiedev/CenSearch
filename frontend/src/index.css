@@ -34,6 +34,7 @@
 }
 
 html {
+  background: #000;
   scroll-behavior: smooth;
 }
 
@@ -621,7 +622,7 @@ button.su-demo {
   display: grid;
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  font: clamp(13px, 1.4vw, 18px) / 1.2 var(--pixel);
+  font: clamp(14px, 1.4vw, 18px) / 1.2 var(--pixel);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -782,7 +783,7 @@ button.su-demo {
   border-radius: 16px;
   background: linear-gradient(160deg, rgb(10 10 10 / 0.82), rgb(0 0 0 / 0.72));
   box-shadow: 0 24px 80px rgb(0 0 0 / 0.6);
-  font: 15px/1.5 var(--sans);
+  font: 16px/1.5 var(--sans);
   color: #e4e4e7;
 }
 
@@ -829,7 +830,7 @@ button.su-demo {
 
 .su-hint,
 .su-privacy {
-  font-size: 13px;
+  font-size: 14px;
   color: #a1a1aa;
 }
 
@@ -927,7 +928,7 @@ button.su-demo {
 }
 
 .su-error {
-  font-size: 13px;
+  font-size: 14px;
   color: #fca5a5;
 }
 
@@ -973,7 +974,7 @@ button.su-demo {
   padding: 0 24px;
   border: 0;
   border-radius: 10px;
-  font: 500 15px/1 var(--sans);
+  font: 500 16px/1 var(--sans);
   cursor: pointer;
 }
 
@@ -1076,7 +1077,7 @@ button.su-demo {
   min-height: 48px;
   padding: 0 12px;
   color: #a1a1aa;
-  font: clamp(13px, 1.4vw, 18px) / 1 var(--pixel);
+  font: clamp(14px, 1.4vw, 18px) / 1 var(--pixel);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   text-decoration: none;
@@ -1354,7 +1355,6 @@ button.su-demo {
   margin: 32px auto 0;
   font-size: 14px;
   text-align: center;
-  opacity: 0.6;
 }
 
 .faq > h2,
@@ -1609,8 +1609,8 @@ button.su-demo {
 /* Cropped product screenshots, with captions outside each frame. */
 .how-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 48px; }
 .how-card { min-width: 0; }
-.how-card h3 { margin: 24px 16px 12px; font-size: 19px; font-weight: 500; letter-spacing: -0.02em; }
-.how-card > p { margin: 0 16px; color: var(--muted); font-size: 15px; line-height: 1.6; }
+.how-card h3 { margin: 24px 16px 12px; font-size: 20px; font-weight: 500; letter-spacing: -0.02em; }
+.how-card > p { margin: 0 16px; color: var(--muted); font-size: 16px; line-height: 1.6; }
 .step-preview {
   position: relative;
   height: 360px;
@@ -1659,7 +1659,7 @@ button.su-demo {
   .faq.landing-section { padding: 40px 20px; }
   .faq-question { padding: 12px; font-size: 14px; }
   .faq-list { margin-top: 24px; }
-  .faq-item p { padding-inline: 12px; font-size: 13px; }
+  .faq-item p { padding-inline: 12px; }
   .site-footer { min-height: 800px; }
   .footer-scene { --centre-shade: radial-gradient(ellipse 96% 64% at 50% 32%, #000 56%, rgb(0 0 0 / 0.96) 72%, transparent 100%); }
 }
@@ -1880,7 +1880,7 @@ button.su-demo {
 .contact-action p {
   margin: 0;
   color: var(--muted);
-  font-size: 13px;
+  font-size: 14px;
   line-height: 1.6;
 }
 

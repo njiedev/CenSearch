@@ -117,7 +117,7 @@ export function Eye({ gaze }: { gaze?: { x: number; y: number; lid: number } }) 
 
 export default function Logo({ compact = false }: { compact?: boolean }) {
   return (
-    <span className="logo" aria-label="CenSearch">
+    <span className="logo" role="img" aria-label="CenSearch">
       <Eye />
       <span aria-hidden="true">{compact ? 'CS' : 'CenSearch'}</span>
     </span>

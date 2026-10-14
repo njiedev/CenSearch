@@ -122,7 +122,7 @@ export default function NewScan({ personId, onStart }: { personId: string; onSta
               <Label className="check-row">
                 <Checkbox checked={faceConsent}
                   onCheckedChange={(checked) => { setFaceConsent(checked === true); clear('faceConsent') }}
-                  aria-describedby="error-faceConsent" aria-invalid={!!errors.faceConsent} />
+                  aria-describedby={errors.faceConsent ? 'error-faceConsent' : undefined} aria-invalid={!!errors.faceConsent} />
                 I authorize sending this enrolled photo to FaceCheck and spending 3 credits on this scan.
               </Label>
               {fieldError('faceConsent')}
@@ -134,14 +134,14 @@ export default function NewScan({ personId, onStart }: { personId: string; onSta
             <CardContent className="grid gap-4">
               <Label>Full name
                 <Input value={name} maxLength={200} onChange={(event) => { setName(event.target.value); clear('name') }}
-                  aria-describedby="error-name" aria-invalid={!!errors.name} />
+                  aria-describedby={errors.name ? 'error-name' : undefined} aria-invalid={!!errors.name} />
                 {fieldError('name')}
               </Label>
               <Label>Handles <span className="muted">Up to 10 · comma or Enter to add</span>
                 <Input value={handle} onChange={(event) => { setHandle(event.target.value); clear('handles') }}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter' || event.key === ',') { event.preventDefault(); addHandles() }
-                  }} onBlur={addHandles} aria-invalid={!!errors.handles} aria-describedby="error-handles" />
+                  }} onBlur={addHandles} aria-invalid={!!errors.handles} aria-describedby={errors.handles ? 'error-handles' : undefined} />
                 {fieldError('handles')}
               </Label>
               <div className="chips">
@@ -151,7 +151,7 @@ export default function NewScan({ personId, onStart }: { personId: string; onSta
                 </Button>)}
               </div>
               <Label>Context <span className="muted">Optional, such as a city or profession</span>
-                <Input value={context} maxLength={300} onChange={(event) => { setContext(event.target.value); clear('context') }} aria-describedby="error-context" />
+                <Input value={context} maxLength={300} onChange={(event) => { setContext(event.target.value); clear('context') }} aria-describedby={errors.context ? 'error-context' : undefined} />
                 {fieldError('context')}
               </Label>
             </CardContent>
@@ -161,7 +161,7 @@ export default function NewScan({ personId, onStart }: { personId: string; onSta
             <CardContent className="grid gap-4">
               <Label>Page URLs <span className="muted">Optional · one per line, up to 25</span>
                 <Textarea rows={8} value={urls} onChange={(event) => { setUrls(event.target.value); clear('urls') }}
-                  aria-describedby="error-urls" aria-invalid={!!errors.urls} />
+                  aria-describedby={errors.urls ? 'error-urls' : undefined} aria-invalid={!!errors.urls} />
                 {fieldError('urls')}
               </Label>
             </CardContent>

@@ -211,7 +211,7 @@ function Dashboard() {
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
-              <SidebarMenuButton onClick={() => signOut()} tooltip="Sign out" aria-label="Sign out">
+              <SidebarMenuButton onClick={() => signOut()} tooltip="Sign out">
                 <LogOut /><span className="truncate">{data.value?.person.name ?? session?.name} · Sign out</span>
               </SidebarMenuButton>
             </SidebarMenuItem>

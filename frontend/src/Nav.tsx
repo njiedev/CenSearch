@@ -16,7 +16,7 @@ export default function Nav({ onLanding = true }: { onLanding?: boolean }) {
   return (
     <header className={`site-header${scrolled ? ' is-scrolled' : ''}`}>
       <nav className="site-nav" aria-label="Main navigation">
-        <a className="brand-link" href={`${home}#top`} aria-label="CenSearch">
+        <a className="brand-link" href={`${home}#top`} aria-label="CS, CenSearch home">
           <Logo compact />
         </a>
         <div className="nav-links">

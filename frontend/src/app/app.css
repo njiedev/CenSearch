@@ -3,13 +3,13 @@
   --line-strong: var(--input);
   --panel: var(--card);
   color: var(--foreground);
-  font: 13px/1.5 var(--sans);
+  font: 14px/1.5 var(--sans);
   font-variant-numeric: tabular-nums;
 }
 .app-shell :is(h1, h2, h3, h4, p) { margin: 0; }
 .app-shell h1 { font-size: 24px; font-weight: 500; letter-spacing: -0.035em; overflow-wrap: anywhere; }
 .app-shell h2 { font-size: 18px; font-weight: 500; }
-.app-shell h3 { font-size: 15px; font-weight: 500; }
+.app-shell h3 { font-size: 16px; font-weight: 500; }
 .app-shell h4 { font-size: 14px; font-weight: 500; }
 .app-shell p, .app-shell .muted, .app-shell small { color: var(--muted-foreground); }
 .app-shell .logo { font-size: 18px; }
@@ -17,10 +17,10 @@
 .app-shell [data-slot="sidebar-group-label"] { font-family: var(--sans); }
 .app-shell [data-slot="label"] { line-height: 1.5; }
 .app-shell [data-slot="button"] { min-height: 40px; }
-.app-shell [data-slot="input"], .app-shell [data-slot="textarea"], .app-shell [data-slot="native-select"] { font-size: 13px; }
+.app-shell [data-slot="input"], .app-shell [data-slot="textarea"], .app-shell [data-slot="native-select"] { font-size: 14px; }
 .app-shell [data-slot="native-select-wrapper"] { width: 100%; }
-.skip-link { position: fixed; top: -100px; left: 16px; z-index: 100; padding: 12px; background: var(--background); }
-.skip-link:focus { top: 16px; }
+.skip-link { position: fixed; top: 16px; left: 16px; z-index: 100; padding: 12px; background: var(--background); opacity: 0; pointer-events: none; }
+.skip-link:focus { opacity: 1; pointer-events: auto; }
 .app-home {
   display: grid;
   gap: 32px;
@@ -165,7 +165,7 @@
 }
 .field-error {
   color: #ffb2b9;
-  font-size: 13px;
+  font-size: 14px;
 }
 .app-empty {
   display: grid;
@@ -784,6 +784,7 @@
 
 .home-start { padding: 0; }
 .app-shell .recent-scan { height: auto; white-space: normal; }
+.app-shell .recent-scan small { font-size: 12px; }
 
 .app-shell .mx-card-open { height: auto; white-space: normal; }
 .app-shell .mx-check [data-slot="checkbox"] { background-color: var(--background); }
