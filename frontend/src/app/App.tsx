@@ -8,7 +8,8 @@ import { useEffect, useRef, useState } from 'react'
 import Logo from '../Logo'
 import AuthorizeBatch from '../matches/AuthorizeBatch'
 import { hostname } from '../matches/types'
-import { api, isSample } from './api'
+import { DEMO } from '../demo'
+import { api } from './api'
 import { readSession, signOut, type Session } from './session'
 import type { Case, Contact, Scan } from './types'
 import { ErrorBox, Loading, ScanStatus } from './ui'
@@ -30,9 +31,7 @@ export default function App() {
   return <SidebarProvider className="app-shell"><Dashboard /></SidebarProvider>
 }
 function Dashboard() {
-  const [session] = useState<Session | null>(
-    () => readSession() ?? (isSample() ? { id: 'sample', name: 'Alex Rivera' } : null),
-  )
+  const [session] = useState<Session | null>(readSession)
   const [route, setRoute] = useState(currentRoute)
   const { state, setOpenMobile } = useSidebar()
   const main = useRef<HTMLDivElement>(null)
@@ -66,7 +65,7 @@ function Dashboard() {
     session?.id ?? '',
   )
   useEffect(() => {
-    if (!session) location.replace('/signup.html')
+    if (!session) location.replace('/signup/')
   }, [session])
   useEffect(() => {
     const change = () => {
@@ -79,7 +78,7 @@ function Dashboard() {
     window.addEventListener('hashchange', change)
     return () => window.removeEventListener('hashchange', change)
   }, [setOpenMobile])
-  const batchKey = `censearch.batch.${isSample() ? 'sample' : session?.id}.${runId}`
+  const batchKey = `censearch.batch.${session?.id}.${runId}`
   const savedBatch = localStorage.getItem(batchKey)
   const scans = data.value?.scans ?? []
   const scan = scans.find((row) => row.run_id === runId)
@@ -127,7 +126,7 @@ function Dashboard() {
     try {
       const result = await api.warning()
       setWarning(result.warning)
-      setDeliveryNote(isSample() ? 'Sample mode: deliveries are simulated. No email is sent.'
+      setDeliveryNote(DEMO ? 'Demo: deliveries are simulated. No email is sent.'
         : result.email_delivery?.ready ? ''
         : 'The sending account is not connected yet. Email requests will be saved as drafts.')
     } catch (failure) {
@@ -353,7 +352,7 @@ function Dashboard() {
           <SidebarTrigger aria-label="Toggle navigation" />
           <Separator orientation="vertical" className="data-[orientation=vertical]:h-4" />
           <span className="text-sm text-muted-foreground">CenSearch / {route === 'home' ? 'Home' : route === 'new' ? 'New scan' : parts[0] === 'settings' ? 'Settings' : route === 'scans' ? 'All scans' : 'Scan'}</span>
-          {isSample() && <Badge variant="outline" className="sample-label ml-auto max-w-[50%] shrink whitespace-normal text-right text-amber-200">Sample data: backend not connected</Badge>}
+          {DEMO && <Badge variant="outline" className="sample-label ml-auto max-w-[50%] shrink whitespace-normal text-right text-amber-200">Demo: sample person, simulated scans and sending</Badge>}
         </header>
         <div id="app-main" ref={main} tabIndex={-1} className="dashboard-content flex-1 p-4 md:p-6">
           {error && <ErrorBox error={error} />}

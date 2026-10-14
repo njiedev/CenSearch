@@ -6,7 +6,7 @@ from censearch.frontend import install_frontend
 
 def test_frontend_routes_and_assets(settings, tmp_path):
     settings.frontend_dir = tmp_path / "frontend"
-    for root, pages in [(settings.frontend_dir, ["index.html", "signup.html", "app/index.html", "assets/app.js", "legal/privacy-policy/index.html"])]:
+    for root, pages in [(settings.frontend_dir, ["index.html", "signup/index.html", "app/index.html", "assets/app.js", "legal/privacy-policy/index.html"])]:
         for name in pages:
             path = root / name
             path.parent.mkdir(parents=True, exist_ok=True)
@@ -17,7 +17,7 @@ def test_frontend_routes_and_assets(settings, tmp_path):
         return {"real": True}
     install_frontend(app, settings)
     with TestClient(app) as client:
-        for url in ["/", "/app/", "/signup.html", "/legal/privacy-policy/"]:
+        for url in ["/", "/app/", "/signup/", "/legal/privacy-policy/"]:
             response = client.get(url)
             assert response.status_code == 200
             assert response.headers["cache-control"] == "no-store"

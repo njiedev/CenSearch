@@ -91,25 +91,39 @@ outcomes; it is not evidence of the model, crawler or delivery provider running.
 
 ## Run locally
 
-Install Python 3.12, `uv` and Node.js. From the repository root:
+### Demo (browser only)
+
+Needs Node.js. From the repository root:
 
 ```sh
-git clone https://github.com/njiedev/CenSearch.git
-cd CenSearch
+npm install
+npm run dev
+```
+
+This opens the landing page. The demo runs entirely in the browser: sign-up and
+log-in are stored in localStorage, scans return a fixed set of sample matches of
+one sample person (photos in `frontend/public/demo`), and batch decisions and
+deliveries are simulated. Nothing is uploaded or sent. `npm run build` produces
+the same static site in `frontend/dist`, which is what Vercel serves
+(`vercel.json`).
+
+### Full app (with the backend)
+
+Install Python 3.12, `uv` and Node.js, then:
+
+```sh
 make -C backend setup
 cp -n backend/.env.example backend/.env
 make -C backend api
 ```
 
 `setup` installs dependencies, face models, Chromium and the frontend build.
-It does not download face datasets. Preserve any existing `.env`.
-Open [the local dashboard](http://127.0.0.1:8190/app/) or
-[the sample interface](http://127.0.0.1:8190/app/?sample=1), which needs no provider
-keys and performs no real search or delivery. Enrollment is at `/signup.html`.
+It does not download face datasets. Preserve any existing `.env`. Open
+[the local dashboard](http://127.0.0.1:8190/app/); enrollment is at `/signup/`.
 
-For frontend development, run `npm --prefix frontend run dev` in a second shell.
-Vite proxies `/api` to port 8190. Rebuild with `npm --prefix frontend run build`
-when using the static frontend served by FastAPI.
+For frontend development against the backend, run `npm run dev:backend` in a
+second shell. Vite proxies `/api` to port 8190. Builds that should talk to the
+backend need `VITE_BACKEND=1 npm run build`.
 
 ### Optional providers
 
@@ -158,8 +172,8 @@ reads their ground truth. Fixtures stay local.
 
 ```sh
 LIKENESS_TEST_PHOTOS=/absolute/path/to/fixtures make -C backend test
-npm --prefix frontend run build
-npm --prefix frontend run lint
+npm run build
+npm run lint
 backend/.venv/bin/python frontend/tests/profile_browser.py
 make -C backend e2e-app PHOTOS=/absolute/path/to/fixtures
 ```

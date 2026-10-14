@@ -8,7 +8,7 @@ setup:
 	uv sync --frozen
 	uv run python scripts/setup_models.py $(if $(MODEL_SOURCE),--source "$(MODEL_SOURCE)",)
 	uv run playwright install chromium
-	cd ../frontend && npm ci && npm run build
+	cd .. && npm ci && VITE_BACKEND=1 npm run build
 
 test:
 	uv run pytest

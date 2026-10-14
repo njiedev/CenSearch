@@ -54,7 +54,7 @@ def main():
             api = Recorder(base)
             stack.callback(api.client.close)
             wait_ready(api, server)
-            for path in ['/', '/signup.html', '/app/', '/contact/', '/legal/privacy-policy/']:
+            for path in ['/', '/signup/', '/app/', '/contact/', '/legal/privacy-policy/']:
                 response = api.client.get(path)
                 assert response.status_code == 200, (path, response.status_code)
             report['production_routes'] = 'passed'
@@ -64,7 +64,7 @@ def main():
                 page.set_default_timeout(15000)
                 errors = []
                 page.on('pageerror', lambda error: errors.append(str(error)))
-                page.goto(base + '/signup.html?fixture=1')
+                page.goto(base + '/signup/?fixture=1')
                 page.get_by_label('Name', exact=True).fill('Local fixture operator')
                 page.locator('#su-references').set_input_files(str(photos(source / 'reference')[0]))
                 page.locator('#su-originals').set_input_files(str(photos(source / 'originals')[0]))

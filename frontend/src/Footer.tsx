@@ -18,7 +18,7 @@ export default function Footer() {
           <h3>Product</h3>
           <a href="/#mission">Mission</a>
           <a href="/#features">Features</a>
-          <a href="/signup.html">Sign up</a>
+          <a href="/signup/">Sign up</a>
         </nav>
         <nav className="footer-links" aria-label="Support">
           <h3>Support</h3>

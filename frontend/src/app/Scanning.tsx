@@ -1,4 +1,4 @@
-import { photoUrl } from '../photoUrl'
+import { MATCH_PHOTOS } from '../demoPhotos'
 import { Eye } from '../Logo'
 import { DustLayer } from '../dust'
 import { Button } from "@/components/ui/button"
@@ -80,13 +80,13 @@ export function ScanAnimation() {
   }, [])
   return (
     <div className="scan-art" ref={stage} aria-hidden="true">
-      {[63, 77, 88, 49, 60, 74].map((photo, i) => (
+      {MATCH_PHOTOS.slice(0, 6).map((photo, i) => (
         <div
           className={`scan-tile ${i % 2 ? 'dismiss' : 'match'} scan-slot-${i % 3}`}
           ref={(node) => { tiles.current[i] = node }}
           key={photo}
         >
-          <img src={photoUrl(photo)} alt="" />
+          <img src={photo} alt="" />
           <span>{i % 2 ? '×' : '✓'}</span>
         </div>
       ))}

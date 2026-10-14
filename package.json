@@ -1,0 +1,14 @@
+{
+  "name": "censearch",
+  "private": true,
+  "workspaces": [
+    "frontend"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w frontend",
+    "dev:backend": "VITE_BACKEND=1 npm run dev -w frontend",
+    "build": "npm run build -w frontend",
+    "preview": "npm run preview -w frontend",
+    "lint": "npm run lint -w frontend"
+  }
+}

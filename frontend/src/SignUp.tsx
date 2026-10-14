@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import Logo from './Logo'
 import { saveSession } from './app/session'
 
-// Sign-up is enrollment: POST /api/people (see backend/handoff/openapi.json).
+// Backend sign-up is enrollment: POST /api/people. The browser-only demo uses
+// DemoAuth.tsx instead.
 // The person attests to consent and ownership by ticking the exact statements
 // below; those statements are what the backend stores.
 const CONSENT = 'I agree to let CenSearch store these photos and search the web for my face.'
@@ -19,7 +20,6 @@ type PhotoResult = {
 type Outcome =
   | { state: 'idle' }
   | { state: 'sending' }
-  | { state: 'enrolled'; name: string; photos: PhotoResult[] }
   | { state: 'failed'; message: string; photos: PhotoResult[] }
 
 type Errors = Partial<Record<'name' | 'references' | 'consent' | 'ownership', string>>
@@ -146,38 +146,7 @@ export default function SignUp() {
     }
   }
 
-  function reset() {
-    setName('')
-    setReferences([])
-    setOriginals([])
-    setConsent(false)
-    setOwnership(false)
-    setErrors({})
-    setOutcome({ state: 'idle' })
-  }
-
   const sending = outcome.state === 'sending'
-
-  if (outcome.state === 'enrolled') {
-    return (
-      <div className="su-panel" role="status">
-        <span className="su-logo">
-          <Logo />
-        </span>
-        <h2 className="su-title" id="signup-title">
-          You're enrolled, {outcome.name}.
-        </h2>
-        <p className="su-lede">We'll search the web using the photos marked accepted.</p>
-        <PhotoList photos={outcome.photos} />
-        <button type="button" className="su-secondary" onClick={reset}>
-          Enroll someone else
-        </button>
-        <a className="su-demo" href="/app/?sample=1">
-          See the demo with sample matches
-        </a>
-      </div>
-    )
-  }
 
   return (
     <form className="su-panel" onSubmit={submit} noValidate>
@@ -314,9 +283,6 @@ export default function SignUp() {
       </button>
 
       <p className="su-privacy">Your photos are never sent to an AI model.</p>
-      <a className="su-demo" href="/app/?sample=1">
-        Skip sign-up and try the demo with sample matches
-      </a>
     </form>
   )
 }

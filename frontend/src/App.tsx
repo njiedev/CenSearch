@@ -1,3 +1,5 @@
+import { startDemo } from './app/accounts'
+import { DEMO } from './demo'
 import Nav from './Nav'
 import Features from './Features'
 import Faq from './Faq'
@@ -22,12 +24,14 @@ export default function App() {
               We search the web for your face and send deletion requests wherever they're needed.
             </p>
             <div className="hero-actions">
-              <a className="landing-button" href="/signup.html">
+              <a className="landing-button" href="/signup/">
                 Start here
               </a>
-              <a className="landing-link" href="/app/?sample=1">
-                Try the demo
-              </a>
+              {DEMO && (
+                <button type="button" className="landing-link" onClick={startDemo}>
+                  Try the demo
+                </button>
+              )}
             </div>
           </div>
         </section>

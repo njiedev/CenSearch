@@ -199,7 +199,7 @@ async def response_checks(browser):
     context = await browser.new_context()
     page = await context.new_page()
     await page.goto(BASE + '/app/')
-    await expect(page).to_have_url(BASE + '/signup.html')
+    await expect(page).to_have_url(BASE + '/signup/')
     # Synthetic, local enrollment response. The uploaded bytes are not a face.
     await page.route('**/api/people', lambda route: route.fulfill(json={'person': {'id':'test-person','name':'Browser Test'},'photos':[]}))
     await page.route('**/api/people/test-person', lambda route: route.fulfill(json={'id':'test-person','name':'Browser Test'}))
@@ -225,7 +225,7 @@ async def response_checks(browser):
     await page.unroute('**/api/people/test-person')
     await page.route('**/api/people/test-person', lambda route: route.fulfill(status=404,json={'detail':'Person not found'}))
     await page.reload()
-    await expect(page).to_have_url(BASE + '/signup.html')
+    await expect(page).to_have_url(BASE + '/signup/')
     assert await page.evaluate("localStorage.getItem('censearch.session')") is None
     print('PASS no-session redirect, synthetic signup handoff, empty scans, mid-session network failure stays real, missing-person signout', flush=True)
     await context.close()

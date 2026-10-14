@@ -14,7 +14,8 @@ import { hostname } from '../matches/types'
 import type { Case, Scan } from './types'
 import { Empty, ErrorBox } from './ui'
 import { date, duration, usePoll } from './hooks'
-import { api, isSample } from './api'
+import { DEMO } from '../demo'
+import { api } from './api'
 
 type Filters = {
   from: string
@@ -66,7 +67,7 @@ export default function ScanDetail({
 }) {
   const [filters, setFilters] = useState<Filters>(clean)
   const detail = usePoll(
-    () => scan.kind === 'public_search' && !isSample() ? api.run(scan.run_id) : Promise.resolve(null),
+    () => scan.kind === 'public_search' && !DEMO ? api.run(scan.run_id) : Promise.resolve(null),
     [scan.run_id, scan.kind],
   )
   const [selected, setSelected] = useState<number[]>([])
@@ -287,7 +288,7 @@ export default function ScanDetail({
         onWhitelist={onWhitelist}
         whitelistBusy={whitelistBusy}
         whitelistError={whitelistError}
-        followUp={opened && !isSample() ? <FollowUp key={opened.id} caseId={opened.id} /> : undefined}
+        followUp={opened && !DEMO ? <FollowUp key={opened.id} caseId={opened.id} /> : undefined}
       />
     </section>
   )

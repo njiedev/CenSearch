@@ -1,3 +1,5 @@
+import { DEMO } from '../demo'
+import { REFERENCE_PHOTOS } from '../demoPhotos'
 import { sample } from './sample'
 import { signOut } from './session'
 import type { Batch, BatchRequest, Case, Person, PhotoKind, Run, Scan, SearchRequest, Workflow, WorkflowNotice } from './types'
@@ -9,11 +11,6 @@ export class ApiError extends Error {
     this.status = status
   }
 }
-let sampleMode = new URLSearchParams(location.search).get('sample') === '1'
-let firstCall = true
-export function isSample() {
-  return sampleMode
-}
 function message(body: { error?: { message?: string }; detail?: unknown }, status: number) {
   if (status === 409) return 'Another operation is running. Wait for it to finish, then retry.'
   if (body.error?.message) return body.error.message
@@ -22,18 +19,13 @@ function message(body: { error?: { message?: string }; detail?: unknown }, statu
     return body.detail.map((row) => `${row.loc?.slice(1).join('.') || 'Request'}: ${row.msg}`).join(' ')
   return `The server returned ${status}. Please retry.`
 }
+// In the demo build every call is answered by `fallback` from sample.ts.
 async function request<T>(path: string, fallback: () => T, init?: RequestInit): Promise<T> {
-  if (sampleMode) return fallback()
-  const canFallback = firstCall && !sessionStorage.getItem('censearch.live')
-  firstCall = false
+  if (DEMO) return fallback()
   let response: Response
   try {
     response = await fetch(`/api${path}`, init)
   } catch {
-    if (canFallback) {
-      sampleMode = true
-      return fallback()
-    }
     throw new ApiError(0, 'Connection lost. Your real data is unchanged. Check the backend and retry.')
   }
   const raw = await response.text()
@@ -43,12 +35,7 @@ async function request<T>(path: string, fallback: () => T, init?: RequestInit): 
   } catch {
     body = null
   }
-  if (canFallback && [502, 504].includes(response.status) && !body) {
-    sampleMode = true
-    return fallback()
-  }
   if (!response.ok) throw new ApiError(response.status, message(body ?? {}, response.status))
-  sessionStorage.setItem('censearch.live', '1')
   return body as T
 }
 const json = (method: string, body?: unknown): RequestInit => ({
@@ -58,7 +45,10 @@ const json = (method: string, body?: unknown): RequestInit => ({
 })
 const personPath = (id: string) => `/people/${encodeURIComponent(id)}`
 function liveOnly(): never {
-  throw new ApiError(503, 'Connect the backend to check removal and follow up.')
+  throw new ApiError(503, 'Checking removal and follow-up need the backend; they are not part of the demo.')
+}
+function photosLiveOnly(): never {
+  throw new ApiError(503, 'Photos can’t be changed in the demo.')
 }
 export const api = {
   workflow: (id: number) => request<Workflow>(`/cases/${id}/workflow`, liveOnly),
@@ -76,18 +66,19 @@ export const api = {
   sendNotice: (id: number) => request(`/cases/${id}/send`, liveOnly, json('POST')),
   person: async (id: string): Promise<Person> => {
     try {
-      return await request(personPath(id), sample.person)
+      return await request(personPath(id), () => sample.person(id))
     } catch (error) {
-      if (error instanceof ApiError && error.status === 404) signOut('/signup.html')
+      if (error instanceof ApiError && error.status === 404) signOut('/signup/')
       throw error
     }
   },
-  photoUrl: (id: string, kind: PhotoKind, photoId: number) => `/api${personPath(id)}/photos/${kind}/${photoId}`,
+  photoUrl: (id: string, kind: PhotoKind, photoId: number) =>
+    DEMO ? REFERENCE_PHOTOS[photoId - 1] : `/api${personPath(id)}/photos/${kind}/${photoId}`,
   addPhotos: (id: string, body: FormData) => request<{ person: Person; photos: unknown[] }>(
-    `${personPath(id)}/photos`, () => { throw new ApiError(503, 'Connect the backend to manage photos.') }, { method: 'POST', body },
+    `${personPath(id)}/photos`, photosLiveOnly, { method: 'POST', body },
   ),
   deletePhoto: (id: string, kind: PhotoKind, photoId: number) => request<Person>(
-    `${personPath(id)}/photos/${kind}/${photoId}`, () => { throw new ApiError(503, 'Connect the backend to manage photos.') }, json('DELETE'),
+    `${personPath(id)}/photos/${kind}/${photoId}`, photosLiveOnly, json('DELETE'),
   ),
   scans: (id: string) => request<Scan[]>(`${personPath(id)}/scans`, sample.scans),
   cases: (id: string, run?: number) =>
@@ -100,10 +91,7 @@ export const api = {
     request(`${personPath(id)}/whitelist`, () => sample.putWhitelist(domains), json('PUT', { domains })),
   deletePerson: (id: string) => request(`${personPath(id)}`, sample.deletePerson, json('DELETE')),
   startScan: (body: SearchRequest) =>
-    request<Run>('/public-searches', () => {
-      if (body.mode === 'face_search') throw new ApiError(503, 'Connect the backend to run FaceCheck. Face search is unavailable in sample mode.')
-      return sample.start(body)
-    }, json('POST', body)),
+    request<Run>('/public-searches', () => sample.start(body), json('POST', body)),
   run: (id: number) => request<Run>(`/public-searches/${id}`, () => sample.run(id)),
   cancel: (id: number) =>
     request<Run>(`/public-searches/${id}/cancel`, () => sample.cancel(id), json('POST')),

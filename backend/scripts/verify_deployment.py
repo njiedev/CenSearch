@@ -15,7 +15,7 @@ def main():
     report = {}
     settings = Settings()
     with httpx.Client(base_url='http://127.0.0.1:8000', timeout=90, trust_env=False) as api:
-        for path in ['/', '/app/', '/signup.html', '/contact/', '/legal/privacy-policy/']:
+        for path in ['/', '/app/', '/signup/', '/contact/', '/legal/privacy-policy/']:
             response = api.get(path)
             assert response.status_code == 200, (path, response.status_code)
         health = api.get('/api/health').json()

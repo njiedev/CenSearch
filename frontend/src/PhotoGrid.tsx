@@ -1,8 +1,8 @@
-import { photoUrl } from './photoUrl'
+import { DEMO_PHOTOS } from './demoPhotos'
 import { useEffect, useRef } from 'react'
 import { DustLayer } from './dust'
 
-const PHOTO_COUNT = 160 // decorative photos in public/photos
+const PHOTO_COUNT = DEMO_PHOTOS.length
 const CELL_TARGET = 130 // preferred cell edge in CSS pixels
 const DIM = 0.45 // signup photo brightness
 const HERO_DIM = 0.18 // uniform hero brightness, including dust
@@ -71,7 +71,7 @@ function startGrid(container: HTMLDivElement, dust: DustLayer, framed: boolean) 
     img.draggable = false
     el.append(img)
     container.append(el)
-    cells.push({ el, img, photo: 0, busy: false })
+    cells.push({ el, img, photo: -1, busy: false })
   }
 
   // Prefers a photo nobody is showing; repeats only when the grid has more
@@ -79,20 +79,20 @@ function startGrid(container: HTMLDivElement, dust: DustLayer, framed: boolean) 
   function pickPhoto() {
     const shown = new Set(cells.map((cell) => cell.photo))
     const free: number[] = []
-    for (let photo = 1; photo <= PHOTO_COUNT; photo++) {
+    for (let photo = 0; photo < PHOTO_COUNT; photo++) {
       if (!shown.has(photo)) {
         free.push(photo)
       }
     }
     if (free.length === 0) {
-      return 1 + Math.floor(Math.random() * PHOTO_COUNT)
+      return Math.floor(Math.random() * PHOTO_COUNT)
     }
     return free[Math.floor(Math.random() * free.length)]
   }
 
   async function showNewPhoto(cell: Cell) {
     cell.photo = pickPhoto()
-    cell.img.src = photoUrl(cell.photo)
+    cell.img.src = DEMO_PHOTOS[cell.photo]
     try {
       await cell.img.decode()
     } catch {

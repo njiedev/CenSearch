@@ -8,12 +8,13 @@ export default defineConfig({
   plugins: [react(), tailwindcss()],
   resolve: { alias: { "@": resolve(import.meta.dirname, "src") } },
   build: {
-    // Separate HTML entries keep direct links usable on a static host.
+    // One HTML file per page keeps direct links working on any static host
+    // without rewrite rules.
     rollupOptions: {
       input: {
         main: resolve(import.meta.dirname, 'index.html'),
-        signup: resolve(import.meta.dirname, 'signup.html'),
-        matches: resolve(import.meta.dirname, 'matches.html'),
+        signup: resolve(import.meta.dirname, 'signup/index.html'),
+        login: resolve(import.meta.dirname, 'login/index.html'),
         app: resolve(import.meta.dirname, 'app/index.html'),
         contact: resolve(import.meta.dirname, 'contact/index.html'),
         privacy: resolve(import.meta.dirname, 'legal/privacy-policy/index.html'),
@@ -22,7 +23,9 @@ export default defineConfig({
     },
   },
   server: {
-    // The backend (backend/, `make api`) serves the API on 8190 without CORS.
+    open: '/',
+    // Only used with `npm run dev:backend`; the backend (`make api`) serves the
+    // API on 8190 without CORS.
     proxy: {
       '/api': 'http://127.0.0.1:8190',
     },

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import Logo from './Logo'
 import { readSession } from './app/session'
+import { DEMO } from './demo'
 
 export default function Nav({ onLanding = true }: { onLanding?: boolean }) {
   const home = onLanding ? '' : '/'
@@ -23,7 +24,14 @@ export default function Nav({ onLanding = true }: { onLanding?: boolean }) {
           <a href={`${home}#features`}>Features</a>
           <a href={`${home}#faq`}>FAQ</a>
         </div>
-        {readSession() ? <a className="landing-button" href="/app/">Open app</a> : <a className="landing-button" href="/signup.html">Sign up</a>}
+        {readSession() ? (
+          <a className="landing-button" href="/app/">Open app</a>
+        ) : (
+          <div className="nav-actions">
+            {DEMO && <a className="landing-link" href="/login/">Log in</a>}
+            <a className="landing-button" href="/signup/">Sign up</a>
+          </div>
+        )}
       </nav>
     </header>
   )

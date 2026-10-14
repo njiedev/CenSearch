@@ -331,9 +331,49 @@ body {
   min-height: 48px;
 }
 
+button.landing-link {
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
 .su-demo {
   justify-self: center;
   text-align: center;
+}
+
+button.su-demo {
+  min-height: 48px;
+  padding: 0 8px;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.su-switch {
+  text-align: center;
+  color: #a1a1aa;
+}
+
+.su-switch a {
+  color: #fff;
+  text-underline-offset: 4px;
+}
+
+.su-demo-note {
+  display: grid;
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid #27272a;
+  border-radius: 10px;
+  color: #d4d4d8;
 }
 
 .landing-link:hover,
@@ -798,7 +838,7 @@ body {
   text-align: center;
 }
 
-.su-field input[type='text'] {
+.su-field input:is([type='text'], [type='email'], [type='password']) {
   min-height: 48px;
   padding: 0 16px;
   border: 1px solid #27272a;
@@ -808,7 +848,7 @@ body {
   font: inherit;
 }
 
-.su-field input[type='text']:hover {
+.su-field input:is([type='text'], [type='email'], [type='password']):hover {
   border-color: #3f3f46;
 }
 

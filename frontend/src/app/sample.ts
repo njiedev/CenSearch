@@ -1,10 +1,14 @@
 import { PLANS, WARNING, finalDecision, noticeBody, sampleCases } from '../matches/mockData'
 import { prepareSampleItem, STAGE_REASON } from '../matches/logic'
 import { TERMINAL, hostname } from '../matches/types'
-import type { Batch, BatchRequest, Case, Run, Scan, SearchRequest } from './types'
+import { deleteAccount, findAccount } from './accounts'
+import { readSession } from './session'
+import type { Batch, BatchRequest, Case, Person, Run, Scan, SearchRequest } from './types'
 
-const KEY = 'censearch.sample.v1'
-type SampleBatch = { view: Batch; started: number; request: BatchRequest; scan: number; sentIds?: number[] }
+// The browser-only demo backend. Each demo account keeps its scans and batches
+// in localStorage; scans and deliveries are simulated on timers.
+const KEY = `censearch.demo.${readSession()?.id ?? 'guest'}`
+type SampleBatch = { view: Batch; started: number; request: BatchRequest; scan: number }
 type State = {
   scans: Scan[]
   cases: Record<number, Case[]>
@@ -13,40 +17,20 @@ type State = {
   batches: Record<string, SampleBatch>
 }
 function initial(): State {
-  const started = new Date(Date.now() - 86400000).toISOString()
-  return {
-    scans: [
-      {
-        run_id: 1,
-        kind: 'public_search',
-        status: 'completed',
-        started_at: started,
-        finished_at: new Date(Date.parse(started) + 42000).toISOString(),
-        label: 'Alex Rivera · public pages',
-        pages_fetched: 24,
-        images_checked: 86,
-        match_count: 5,
-        possible_count: 3,
-        whitelisted_count: 0,
-      },
-    ],
-    cases: { 1: sampleCases(started) },
-    runs: {},
-    domains: [],
-    batches: {},
-  }
+  return { scans: [], cases: {}, runs: {}, domains: [], batches: {} }
 }
 function read(): State {
   try {
-    return JSON.parse(sessionStorage.getItem(KEY) ?? 'null') ?? initial()
+    return JSON.parse(localStorage.getItem(KEY) ?? 'null') ?? initial()
   } catch {
     return initial()
   }
 }
 let state = read()
 function save() {
-  sessionStorage.setItem(KEY, JSON.stringify(state))
+  localStorage.setItem(KEY, JSON.stringify(state))
 }
+const REFERENCES = [1, 2, 3].map((id) => ({ id, filename: `sample-face-${id}.jpg` }))
 function marked(rows: Case[]) {
   return rows.map((row) => ({
     ...row,
@@ -56,7 +40,19 @@ function marked(rows: Case[]) {
   }))
 }
 export const sample = {
-  person: () => ({ id: 'sample', name: 'Alex Rivera', consent: '', created_at: '', development_fixture: false, references: [], originals: [], active_reference_count: 0 }),
+  person: (id: string): Person => {
+    const account = findAccount(id)
+    return {
+      id,
+      name: account?.name ?? 'Guest',
+      consent: 'Demo account. The face photos belong to a sample person and stay in this browser.',
+      created_at: account?.createdAt ?? '',
+      development_fixture: false,
+      references: REFERENCES,
+      originals: [],
+      active_reference_count: REFERENCES.length,
+    }
+  },
   warning: () => ({ warning: WARNING }),
   scans: () =>
     state.scans.map((row) => ({
@@ -71,9 +67,11 @@ export const sample = {
     return { domains: state.domains }
   },
   deletePerson: () => {
+    const id = readSession()?.id ?? 'guest'
+    deleteAccount(id)
+    localStorage.removeItem(KEY)
     state = initial()
-    save()
-    return { deleted: 'sample' }
+    return { deleted: id }
   },
   start: (request: SearchRequest): Run => {
     const id = Math.max(...state.scans.map((row) => row.run_id), 0) + 1
@@ -96,7 +94,9 @@ export const sample = {
       status: 'running',
       started_at: started,
       finished_at: null,
-      label: request.full_name || request.handles[0] || 'Supplied public pages',
+      label: request.mode === 'face_search'
+        ? 'Face search'
+        : request.full_name || request.handles[0] || 'Supplied public pages',
       pages_fetched: 0,
       images_checked: 0,
       match_count: 0,

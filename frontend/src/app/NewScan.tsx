@@ -6,7 +6,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { useState, type FormEvent } from 'react'
-import { api, isSample } from './api'
+import { DEMO } from '../demo'
+import { api } from './api'
 import { ErrorBox } from './ui'
 import type { Run, SearchRequest } from './types'
 
@@ -18,7 +19,7 @@ export default function NewScan({ personId, onStart }: { personId: string; onSta
   const [context, setContext] = useState('')
   const [urls, setUrls] = useState('')
   const [consent, setConsent] = useState(false)
-  const [faceSearch, setFaceSearch] = useState(!isSample())
+  const [faceSearch, setFaceSearch] = useState(true)
   const [faceConsent, setFaceConsent] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [error, setError] = useState('')
@@ -115,8 +116,9 @@ export default function NewScan({ personId, onStart }: { personId: string; onSta
           <Card className="scan-input-group col-span-full">
             <CardHeader><CardTitle>Search by face</CardTitle></CardHeader>
             <CardContent className="grid gap-4">
-              <p>Your first enrolled face photo will be sent to FaceCheck with its metadata removed.
-                A search costs 3 credits. Photos are never sent to the language model.</p>
+              <p>{DEMO
+                ? 'Demo: the face search is simulated with sample results. No photo is uploaded.'
+                : 'Your first enrolled face photo will be sent to FaceCheck with its metadata removed. A search costs 3 credits. Photos are never sent to the language model.'}</p>
               <Label className="check-row">
                 <Checkbox checked={faceConsent}
                   onCheckedChange={(checked) => { setFaceConsent(checked === true); clear('faceConsent') }}

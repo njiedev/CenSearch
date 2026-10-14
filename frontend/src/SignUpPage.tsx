@@ -1,11 +1,11 @@
 import Corners from './Corners'
 import { Battery, Clock, Timecode } from './Hud'
+import type { ReactNode } from 'react'
 import PhotoGrid from './PhotoGrid'
-import SignUp from './SignUp'
 
-// The sign-up page: the photo grid, blurred, behind a full-screen camera HUD.
+// The sign-up and log-in pages: the photo grid, blurred, behind a full-screen camera HUD.
 // The HUD is fixed and decorative; the form scrolls underneath it.
-export default function SignUpPage() {
+export default function SignUpPage({ children }: { children: ReactNode }) {
   return (
     <>
       <PhotoGrid />
@@ -28,7 +28,7 @@ export default function SignUpPage() {
         ← Back
       </a>
       <main className="rec-page" aria-labelledby="signup-title">
-        <SignUp />
+        {children}
       </main>
     </>
   )

@@ -1,9 +1,9 @@
-import { photoUrl } from '../photoUrl'
+import { MATCH_PHOTOS } from '../demoPhotos'
 import type { Action, Case, Contact, Outcome, Recipient, Route } from './types'
 
-// MOCK DATA. Nothing here comes from the backend. Labels, the warning and the
-// notice wording are copied from backend/censearch so the layout shows real
-// lengths. Images are decorative samples, not discovered matches.
+// MOCK DATA for the browser-only demo. Labels, the warning and the notice
+// wording are copied from backend/censearch. The photos are of one sample
+// person (public/demo); the pages and outcomes are made up.
 
 export const LABELS: Record<Route, string> = {
   copyright_notice: 'Copyright notice (DMCA 512(c))',
@@ -30,12 +30,17 @@ const TEMPLATES: Partial<Record<Route, string>> = {
     'its agent, or the law.\nThe information in this notice is accurate. Under penalty of perjury, I am ' +
     'authorized to act on behalf of the owner of the exclusive right allegedly infringed.\nPlease remove ' +
     'or disable access to the identified material under 17 U.S.C. 512(c)(3).',
+  impersonation_report:
+    'I confirm this page impersonates me without my authorization. ' +
+    'Please review it under your impersonation policy.',
   privacy_request:
     'I am the depicted person and request removal for privacy reasons. This is a voluntary request ' +
     'and does not assert copyright ownership or a statutory removal duty.',
 }
 
-export const PERSON = { name: 'Alex Rivera' }
+export const PERSON = { name: 'John Doe' }
+
+const image = (index: number) => MATCH_PHOTOS[index - 1]
 
 function action(route: Route, reason: string, possible = true): Action {
   return {
@@ -51,28 +56,29 @@ function action(route: Route, reason: string, possible = true): Action {
 const COPY = 'An exact or derived copy matches an enrolled original photo.'
 const PRIVACY = 'A face match on a different photo supports a voluntary privacy request only.'
 const UNCERTAIN = 'The photo relationship or original ownership evidence is uncertain.'
+const IMPERSONATION = 'A profile uses your face and name and presents itself as you.'
 
 export const CASES: Case[] = [
   {
     id: 1,
     page_url: 'http://pixboard.example/gallery/summer-17',
-    matched_image_url: photoUrl(63),
+    matched_image_url: image(1),
     band: 'match',
     state: 'new',
     possible_action: action('copyright_notice', COPY),
   },
   {
     id: 2,
-    page_url: 'http://friendlink.example/u/arivera_fan/photos',
-    matched_image_url: photoUrl(77),
+    page_url: 'http://friendlink.example/u/john.doe.official',
+    matched_image_url: image(2),
     band: 'match',
     state: 'new',
-    possible_action: action('privacy_request', PRIVACY),
+    possible_action: action('impersonation_report', IMPERSONATION),
   },
   {
     id: 3,
     page_url: 'http://localnews.example/2026/09/street-festival-recap',
-    matched_image_url: photoUrl(88),
+    matched_image_url: image(3),
     band: 'possible',
     state: 'new',
     possible_action: action('hold_for_review', UNCERTAIN),
@@ -80,7 +86,7 @@ export const CASES: Case[] = [
   {
     id: 4,
     page_url: 'http://shadygallery.example/sets/candid-412',
-    matched_image_url: photoUrl(49),
+    matched_image_url: image(4),
     band: 'match',
     state: 'new',
     possible_action: action('copyright_notice', COPY),
@@ -88,7 +94,7 @@ export const CASES: Case[] = [
   {
     id: 5,
     page_url: 'https://streetstyle.example/posts/downtown-looks',
-    matched_image_url: photoUrl(60),
+    matched_image_url: image(5),
     band: 'match',
     state: 'new',
     possible_action: action('privacy_request', PRIVACY),
@@ -96,7 +102,7 @@ export const CASES: Case[] = [
   {
     id: 6,
     page_url: 'http://friendlink.example/groups/campus-2025',
-    matched_image_url: photoUrl(74),
+    matched_image_url: image(6),
     band: 'possible',
     state: 'new',
     possible_action: action('privacy_request', PRIVACY),
@@ -104,7 +110,7 @@ export const CASES: Case[] = [
   {
     id: 7,
     page_url: 'http://pixboard.example/boards/faces-of-the-city',
-    matched_image_url: photoUrl(62),
+    matched_image_url: image(7),
     band: 'match',
     state: 'new',
     possible_action: action('privacy_request', PRIVACY),
@@ -112,7 +118,7 @@ export const CASES: Case[] = [
   {
     id: 8,
     page_url: 'http://localnews.example/2026/10/council-meeting',
-    matched_image_url: photoUrl(76),
+    matched_image_url: image(8),
     band: 'possible',
     state: 'new',
     possible_action: action('hold_for_review', UNCERTAIN),
@@ -131,12 +137,12 @@ export const PLANS: Record<number, Plan> = {
   },
   2: {
     outcome: 'sent',
-    route: 'privacy_request',
-    reason: 'Sent through the site’s privacy report form.',
+    route: 'impersonation_report',
+    reason: 'Sent through the site’s impersonation report form.',
     recipient: {
-      address: 'friendlink.example privacy form',
+      address: 'friendlink.example impersonation form',
       channel: 'web_form',
-      endpoint: 'http://friendlink.example/report/privacy',
+      endpoint: 'http://friendlink.example/report/impersonation',
     },
   },
   3: {
@@ -193,7 +199,6 @@ export function finalDecision(route: Route, reason: string) {
   return action(route, reason, false)
 }
 
-// App-only sample scan; the standalone matches demo retains its original rows.
 export function sampleCases(startedAt: string): Case[] {
   return CASES.map((row) => ({ ...structuredClone(row), created_at: startedAt, whitelisted: false }))
 }

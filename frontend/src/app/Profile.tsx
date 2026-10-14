@@ -5,7 +5,8 @@ import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Checkbox } from '@/components/ui/checkbox'
-import { api, isSample } from './api'
+import { DEMO } from '../demo'
+import { api } from './api'
 import type { Person, ProfilePhoto, PhotoKind } from './types'
 import { ErrorBox } from './ui'
 
@@ -87,11 +88,11 @@ export default function Profile({ person, onUpdated }: { person: Person; onUpdat
     <Card className="settings-section profile-info">
       <div className="profile-identity"><span className="profile-avatar"><UserRound aria-hidden="true" /></span><div><h2>{current.name}</h2><p>Your enrollment</p></div></div>
       <dl className="profile-facts">
-        <div><dt>Enrolled</dt><dd>{current.created_at ? new Date(current.created_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) : 'Sample profile'}</dd></div>
+        <div><dt>Enrolled</dt><dd>{current.created_at ? new Date(current.created_at).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' }) : 'Guest session'}</dd></div>
         <div><dt>Face photos</dt><dd>{current.references.length}</dd></div>
         <div><dt>Original photos</dt><dd>{current.originals.length}</dd></div>
       </dl>
-      <details><summary>Enrollment consent</summary><p className="profile-consent">{current.consent || 'No consent recorded in sample mode.'}</p></details>
+      <details><summary>Enrollment consent</summary><p className="profile-consent">{current.consent || 'No consent recorded.'}</p></details>
     </Card>
     <Card className="settings-section">
       <div><h2>Your photos</h2><p>Manage the photos CenSearch uses to find you and copies of your work.</p></div>
@@ -103,7 +104,7 @@ export default function Profile({ person, onUpdated }: { person: Person; onUpdat
       {photos(current.originals, 'original')}
       <form className="profile-upload" onSubmit={(event) => void upload(event)}>
         <h3><ImagePlus aria-hidden="true" /> Add photos</h3>
-        <fieldset disabled={busy || isSample()}>
+        <fieldset disabled={busy || DEMO}>
           <legend>Photo type</legend>
           <div className="profile-kind">
             <Label className="check-row"><input type="radio" name="photo-kind" checked={kind === 'reference'} onChange={() => { setKind('reference'); setError('') }} />Face photos</Label>
@@ -116,7 +117,7 @@ export default function Profile({ person, onUpdated }: { person: Person; onUpdat
           {kind === 'original' && <Label className="profile-ownership check-row"><Checkbox checked={ownership} onCheckedChange={(value) => setOwnership(value === true)} />I own the copyright to these photos.</Label>}
           <Button type="submit" disabled={!files.length || busy || (kind === 'original' && !ownership)}>{busy ? 'Saving photos…' : 'Add photos'}</Button>
         </fieldset>
-        <p className="muted">{isSample() ? 'Connect the backend to manage your real photos.' : 'Photos are saved to your enrollment. Adding photos does not start a search or upload them to a search provider.'}</p>
+        <p className="muted">{DEMO ? 'The demo uses a sample person’s photos, so they can’t be changed.' : 'Photos are saved to your enrollment. Adding photos does not start a search or upload them to a search provider.'}</p>
       </form>
       {error && <ErrorBox error={error} />}
       <p className="profile-feedback" role="status">{notice}</p>
