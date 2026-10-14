@@ -342,7 +342,22 @@ button.landing-link {
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 24px;
+  justify-self: end;
+  gap: 8px;
+}
+
+/* Log in reads as a nav link, next to the Sign up button. */
+.nav-actions .landing-link {
+  padding-inline: 8px;
+  border-radius: 8px;
+  color: var(--muted);
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.nav-actions .landing-link:hover {
+  background: rgb(255 255 255 / 0.08);
+  color: #fff;
 }
 
 .su-demo {
